@@ -9,7 +9,7 @@ interface Props {
   shopId: number;
 }
 
-const WS_URL = (import.meta.env.VITE_API_URL || 'http://localhost:8080/api').replace('/api', '/api/ws');
+const WS_URL = (import.meta.env.VITE_API_URL || 'http://localhost:8080/api').replace(/\/api\/?$/, '/api/ws');
 
 /** Keys cần được reload khi có sự kiện cập nhật đơn hàng.
  *  Dùng prefix-match của React Query — chỉ cần khai báo phần đầu của key.

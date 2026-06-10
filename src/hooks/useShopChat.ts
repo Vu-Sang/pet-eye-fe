@@ -6,7 +6,7 @@ import { useAuth } from '../contexts/AuthContext';
 import type { ApiResponse } from '../types/api';
 import type { ChatMessage } from '../services/admin.service';
 
-const WS_URL = (import.meta.env.VITE_API_URL || 'http://localhost:8080/api').replace('/api', '/api/ws');
+const WS_URL = (import.meta.env.VITE_API_URL || 'http://localhost:8080/api').replace(/\/api\/?$/, '/api/ws');
 
 export function useShopChat(
   shopId: number | null, 
