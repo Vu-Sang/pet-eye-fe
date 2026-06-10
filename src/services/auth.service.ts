@@ -49,15 +49,6 @@ export const authService = {
     return authService._decodeAndCreateUser(jwtToken, requiresEmailUpdate);
   },
 
-  loginWithFacebook: async (code: string): Promise<User> => {
-    const response = await apiClient.post<ApiResponse<AuthenticationResponse>>('/auth/facebook', {
-      code,
-    });
-    const { token: jwtToken, authenticated, requiresEmailUpdate } = response.data.result!;
-    if (!authenticated) throw new Error('Authentication failed');
-    return authService._decodeAndCreateUser(jwtToken, requiresEmailUpdate);
-  },
-
   loginWithZalo: async (code: string): Promise<User> => {
     const response = await apiClient.post<ApiResponse<AuthenticationResponse>>('/auth/zalo', {
       code,

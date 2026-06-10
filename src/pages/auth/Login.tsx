@@ -108,13 +108,6 @@ export default function Login() {
     onError: () => setErrorMessage('Lỗi xác thực Google'),
   });
 
-  const handleFacebookLogin = () => {
-    const appId = import.meta.env.VITE_FACEBOOK_APP_ID;
-    const redirectUri = import.meta.env.VITE_FACEBOOK_REDIRECT_URI || `${window.location.origin}/login/facebook/callback`;
-    if (!appId) { setErrorMessage('Chưa cấu hình Facebook Login'); return; }
-    window.location.href = `https://www.facebook.com/v19.0/dialog/oauth?client_id=${appId}&redirect_uri=${encodeURIComponent(redirectUri)}&scope=public_profile%20email`;
-  };
-
   const handleZaloLogin = () => {
     const appId = import.meta.env.VITE_ZALO_APP_ID;
     const redirectUri = import.meta.env.VITE_ZALO_REDIRECT_URI || `${window.location.origin}/login/zalo/callback`;
@@ -419,7 +412,7 @@ export default function Login() {
                       <div className="flex-1 h-[1px] bg-slate-200 dark:bg-slate-800" />
                     </div>
 
-                    <div className="grid grid-cols-3 gap-3">
+                    <div className="grid grid-cols-2 gap-3">
                       <button
                         onClick={() => loginGoogle()}
                         type="button"
@@ -432,17 +425,6 @@ export default function Login() {
                           <path d="M12 5.38c1.62 0 3.06.56 4.21 1.66l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335" />
                         </svg>
                         <span className="text-[11px] font-black text-slate-700 dark:text-slate-300 hidden sm:inline">Google</span>
-                      </button>
-
-                      <button
-                        onClick={handleFacebookLogin}
-                        type="button"
-                        className="flex items-center justify-center gap-2 py-3 px-4 border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 hover:bg-slate-50 dark:hover:bg-slate-800/50 hover:border-[#1877F2]/30 dark:hover:border-[#1877F2]/30 hover:shadow-md hover:shadow-slate-100/50 dark:hover:shadow-none transition-all rounded-2xl"
-                      >
-                        <svg className="w-4 h-4 text-[#1877F2] shrink-0" fill="currentColor" viewBox="0 0 24 24">
-                          <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z" />
-                        </svg>
-                        <span className="text-[11px] font-black text-slate-700 dark:text-slate-300 hidden sm:inline">Facebook</span>
                       </button>
 
                       <button

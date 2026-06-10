@@ -46,7 +46,6 @@ import ProfileSecurity from './pages/customer/ProfileSecurity';
 import ProfileNotifications from './pages/customer/ProfileNotifications';
 import CameraView from './pages/public/CameraView';
 import ZaloCallback from './pages/auth/ZaloCallback';
-import FacebookCallback from './pages/auth/FacebookCallback';
 import BookingSuccess from './pages/customer/BookingSuccess';
 import PaymentFailure from './pages/payment/PaymentFailure';
 import PaymentResult from './pages/payment/PaymentResult';
@@ -71,7 +70,7 @@ import FloatingScrollButtons from './components/FloatingScrollButtons';
 const SHOP_ROUTES_PREFIX = '/shop';
 const STAFF_ROUTES_PREFIX = '/staff';
 const ADMIN_ROUTES_PREFIX = '/admin';
-const NO_NAVBAR_ROUTES = ['/login', '/register', '/login/zalo/callback', '/login/facebook/callback', '/complete-profile', '/verify-email', '/forgot-password', '/shop/login'];
+const NO_NAVBAR_ROUTES = ['/login', '/register', '/login/zalo/callback', '/complete-profile', '/verify-email', '/forgot-password', '/shop/login'];
 
 function AppLayout() {
   const location = useLocation();
@@ -122,7 +121,6 @@ function AppLayout() {
           <Route path="/privacy" element={<Legal />} />
           <Route path="/login" element={<Login />} />
           <Route path="/login/zalo/callback" element={<ZaloCallback />} />
-          <Route path="/login/facebook/callback" element={<FacebookCallback />} />
           <Route path="/register" element={<Register />} />
           <Route path="/complete-profile" element={<CompleteProfile />} />
           <Route path="/verify-email" element={<VerifyEmail />} />
