@@ -933,7 +933,7 @@ export default function Home() {
       </section>
 
       {/* ─── FAQ Section ───────────────────────────────────────────────── */}
-      <section className="pt-12 md:pt-16 xl:pt-24 pb-32 md:pb-48 px-6 bg-slate-50 dark:bg-slate-950 relative">
+      <section className="pt-12 md:pt-16 xl:pt-24 pb-12 md:pb-16 xl:pb-20 px-6 bg-slate-50 dark:bg-slate-950 relative">
         <div className="max-w-3xl mx-auto relative z-10">
           <div className="text-center mb-8 xl:mb-16">
             <h2 className="text-3xl xl:text-4xl font-black text-slate-900 dark:text-white mb-4"><span className="text-gradient">Câu hỏi thường gặp</span></h2>
@@ -971,7 +971,7 @@ export default function Home() {
       </section>
 
       {/* ─── News & Community CTA ─────────────────────────────────────────── */}
-      <section className="px-6 -mt-24 md:-mt-32 relative z-10 pb-16 md:pb-24">
+      <section className="px-6 py-12 md:py-16 xl:py-20 bg-slate-50 dark:bg-slate-950 relative z-10">
         <div className="max-w-5xl mx-auto relative">
           {/* Decorative Glowing Backdrop */}
           <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[80%] h-[80%] bg-blue-400/20 dark:bg-indigo-500/10 blur-[100px] rounded-full -z-10 pointer-events-none"></div>

@@ -21,33 +21,61 @@ export default function FloatingScrollButtons() {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
+  const smoothScrollTo = (targetY: number, duration: number = 600) => {
+    const startY = window.scrollY;
+    const difference = targetY - startY;
+    let startTime: number | null = null;
+
+    const easeInOutCubic = (t: number) => {
+      return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+    };
+
+    const step = (timestamp: number) => {
+      if (!startTime) startTime = timestamp;
+      const progress = Math.min((timestamp - startTime) / duration, 1);
+      const easedProgress = easeInOutCubic(progress);
+      
+      window.scrollTo(0, startY + difference * easedProgress);
+
+      if (progress < 1) {
+        window.requestAnimationFrame(step);
+      }
+    };
+
+    window.requestAnimationFrame(step);
+  };
+
   const scrollToTop = () => {
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    smoothScrollTo(0, 600);
   };
 
   const scrollToNextSection = () => {
-    const sections = Array.from(document.querySelectorAll('section, main > div, footer'));
+    const sections = Array.from(document.querySelectorAll('section, main > div, footer'))
+      .filter((el) => {
+        // Bỏ qua các hình trang trí decoration-blob
+        if (el.classList.contains('decoration-blob')) return false;
+        
+        // Bỏ qua các phần tử ẩn hoặc absolute/fixed định vị ngoài luồng cuộn thông thường
+        const style = window.getComputedStyle(el);
+        if (style.position === 'absolute' || style.position === 'fixed') return false;
+        if (style.display === 'none' || style.visibility === 'hidden') return false;
+        
+        return true;
+      });
     
     // Tìm section tiếp theo nằm bên dưới vị trí cuộn hiện tại
-    // Phải dùng rect.top > 80 vì khi cuộn ta trừ đi 70px (nếu dùng 50 nó sẽ kẹt ở chính section đó mãi mãi)
+    // Phải dùng rect.top > 80 vì khi cuộn ta trừ đi 70px
     const nextSection = sections.find((section) => {
       const rect = section.getBoundingClientRect();
       return rect.top > 80; 
     });
 
-    const maxScrollDistance = window.innerHeight * 0.8;
-
     if (nextSection) {
       const rect = nextSection.getBoundingClientRect();
-      
-      if (rect.top > maxScrollDistance + 70) {
-        window.scrollBy({ top: maxScrollDistance, behavior: 'smooth' });
-      } else {
-        const top = rect.top + window.scrollY - 70;
-        window.scrollTo({ top, behavior: 'smooth' });
-      }
+      const top = rect.top + window.scrollY - 70; // Trừ đi 70px chiều cao của navbar
+      smoothScrollTo(top, 600);
     } else {
-      window.scrollBy({ top: maxScrollDistance, behavior: 'smooth' });
+      smoothScrollTo(document.documentElement.scrollHeight, 600);
     }
   };
 
