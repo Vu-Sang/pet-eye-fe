@@ -31,8 +31,8 @@ function scrollTo(id: string) {
 function ThemeToggle() {
   const { isDark, toggleTheme } = useTheme();
   return (
-    <button onClick={toggleTheme} className="p-2.5 rounded-xl bg-slate-100 dark:bg-slate-800/80 text-slate-500 dark:text-slate-300 hover:text-primary dark:hover:text-blue-400 dark:hover:bg-slate-700 transition-colors flex items-center justify-center">
-      {isDark ? <Sun size={18} /> : <Moon size={18} />}
+    <button onClick={toggleTheme} className="p-1.5 rounded-full bg-slate-100/50 dark:bg-slate-800/50 border border-primary/20 dark:border-blue-500/20 text-slate-500 dark:text-slate-300 hover:text-primary dark:hover:text-blue-400 dark:hover:bg-slate-700 transition-colors flex items-center justify-center">
+      {isDark ? <Sun size={16} /> : <Moon size={16} />}
     </button>
   );
 }
@@ -69,14 +69,15 @@ function GuestNavbar() {
 
   return (
     <header
-      className={`sticky top-0 z-50 transition-[background-color,backdrop-filter,box-shadow,border-color] duration-300
+      className={`fixed top-4 left-1/2 -translate-x-1/2 z-50 w-[calc(100%-2rem)] max-w-screen-xl transition-all duration-300 h-15
+        ${mobileOpen ? 'rounded-[24px]' : 'rounded-full'}
         ${scrolled
-          ? 'bg-white/90 dark:bg-slate-950/90 backdrop-blur-md shadow-sm border-b border-slate-200 dark:border-slate-800'
-          : 'bg-transparent border-b border-transparent'}`}
+          ? 'bg-white/95 dark:bg-slate-950/95 shadow-md border border-primary/30 dark:border-blue-500/30 backdrop-blur-md'
+          : 'bg-white/95 dark:bg-slate-950/95 shadow-sm border border-primary/15 dark:border-blue-500/15 backdrop-blur-sm'}`}
     >
-      <div className="py-3.5 max-w-screen-xl mx-auto px-6 md:px-10 flex items-center gap-8">
-        <Link 
-          to="/" 
+      <div className="h-full px-6 md:px-8 flex items-center gap-8">
+        <Link
+          to="/"
           onClick={(e) => {
             if (window.location.pathname === '/') {
               e.preventDefault();
@@ -95,11 +96,10 @@ function GuestNavbar() {
 
         <div className="hidden sm:flex items-center gap-3">
           <Link to="/search"
-            className={`flex items-center gap-2 h-10 px-5 rounded-2xl text-[13px] font-black transition-all ${
-              window.location.pathname === '/search'
-                ? 'text-primary bg-primary/10 dark:text-blue-400 dark:bg-blue-900/30'
-                : 'text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100/50 dark:hover:bg-slate-800/50'
-            }`}>
+            className={`flex items-center gap-2 h-8 px-4 rounded-full text-[14px] font-black border border-primary/15 hover:border-primary/45 dark:border-blue-500/15 dark:hover:border-blue-500/45 transition-all ${window.location.pathname === '/search'
+              ? 'text-primary bg-primary/10 border-primary/30 dark:text-blue-400 dark:bg-blue-900/30 dark:border-blue-500/30'
+              : 'text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100/50 dark:hover:bg-slate-800/50'
+              }`}>
             Cơ sở gần tôi
           </Link>
 
@@ -107,11 +107,11 @@ function GuestNavbar() {
 
           <ThemeToggle />
           <Link to="/login"
-            className="h-10 px-6 rounded-2xl flex items-center justify-center text-[13px] font-bold bg-primary-light text-primary hover:bg-blue-100 dark:bg-blue-950/40 dark:text-blue-400 dark:hover:bg-blue-900/30 transition-all hover:-translate-y-1 active:scale-95">
+            className="h-8 px-4 rounded-full flex items-center justify-center text-[14px] font-bold border border-primary/20 hover:border-primary/50 text-slate-700 hover:bg-slate-50 dark:border-blue-500/20 dark:hover:border-blue-500/50 dark:text-slate-300 dark:hover:bg-slate-800 transition-all hover:-translate-y-0.5 active:scale-95">
             Đăng nhập
           </Link>
           <Link to="/register"
-            className="h-10 px-6 rounded-2xl flex items-center justify-center text-[13px] font-bold bg-primary text-white hover:bg-primary-dark dark:bg-blue-600 dark:hover:bg-blue-700 transition-all hover:shadow-xl hover:shadow-primary/20 dark:hover:shadow-blue-600/20 hover:-translate-y-1 active:scale-95">
+            className="h-8 px-4 rounded-full flex items-center justify-center text-[14px] font-bold bg-gradient-to-r from-primary to-blue-500 dark:from-blue-400 dark:to-secondary text-white border border-primary/30 dark:border-blue-500/30 shadow-md shadow-primary/10 hover:shadow-lg hover:shadow-primary/20 transition-all hover:-translate-y-0.5 active:scale-95">
             Đăng ký
           </Link>
         </div>
@@ -119,8 +119,8 @@ function GuestNavbar() {
         <div className="flex items-center gap-2 lg:hidden">
           <ThemeToggle />
           <button onClick={() => setMobileOpen(v => !v)}
-            className="p-2.5 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 transition-colors">
-            {mobileOpen ? <X size={20} /> : <Menu size={20} />}
+            className="p-1.5 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 transition-colors">
+            {mobileOpen ? <X size={18} /> : <Menu size={18} />}
           </button>
         </div>
       </div>
@@ -131,7 +131,7 @@ function GuestNavbar() {
             initial={{ opacity: 0, height: 0 }}
             animate={{ opacity: 1, height: 'auto' }}
             exit={{ opacity: 0, height: 0 }}
-            className="lg:hidden overflow-hidden bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl border-t border-slate-100 dark:border-slate-800"
+            className="lg:hidden overflow-hidden bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl border-t border-slate-100 dark:border-slate-800 rounded-b-[24px]"
           >
             <div className="px-6 py-6 space-y-2">
               <Link to="/search" onClick={() => setMobileOpen(false)}
@@ -141,11 +141,11 @@ function GuestNavbar() {
 
               <div className="flex flex-col gap-3 pt-4">
                 <Link to="/login" onClick={() => setMobileOpen(false)}
-                  className="w-full text-center py-4 rounded-2xl bg-primary-light text-primary dark:bg-blue-950/40 dark:text-blue-400 font-bold">
+                  className="w-full text-center py-4 rounded-2xl border border-slate-200 text-slate-700 dark:border-slate-700 dark:text-slate-300 font-bold hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors">
                   Đăng nhập
                 </Link>
                 <Link to="/register" onClick={() => setMobileOpen(false)}
-                  className="w-full text-center py-4 bg-primary text-white dark:bg-blue-600 rounded-2xl font-black shadow-lg shadow-primary/20 dark:shadow-blue-600/20">
+                  className="w-full text-center py-4 bg-gradient-to-r from-primary to-blue-500 dark:from-blue-400 dark:to-secondary text-white rounded-2xl font-black shadow-md shadow-primary/10 hover:shadow-lg hover:shadow-primary/20 transition-all">
                   Tham gia ngay
                 </Link>
               </div>
@@ -208,16 +208,17 @@ function AuthNavbar() {
 
   return (
     <header
-      className={`sticky top-0 z-50 transition-[background-color,backdrop-filter,box-shadow,border-color] duration-300
+      className={`fixed top-4 left-1/2 -translate-x-1/2 z-50 w-[calc(100%-2rem)] max-w-screen-xl transition-all duration-300 h-14
+        ${mobileOpen ? 'rounded-[24px]' : 'rounded-full'}
         ${scrolled
-          ? 'bg-white/90 dark:bg-slate-950/90 backdrop-blur-md border-b border-slate-200 dark:border-white/10'
-          : 'bg-transparent border-b border-transparent'}`}
+          ? 'bg-white/95 dark:bg-slate-950/95 shadow-md border border-blue-900/40 dark:border-blue-900/60 backdrop-blur-md'
+          : 'bg-white/95 dark:bg-slate-950/95 shadow-sm border border-blue-900/25 dark:border-blue-900/40 backdrop-blur-sm'}`}
     >
-      <div className="py-3.5 max-w-screen-xl mx-auto px-6 md:px-10 flex items-center gap-6">
+      <div className="h-full px-6 md:px-8 flex items-center gap-6">
 
         {/* ── Logo ──────────────────────────────── */}
-        <Link 
-          to="/" 
+        <Link
+          to="/"
           onClick={(e) => {
             if (window.location.pathname === '/') {
               e.preventDefault();
@@ -240,11 +241,10 @@ function AuthNavbar() {
 
           {/* Nút Tìm cơ sở */}
           <Link to="/search"
-            className={`hidden sm:flex items-center gap-2 h-10 px-5 rounded-2xl text-[13px] font-black transition-all ${
-              active('/search')
-                ? 'text-primary bg-primary/10 dark:text-blue-400 dark:bg-blue-900/30'
-                : 'text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100/50 dark:hover:bg-slate-800/50'
-            }`}>
+            className={`hidden sm:flex items-center gap-2 h-8 px-4 rounded-full text-[14px] font-black border border-primary/15 hover:border-primary/45 dark:border-blue-500/15 dark:hover:border-blue-500/45 transition-all ${active('/search')
+              ? 'text-primary bg-primary/10 border-primary/30 dark:text-blue-400 dark:bg-blue-900/30 dark:border-blue-500/30'
+              : 'text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100/50 dark:hover:bg-slate-800/50'
+              }`}>
             Cơ sở gần tôi
           </Link>
 
@@ -253,12 +253,11 @@ function AuthNavbar() {
           {/* Icon Tin nhắn */}
           {user && (
             <Link to="/messages"
-              className={`relative w-10 h-10 flex items-center justify-center rounded-2xl transition-all ${
-                active('/messages')
-                  ? 'bg-primary text-white shadow-lg shadow-primary/20'
-                  : 'bg-slate-100/50 dark:bg-slate-800/80 text-slate-500 dark:text-slate-300 hover:text-primary dark:hover:text-blue-400 hover:bg-primary/5 dark:hover:bg-slate-700'
-              }`}>
-              <MessageCircle size={19} />
+              className={`relative w-8 h-8 flex items-center justify-center rounded-full transition-all ${active('/messages')
+                ? 'bg-primary text-white shadow-lg shadow-primary/20'
+                : 'bg-slate-100/50 dark:bg-slate-800/80 text-slate-500 dark:text-slate-300 hover:text-primary dark:hover:text-blue-400 hover:bg-primary/5 dark:hover:bg-slate-700'
+                }`}>
+              <MessageCircle size={16} />
             </Link>
           )}
 
@@ -267,11 +266,11 @@ function AuthNavbar() {
           {/* Notifications */}
           <div ref={notifRef} className="relative">
             <button onClick={() => { setNotifOpen(v => !v); setUserOpen(false); }}
-              className={`relative w-10 h-10 flex items-center justify-center rounded-2xl transition-all
+              className={`relative w-8 h-8 flex items-center justify-center rounded-full transition-all
                 ${notifOpen ? 'bg-primary text-white shadow-lg shadow-primary/20' : 'bg-slate-100/50 dark:bg-slate-800/80 text-slate-500 dark:text-slate-300 hover:text-primary dark:hover:text-blue-400 hover:bg-primary/5 dark:hover:bg-slate-700'}`}>
-              <Bell size={19} />
+              <Bell size={16} />
               {unreadCount > 0 && (
-                <span className="absolute top-2 right-2 w-3.5 h-3.5 bg-rose-500 text-[9px] font-black text-white flex items-center justify-center rounded-full border-2 border-white dark:border-slate-900 shadow-sm">
+                <span className="absolute top-1 right-1 w-3 h-3 bg-rose-500 text-[8px] font-black text-white flex items-center justify-center rounded-full border border-white dark:border-slate-900 shadow-sm">
                   {unreadCount > 9 ? '9+' : unreadCount}
                 </span>
               )}
@@ -328,9 +327,9 @@ function AuthNavbar() {
           {/* User avatar / menu */}
           <div ref={userRef} className="relative ml-1">
             <button onClick={() => { setUserOpen(v => !v); setNotifOpen(false); }}
-              className={`flex items-center gap-3 pl-1.5 pr-4 h-10 rounded-2xl transition-all border-2
-                ${userOpen ? 'bg-white dark:bg-slate-800 border-primary shadow-lg shadow-primary/10' : 'bg-slate-100/50 dark:bg-slate-800/50 border-transparent hover:border-slate-200 dark:hover:border-slate-700'}`}>
-              <div className="w-7 h-7 rounded-xl overflow-hidden bg-gradient-to-br from-primary to-blue-600 flex items-center justify-center text-white text-xs font-black shadow-lg">
+              className={`flex items-center gap-2 pl-1 pr-3 h-8 rounded-full transition-all border-2
+                ${userOpen ? 'bg-white dark:bg-slate-800 border-primary shadow-lg shadow-primary/10' : 'bg-slate-100/50 dark:bg-slate-800/50 border-transparent hover:border-slate-200/80 dark:hover:border-slate-700/80'}`}>
+              <div className="w-6 h-6 rounded-xl overflow-hidden bg-gradient-to-br from-primary to-blue-600 flex items-center justify-center text-white text-[10px] font-black shadow-lg">
                 {user!.avatar ? (
                   <img src={user!.avatar} alt={user!.name} className="w-full h-full object-cover" />
                 ) : (
@@ -338,8 +337,8 @@ function AuthNavbar() {
                 )}
               </div>
               <div className="hidden lg:block text-left mr-1">
-                <p className="text-[11px] font-black text-slate-400 uppercase tracking-tighter leading-none mb-1">Thành viên</p>
-                <p className="text-[13px] font-black text-slate-900 dark:text-white leading-none truncate max-w-[90px]">{user!.name.split(' ').pop()}</p>
+                <p className="text-[9.5px] font-black text-slate-400 uppercase tracking-tighter leading-none mb-0.5">Thành viên</p>
+                <p className="text-[11.5px] font-black text-slate-900 dark:text-white leading-none truncate max-w-[90px]">{user!.name.split(' ').pop()}</p>
               </div>
               <ChevronDown size={14} className={`text-slate-400 transition-transform duration-300 ${userOpen ? 'rotate-180' : ''}`} />
             </button>
@@ -360,7 +359,7 @@ function AuthNavbar() {
                   </div>
 
                   {[
-                  { to: '/user/dashboard', icon: <LayoutDashboard size={16} />, label: 'Tổng quan' },
+                    { to: '/user/dashboard', icon: <LayoutDashboard size={16} />, label: 'Tổng quan' },
                     { to: '/profile', icon: <User size={16} />, label: 'Quản lý tài khoản' },
                     { to: '/profile/pets', icon: <PawPrint size={16} />, label: 'Thú cưng của tôi' },
                     { to: '/profile/bookings', icon: <Calendar size={16} />, label: 'Lịch đặt hẹn' },
@@ -391,8 +390,8 @@ function AuthNavbar() {
 
           {/* Mobile hamburger */}
           <button onClick={() => setMobileOpen(v => !v)}
-            className="md:hidden w-10 h-10 flex items-center justify-center rounded-2xl bg-slate-100/50 dark:bg-slate-800/50 text-slate-500 transition-colors">
-            {mobileOpen ? <X size={20} /> : <Menu size={20} />}
+            className="md:hidden w-8 h-8 flex items-center justify-center rounded-full bg-slate-100/50 dark:bg-slate-800/50 text-slate-500 transition-colors">
+            {mobileOpen ? <X size={18} /> : <Menu size={18} />}
           </button>
         </div>
       </div>
@@ -404,7 +403,7 @@ function AuthNavbar() {
             initial={{ opacity: 0, height: 0 }}
             animate={{ opacity: 1, height: 'auto' }}
             exit={{ opacity: 0, height: 0 }}
-            className="md:hidden overflow-hidden border-t border-slate-100 dark:border-slate-800 bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl"
+            className="md:hidden overflow-hidden border-t border-slate-100 dark:border-slate-800 bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl rounded-b-[24px]"
           >
             <div className="px-6 py-8 space-y-2">
               {[{ to: '/search', label: 'Tìm cơ sở' }, { to: '/camera', label: 'Camera lưu trú' }, { to: '/messages', label: 'Tin nhắn' }].map(item => (

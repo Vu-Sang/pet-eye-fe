@@ -199,7 +199,7 @@ export default function Register() {
                     <div className="relative group">
                       <User className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-primary transition-colors" size={18} />
                       <input
-                        className="w-full pl-11 pr-4 py-3.5 rounded-2xl border border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/50 text-slate-900 dark:text-white placeholder-slate-400 focus:bg-white dark:focus:bg-slate-900 focus:ring-4 focus:ring-primary/10 focus:border-primary outline-none transition-all text-sm font-medium"
+                        className="w-full pl-11 pr-4 py-3.5 rounded-2xl border border-slate-300 dark:border-slate-700 bg-transparent text-slate-900 dark:text-white placeholder-slate-400 focus:border-primary dark:focus:border-primary-light outline-none transition-all text-sm font-medium"
                         placeholder="Nguyễn Văn A" type="text" value={fullName} onChange={e => setFullName(e.target.value)} required
                         onInvalid={(e) => (e.target as HTMLInputElement).setCustomValidity('Vui lòng điền họ và tên')}
                         onInput={(e) => (e.target as HTMLInputElement).setCustomValidity('')} />
@@ -210,7 +210,7 @@ export default function Register() {
                     <div className="relative group">
                       <Phone className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-primary transition-colors" size={18} />
                       <input
-                        className="w-full pl-11 pr-4 py-3.5 rounded-2xl border border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/50 text-slate-900 dark:text-white placeholder-slate-400 focus:bg-white dark:focus:bg-slate-900 focus:ring-4 focus:ring-primary/10 focus:border-primary outline-none transition-all text-sm font-medium"
+                        className="w-full pl-11 pr-4 py-3.5 rounded-2xl border border-slate-300 dark:border-slate-700 bg-transparent text-slate-900 dark:text-white placeholder-slate-400 focus:border-primary dark:focus:border-primary-light outline-none transition-all text-sm font-medium"
                         placeholder="0901234567" type="tel" value={phone} onChange={e => setPhone(e.target.value)} required
                         onInvalid={(e) => (e.target as HTMLInputElement).setCustomValidity('Vui lòng điền số điện thoại')}
                         onInput={(e) => (e.target as HTMLInputElement).setCustomValidity('')} />
@@ -224,7 +224,7 @@ export default function Register() {
                   <div className="relative group">
                     <Mail className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-primary transition-colors" size={18} />
                     <input
-                      className="w-full pl-11 pr-4 py-3.5 rounded-2xl border border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/50 text-slate-900 dark:text-white placeholder-slate-400 focus:bg-white dark:focus:bg-slate-900 focus:ring-4 focus:ring-primary/10 focus:border-primary outline-none transition-all text-sm font-medium"
+                      className="w-full pl-11 pr-4 py-3.5 rounded-2xl border border-slate-300 dark:border-slate-700 bg-transparent text-slate-900 dark:text-white placeholder-slate-400 focus:border-primary dark:focus:border-primary-light outline-none transition-all text-sm font-medium"
                       placeholder="customer@example.com" type="email" value={email} onChange={e => setEmail(e.target.value)} required
                       onInvalid={(e) => {
                         const target = e.target as HTMLInputElement;
@@ -242,7 +242,7 @@ export default function Register() {
                   <div className="relative group">
                     <MapPin className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-primary transition-colors" size={18} />
                     <input
-                      className="w-full pl-11 pr-4 py-3.5 rounded-2xl border border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/50 text-slate-900 dark:text-white placeholder-slate-400 focus:bg-white dark:focus:bg-slate-900 focus:ring-4 focus:ring-primary/10 focus:border-primary outline-none transition-all text-sm font-medium"
+                      className="w-full pl-11 pr-4 py-3.5 rounded-2xl border border-slate-300 dark:border-slate-700 bg-transparent text-slate-900 dark:text-white placeholder-slate-400 focus:border-primary dark:focus:border-primary-light outline-none transition-all text-sm font-medium"
                       placeholder="Số 1 Võ Văn Ngân, Thủ Đức" type="text" value={address} onChange={e => setAddress(e.target.value)} required
                       onInvalid={(e) => (e.target as HTMLInputElement).setCustomValidity('Vui lòng điền địa chỉ')}
                       onInput={(e) => (e.target as HTMLInputElement).setCustomValidity('')} />
@@ -256,7 +256,7 @@ export default function Register() {
                     <div className="relative group">
                       <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-primary transition-colors" size={18} />
                       <input
-                        className="w-full pl-11 pr-4 py-3.5 rounded-2xl border border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/50 text-slate-900 dark:text-white placeholder-slate-400 focus:bg-white dark:focus:bg-slate-900 focus:ring-4 focus:ring-primary/10 focus:border-primary outline-none transition-all text-sm font-medium"
+                        className="w-full pl-11 pr-4 py-3.5 rounded-2xl border border-slate-300 dark:border-slate-700 bg-transparent text-slate-900 dark:text-white placeholder-slate-400 focus:border-primary dark:focus:border-primary-light outline-none transition-all text-sm font-medium"
                         placeholder="••••••••" type="password" value={password} onChange={e => setPassword(e.target.value)} required minLength={8}
                         onInvalid={(e) => {
                           const target = e.target as HTMLInputElement;
@@ -272,7 +272,7 @@ export default function Register() {
                     <div className="relative group">
                       <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-primary transition-colors" size={18} />
                       <input
-                        className="w-full pl-11 pr-4 py-3.5 rounded-2xl border border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/50 text-slate-900 dark:text-white placeholder-slate-400 focus:bg-white dark:focus:bg-slate-900 focus:ring-4 focus:ring-primary/10 focus:border-primary outline-none transition-all text-sm font-medium"
+                        className="w-full pl-11 pr-4 py-3.5 rounded-2xl border border-slate-300 dark:border-slate-700 bg-transparent text-slate-900 dark:text-white placeholder-slate-400 focus:border-primary dark:focus:border-primary-light outline-none transition-all text-sm font-medium"
                         placeholder="••••••••" type="password" value={confirmPassword} onChange={e => setConfirmPassword(e.target.value)} required
                         onInvalid={(e) => (e.target as HTMLInputElement).setCustomValidity('Vui lòng nhập lại mật khẩu')}
                         onInput={(e) => (e.target as HTMLInputElement).setCustomValidity('')} />

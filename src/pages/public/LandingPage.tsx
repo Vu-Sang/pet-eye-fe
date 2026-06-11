@@ -2,8 +2,8 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { shopService } from '../../services/shop.service';
-import { 
-  Search, MapPin, Video, Star, ArrowRight, ShieldCheck, Shield, Heart, Sparkles, 
+import {
+  Search, MapPin, Video, Star, ArrowRight, ShieldCheck, Shield, Heart, Sparkles,
   Zap, ChevronRight, Navigation, Clock, CheckCircle2, ChevronDown, Percent, Loader2, Compass, PawPrint
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
@@ -36,10 +36,10 @@ export default function Home() {
   const navigate = useNavigate();
   const { user } = useAuth();
   const { isDark } = useTheme();
-  
+
   // GPS State
   const [locationStatus, setLocationStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
-  const [nearbyCoords, setNearbyCoords] = useState<{lat: number, lng: number} | null>(null);
+  const [nearbyCoords, setNearbyCoords] = useState<{ lat: number, lng: number } | null>(null);
   const [manualAddress, setManualAddress] = useState('');
 
   // Hero Search State
@@ -107,34 +107,34 @@ export default function Home() {
   const [activeFaq, setActiveFaq] = useState<number | null>(null);
 
   return (
-    <main className="flex-1 overflow-x-hidden font-display relative pb-32 md:pb-0">
-      
-      {/* ─── Hero Section ────────────────────────────────────────────── */}
-      <section className="relative min-h-fit md:min-h-[80vh] xl:min-h-[85vh] flex items-center justify-center pt-8 pb-24 md:pb-8 xl:pt-16 xl:pb-12 px-6 overflow-hidden bg-slate-50 dark:bg-slate-950">
-        <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none">
-          {/* Navy/Indigo tint overlay */}
-          <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-b from-blue-50/80 to-transparent dark:from-[#0B1120] dark:to-transparent" />
-          <div className="absolute top-0 left-0 w-full h-full bg-mesh opacity-10 dark:opacity-20" />
-          
-          <div className="absolute -top-[10%] -left-[10%] w-[50%] h-[50%] bg-blue-500/10 dark:bg-blue-500/20 rounded-full blur-[120px] pointer-events-none" />
-          <div className="absolute -bottom-[10%] -right-[10%] w-[60%] h-[60%] bg-indigo-500/10 dark:bg-indigo-500/20 rounded-full blur-[120px] pointer-events-none" />
-          
-          <div className="pattern-dots absolute inset-0 opacity-20 pointer-events-none" />
+    <main className="flex-1 overflow-x-hidden font-display relative pb-32 md:pb-0 bg-slate-50 dark:bg-slate-950">
+      {/* Background decoration from hero section applied to entire page */}
+      <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none">
+        <div className="absolute top-0 left-0 w-full h-full bg-mesh opacity-10 dark:opacity-20" />
 
+        <div className="absolute top-[5%] -left-[10%] w-[50%] h-[40%] bg-blue-500/10 dark:bg-blue-500/20 rounded-full blur-[120px] pointer-events-none" />
+        <div className="absolute bottom-[10%] -right-[10%] w-[60%] h-[50%] bg-indigo-500/10 dark:bg-indigo-500/20 rounded-full blur-[120px] pointer-events-none" />
+
+        <div className="pattern-dots absolute inset-0 opacity-20 pointer-events-none" />
+      </div>
+
+      {/* ─── Hero Section ────────────────────────────────────────────── */}
+      <section className="relative min-h-fit md:min-h-[80vh] xl:min-h-[85vh] flex items-center justify-center pt-20 pb-12 md:pt-32 md:pb-8 xl:pt-40 xl:pb-12 px-4 sm:px-6 overflow-hidden bg-transparent">
+        <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none">
           {/* Falling Paw Prints (Optimized with hardware acceleration) */}
           {[...Array(5)].map((_, i) => (
             <motion.div
               key={`paw-${i}`}
               initial={{ y: "-10vh", x: `${Math.random() * 100}%`, opacity: 0, rotate: 0 }}
-              animate={{ 
-                y: "110vh", 
+              animate={{
+                y: "110vh",
                 x: `${Math.random() * 100}%`,
                 opacity: [0, 0.15, 0.15, 0],
-                rotate: 360 
+                rotate: 360
               }}
-              transition={{ 
-                duration: 18 + Math.random() * 15, 
-                repeat: Infinity, 
+              transition={{
+                duration: 18 + Math.random() * 15,
+                repeat: Infinity,
                 delay: Math.random() * 10,
                 ease: "linear"
               }}
@@ -147,58 +147,58 @@ export default function Home() {
         </div>
 
         <div className="max-w-7xl mx-auto w-full relative z-10">
-          <div className="grid lg:grid-cols-2 gap-8 xl:gap-12 items-center">
-            <motion.div variants={staggerContainer} initial="initial" animate="animate" className="flex flex-col gap-8 text-center lg:text-left">
-              <motion.div variants={fadeIn} className="inline-flex items-center gap-2 glass px-4 py-2 rounded-full w-fit mx-auto lg:mx-0">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 xl:gap-12 items-start">
+            <motion.div variants={staggerContainer} initial="initial" animate="animate" className="flex flex-col w-full gap-3 md:gap-6 lg:gap-8 text-center lg:text-left">
+              <motion.div variants={fadeIn} className="inline-flex items-center gap-2 bg-primary/5 dark:bg-white/5 border border-primary/10 dark:border-white/10 px-3 py-1.5 md:px-4 md:py-2 rounded-full w-fit mx-auto lg:mx-0 shadow-sm">
                 <span className="flex h-2 w-2 relative">
-                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75 dark:bg-white"></span>
-                  <span className="relative inline-flex rounded-full h-2 w-2 bg-primary dark:bg-white"></span>
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary dark:bg-cyan-400 opacity-75"></span>
+                  <span className="relative inline-flex rounded-full h-2 w-2 bg-primary dark:bg-cyan-400"></span>
                 </span>
-                <span className="text-[17px] font-black uppercase tracking-widest text-primary dark:text-white">
+                <span className="text-[11px] md:text-[13px] font-black uppercase tracking-widest text-primary dark:text-blue-400">
                   HỆ SINH THÁI THÚ Y TOÀN DIỆN
                 </span>
               </motion.div>
 
-              <motion.h1 variants={fadeIn} className="text-5xl lg:text-6xl xl:text-7xl font-black leading-[1.1] tracking-tight text-slate-900 dark:text-white">
-                Chăm sóc <br />
-                <span className="text-gradient">Thú cưng</span> <br />
+              <motion.h1 variants={fadeIn} className="text-2xl sm:text-4xl lg:text-6xl xl:text-7xl font-black leading-tight tracking-tight text-slate-900 dark:text-white">
+                Chăm sóc <br className="hidden sm:block" />
+                <span className="text-gradient">Thú cưng</span> <br className="hidden sm:block" />
                 thời đại số.
               </motion.h1>
 
-              <motion.p variants={fadeIn} className="text-lg md:text-xl text-slate-600 dark:text-slate-400 max-w-xl mx-auto lg:mx-0 leading-relaxed font-medium">
+              <motion.p variants={fadeIn} className="text-sm sm:text-base md:text-lg text-slate-600 dark:text-slate-300 max-w-xl mx-auto lg:mx-0 leading-relaxed font-medium">
                 Kết nối với mạng lưới chuyên gia, đặt lịch khám nhanh chóng và theo dõi bé yêu mọi lúc qua Live Camera 24/7.
               </motion.p>
 
               {/* Glassmorphic Search Bar */}
-              <motion.div variants={fadeIn} className="glass dark:glass-dark p-2 rounded-3xl mt-4 shadow-2xl group focus-within:ring-4 ring-primary/10 transition-all">
-                <div className="grid grid-cols-1 md:grid-cols-12 gap-2">
+              <motion.div variants={fadeIn} className="w-full glass dark:bg-slate-900/80 dark:border-slate-800 p-2 md:p-2 rounded-[32px] md:rounded-full mt-4 shadow-2xl dark:shadow-[0_25px_50px_-12px_rgba(0,0,0,0.5)] group focus-within:ring-4 ring-primary/10 transition-all">
+                <div className="flex flex-col md:grid md:grid-cols-12 gap-1.5 md:gap-2">
                   <div className="md:col-span-5 relative">
-                    <MapPin className="absolute left-4 top-1/2 -translate-y-1/2 text-primary w-5 h-5" />
-                      <input 
-                        value={heroCity}
-                        onChange={e => setHeroCity(e.target.value)}
-                        onKeyDown={e => e.key === 'Enter' && handleAction('/search')}
-                        className="w-full pl-12 pr-4 py-3 xl:py-4 bg-slate-50 dark:bg-slate-900/50 rounded-2xl border-none focus:ring-0 text-sm font-bold placeholder:text-slate-400" 
-                        placeholder="Tìm khu vực..." 
-                      />
+                    <MapPin className="absolute left-4 top-1/2 -translate-y-1/2 text-blue-600 dark:text-blue-400 w-5 h-5" />
+                    <input
+                      value={heroCity}
+                      onChange={e => setHeroCity(e.target.value)}
+                      onKeyDown={e => e.key === 'Enter' && handleAction('/search')}
+                      className="w-full pl-12 pr-4 py-3 xl:py-4 bg-white/50 dark:bg-slate-950/50 text-slate-900 dark:text-white border-none rounded-full focus:ring-0 text-sm font-bold placeholder:text-slate-400"
+                      placeholder="Tìm khu vực..."
+                    />
                   </div>
-                  <div className="md:col-span-4 relative border-l border-slate-100 dark:border-slate-800 hidden md:block">
-                    <Sparkles className="absolute left-4 top-1/2 -translate-y-1/2 text-secondary w-5 h-5" />
-                    <select 
+                  <div className="md:col-span-4 relative md:border-l border-slate-200 dark:border-slate-800 hidden md:block">
+                    <Sparkles className="absolute left-4 top-1/2 -translate-y-1/2 text-secondary dark:text-cyan-400 w-5 h-5" />
+                    <select
                       value={heroType}
                       onChange={e => setHeroType(e.target.value)}
-                      className="w-full pl-12 pr-4 py-3 xl:py-4 bg-transparent border-none focus:ring-0 text-sm font-bold appearance-none cursor-pointer">
-                      <option value="Tất cả">Tất cả dịch vụ</option>
-                      <option value="CLINIC">Khám thú y (Clinic)</option>
-                      <option value="SPA">Spa & Grooming</option>
-                      <option value="HOTEL">Lưu trú (Hotel)</option>
-                      <option value="MIXED">Dịch vụ tổng hợp</option>
+                      className="w-full pl-12 pr-4 py-3 xl:py-4 bg-transparent border-none focus:ring-0 text-sm font-bold appearance-none cursor-pointer text-slate-900 dark:text-white focus:outline-none">
+                      <option value="Tất cả" className="bg-white dark:bg-slate-900 text-slate-900 dark:text-white">Tất cả dịch vụ</option>
+                      <option value="CLINIC" className="bg-white dark:bg-slate-900 text-slate-900 dark:text-white">Khám thú y (Clinic)</option>
+                      <option value="SPA" className="bg-white dark:bg-slate-900 text-slate-900 dark:text-white">Spa & Grooming</option>
+                      <option value="HOTEL" className="bg-white dark:bg-slate-900 text-slate-900 dark:text-white">Lưu trú (Hotel)</option>
+                      <option value="MIXED" className="bg-white dark:bg-slate-900 text-slate-900 dark:text-white">Dịch vụ tổng hợp</option>
                     </select>
                   </div>
                   <div className="md:col-span-3">
-                    <button 
+                    <button
                       onClick={() => handleAction('/search')}
-                      className="w-full h-full bg-primary hover:bg-primary-dark text-white rounded-2xl font-black transition-all flex items-center justify-center gap-2 py-4 shadow-lg shadow-primary/20 group-hover:scale-[1.02]"
+                      className="w-full h-full bg-primary hover:bg-primary/95 dark:bg-blue-600 dark:hover:bg-blue-500 text-white rounded-full font-black transition-all flex items-center justify-center gap-2 py-3.5 md:py-4 shadow-lg shadow-primary/20 dark:shadow-blue-500/20 group-hover:scale-[1.02] text-sm"
                     >
                       <Search size={18} /> TÌM KIẾM
                     </button>
@@ -209,10 +209,10 @@ export default function Home() {
 
             <div className="relative hidden lg:block h-[500px] xl:h-[600px] w-full mt-8 xl:mt-0">
               {/* Dog Image (Background, Left-aligned) */}
-              <motion.div 
-                initial={{ opacity: 0, x: 50, y: -20, rotate: -5 }} 
-                animate={{ opacity: 1, x: 0, y: 0, rotate: -3 }} 
-                transition={{ duration: 1, ease: "easeOut" }} 
+              <motion.div
+                initial={{ opacity: 0, x: 50, y: -20, rotate: -5 }}
+                animate={{ opacity: 1, x: 0, y: 0, rotate: -3 }}
+                transition={{ duration: 1, ease: "easeOut" }}
                 className="absolute top-0 left-0 w-[65%] h-[80%] z-10 rounded-[40px] xl:rounded-[50px] shadow-[0_30px_60px_-15px_rgba(0,0,0,0.3)] bg-white dark:bg-slate-800"
               >
                 <img src={heroDogImage} alt="Dog patient" className="w-full h-full object-cover rounded-[40px] xl:rounded-[50px]" />
@@ -231,10 +231,10 @@ export default function Home() {
               </motion.div>
 
               {/* Cat Image (Foreground, Right-aligned overlapping) */}
-              <motion.div 
-                initial={{ opacity: 0, x: -50, y: 50, rotate: 5 }} 
-                animate={{ opacity: 1, x: 0, y: 0, rotate: 3 }} 
-                transition={{ duration: 1, delay: 0.2, ease: "easeOut" }} 
+              <motion.div
+                initial={{ opacity: 0, x: -50, y: 50, rotate: 5 }}
+                animate={{ opacity: 1, x: 0, y: 0, rotate: 3 }}
+                transition={{ duration: 1, delay: 0.2, ease: "easeOut" }}
                 className="absolute bottom-0 right-0 w-[55%] h-[70%] z-20 rounded-[40px] xl:rounded-[50px] shadow-[0_40px_80px_-20px_rgba(0,0,0,0.4)] bg-white dark:bg-slate-800"
               >
                 <img src={heroCatImage} alt="Cat spa" className="w-full h-full object-cover rounded-[40px] xl:rounded-[50px]" />
@@ -260,12 +260,12 @@ export default function Home() {
         </div>
 
         {/* Animated Scroll Indicator - Pet Theme */}
-        <div 
+        <div
           onClick={() => document.getElementById('co-so')?.scrollIntoView({ behavior: 'smooth' })}
           className="absolute bottom-6 lg:bottom-10 left-1/2 -translate-x-1/2 flex flex-col items-center gap-3 z-20 opacity-80 hover:opacity-100 transition-opacity cursor-pointer group"
         >
-          <motion.div 
-            animate={{ y: [0, 10, 0] }} 
+          <motion.div
+            animate={{ y: [0, 10, 0] }}
             transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut" }}
             className="w-12 h-12 rounded-full bg-white dark:bg-white/10 backdrop-blur-md shadow-[0_10px_30px_rgba(0,0,0,0.1)] dark:shadow-[0_0_20px_rgba(255,255,255,0.05)] border border-slate-100 dark:border-white/20 flex items-center justify-center text-primary dark:text-blue-400 group-hover:bg-primary dark:group-hover:bg-blue-500 group-hover:border-primary dark:group-hover:border-blue-500 group-hover:text-white dark:group-hover:text-white group-hover:scale-110 transition-all duration-300"
           >
@@ -275,20 +275,20 @@ export default function Home() {
       </section>
 
       {/* ─── Featured Services Showcase (API) ──────────────────────────── */}
-      <section id="co-so" className="py-12 md:py-16 xl:py-24 px-6 bg-white dark:bg-slate-900 relative">
+      <section id="co-so" className="py-8 md:py-16 xl:py-24 px-4 sm:px-6 bg-transparent relative ">
         <div className="max-w-7xl mx-auto relative z-10">
-          <div className="flex flex-col md:flex-row md:items-end justify-between gap-8 mb-16">
-            <div className="max-w-2xl space-y-4">
-              <span className="inline-flex items-center bg-rose-100 text-rose-600 dark:bg-rose-900/30 dark:text-rose-400 px-4 py-2 rounded-full text-xs font-black uppercase tracking-wider w-fit">
+          <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 md:gap-8 mb-8 md:mb-12 lg:mb-16">
+            <div className="max-w-2xl space-y-1 md:space-y-4">
+              <span className="inline-flex items-center gap-1.5 bg-emerald-50 text-emerald-700 dark:bg-emerald-500/15 dark:text-emerald-400 border border-emerald-200/60 dark:border-emerald-500/20 px-3 py-1.5 rounded-full text-xs font-black uppercase tracking-wider w-fit">
+                <Star size={12} className="fill-emerald-500 text-emerald-500 dark:fill-emerald-400 dark:text-emerald-400" />
                 Đánh giá cao nhất
               </span>
-              <h2 className="text-4xl md:text-5xl xl:text-6xl font-black text-blue-950 dark:text-white leading-[1.1]">
-                Khám phá cơ sở <br />
-                <span className="text-gradient">Được yêu thích</span>
+              <h2 className="text-xl sm:text-3xl md:text-5xl xl:text-6xl font-black text-blue-950 dark:text-white leading-tight">
+                Khám phá cơ sở <span className="text-gradient">Được yêu thích</span>
               </h2>
             </div>
-            <button onClick={() => navigate('/search')} className="flex items-center gap-2 font-black text-sm text-slate-400 hover:text-primary transition-colors group">
-              XEM TẤT CẢ CƠ SỞ <ChevronRight className="group-hover:translate-x-1 transition-transform" />
+            <button onClick={() => navigate('/search')} className="flex items-center gap-2 font-black text-sm text-slate-500 dark:text-slate-400 hover:text-primary dark:hover:text-blue-400 transition-colors group">
+              Xem tất cả cơ sở <ChevronRight className="group-hover:translate-x-1 transition-transform" />
             </button>
           </div>
 
@@ -297,19 +297,19 @@ export default function Home() {
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
               {topFeaturedShops.map((shop: any) => (
-                <motion.div 
+                <motion.div
                   key={shop.id} initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }}
                   onClick={() => navigate(`/clinic/${shop.id}`)}
-                  className="bg-slate-50 dark:bg-slate-800/50 rounded-[32px] overflow-hidden shadow-soft hover:shadow-hover border border-slate-100 dark:border-slate-800 hover:-translate-y-2 transition-all cursor-pointer group flex flex-col"
+                  className="bg-white dark:bg-slate-900/60 rounded-[32px] overflow-hidden shadow-md hover:shadow-xl border border-slate-200/85 dark:border-slate-800/80 hover:border-blue-500/20 hover:dark:border-blue-500/30 hover:-translate-y-2 transition-all cursor-pointer group flex flex-col"
                 >
-                  <div className="h-48 bg-slate-200 relative overflow-hidden shrink-0">
+                  <div className="h-48 bg-slate-200 dark:bg-slate-800 relative overflow-hidden shrink-0">
                     {shop.logoUrl ? (
                       <img src={shop.logoUrl} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" alt={shop.shopName} />
                     ) : (
                       <img src={spaImage} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" alt="Placeholder" />
                     )}
                     <div className="absolute top-4 left-4 flex gap-2">
-                      <span className="bg-white/90 backdrop-blur text-blue-950 dark:text-white dark:bg-slate-900 px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest">{shop.shopType}</span>
+                      <span className="bg-white/95 dark:bg-slate-950/80 backdrop-blur text-primary dark:text-blue-400 border border-slate-100 dark:border-slate-800 shadow-sm px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest">{shop.shopType}</span>
                     </div>
                     {shop.ratingAvg > 0 && (
                       <div className="absolute top-4 right-4 bg-yellow-400 text-yellow-900 px-2 py-1 rounded-xl text-xs font-black flex items-center gap-1 shadow-lg">
@@ -320,14 +320,14 @@ export default function Home() {
                   <div className="p-6 flex-1 flex flex-col">
                     <h3 className="text-xl font-black text-slate-900 dark:text-white leading-tight mb-2 line-clamp-2">{shop.shopName}</h3>
                     <div className="flex items-start gap-2 text-slate-500 mb-4">
-                      <MapPin size={16} className="shrink-0 mt-0.5 text-primary dark: text-white" />
-                      <span className="text-sm dark:text-white font-medium line-clamp-2 ">{shop.address}, {shop.city}</span>
+                      <MapPin size={16} className="shrink-0 mt-0.5 text-blue-600 dark:text-blue-400" />
+                      <span className="text-sm text-slate-500 dark:text-slate-400 font-medium line-clamp-2">{shop.address}, {shop.city}</span>
                     </div>
                     <div className="mt-auto flex flex-wrap gap-1.5 pt-4 border-t border-slate-200 dark:border-slate-700">
-                      {shop.serviceNames?.slice(0,3).map((svc: string, idx: number) => (
-                        <span key={idx} className="px-2 py-1 bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 text-[10px] rounded-lg font-bold">{svc}</span>
+                      {shop.serviceNames?.slice(0, 3).map((svc: string, idx: number) => (
+                        <span key={idx} className="px-2 py-1 bg-slate-100 dark:bg-slate-800 text-slate-750 dark:text-slate-350 border border-slate-200/10 dark:border-slate-700/50 text-[10px] rounded-lg font-bold">{svc}</span>
                       ))}
-                      {shop.serviceNames?.length > 3 && <span className="px-2 py-1 bg-slate-100 text-slate-600 text-[10px] rounded-lg font-bold">+{shop.serviceNames.length - 3}</span>}
+                      {shop.serviceNames?.length > 3 && <span className="px-2 py-1 bg-slate-100 dark:bg-slate-800 text-slate-750 dark:text-slate-350 border border-slate-200/10 dark:border-slate-700/50 text-[10px] rounded-lg font-bold">+{shop.serviceNames.length - 3}</span>}
                     </div>
                   </div>
                 </motion.div>
@@ -335,22 +335,20 @@ export default function Home() {
             </div>
           )}
         </div>
+
       </section>
 
       {/* ─── Nearby Shops (Hybrid GPS) ─────────────────────────────────── */}
-      <section className="bg-slate-50 dark:bg-slate-950 relative overflow-hidden">
+      <section className="bg-transparent relative overflow-hidden">
         {/* Full Right Background Map */}
-        <div className="absolute top-0 right-0 w-full lg:w-[75%] h-full pointer-events-none">
+        <div className="absolute top-0 right-0 w-full lg:w-[75%] h-full pointer-events-none [mask-image:linear-gradient(to_right,transparent,black_20%,black_100%),linear-gradient(to_bottom,transparent,black_15%,black_85%,transparent)] [mask-composite:intersect] [-webkit-mask-composite:source-in]">
           {/* Actual Map Background */}
           <img 
             src={isDark ? mockMapBgDark : mockMapBg} 
             alt="Map Background" 
             className="absolute inset-0 w-full h-full object-cover opacity-60 dark:opacity-90 mix-blend-multiply dark:mix-blend-normal grayscale-[20%] dark:grayscale-0" 
           />
-          {/* Fade out left side to blend into background */}
-          <div className="absolute inset-0 bg-gradient-to-r from-slate-50 dark:from-slate-950 via-slate-50/50 dark:via-slate-950/50 to-transparent" />
-          {/* Fade out top/bottom */}
-          <div className="absolute inset-0 bg-gradient-to-b from-slate-50 dark:from-slate-950 via-transparent to-slate-50 dark:to-slate-950 opacity-80" />
+
 
           <div className="hidden lg:block">
             {/* Radar Sweeps */}
@@ -507,27 +505,22 @@ export default function Home() {
         </div>
       </section>
 
+
+
       {/* ─── Live Camera Showcase ──────────────────────────────────────── */}
-      <section id="camera" className="py-20 md:py-24 2xl:py-32 px-6 bg-slate-900 relative overflow-hidden -mt-[1px] z-20">
-        {/* Wave Divider */}
-        <div className="absolute top-0 left-0 w-full overflow-hidden leading-none z-30">
-          <svg className="relative block w-full h-[40px] md:h-[60px]" data-name="Layer 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 120" preserveAspectRatio="none">
-            <path d="M0,0V46.29c47.79,22.2,103.59,32.17,158,28,70.36-5.37,136.33-33.31,206.8-37.5C438.64,32.43,512.34,53.67,583,72.05c69.27,18,138.3,24.88,209.4,13.08,36.15-6,69.85-17.84,104.45-29.34C989.49,25,1113-14.29,1200,52.47V0Z" className="fill-white dark:fill-slate-900"></path>
-          </svg>
-        </div>
-        
-        <div className="absolute top-0 right-0 w-[50%] h-full bg-primary/10 blur-[150px] -rotate-12 pointer-events-none" />
+      <section id="camera" className="py-10 md:py-24 xl:py-28 px-4 sm:px-6 bg-transparent relative overflow-hidden z-20">
+        {/* <div className="absolute top-0 right-0 w-[50%] h-full bg-primary/10 blur-[150px] -rotate-12 pointer-events-none" /> */}
         <div className="max-w-7xl mx-auto relative z-10">
           <div className="grid lg:grid-cols-2 gap-8 lg:gap-12 2xl:gap-20 items-center">
-            <motion.div initial={{ opacity: 0, x: -50 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }} className="space-y-6 md:space-y-8 2xl:space-y-10">
-              <div className="space-y-4 2xl:space-y-6">
-                <span className="inline-flex items-center gap-2 bg-secondary/20 text-secondary px-4 py-2 rounded-full text-xs font-black uppercase tracking-wider">
-                  <Video size={30} /> Tính năng độc quyền
+            <motion.div initial={{ opacity: 0, x: -50 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }} className="space-y-4 md:space-y-8 2xl:space-y-10">
+              <div className="space-y-1 md:space-y-4 2xl:space-y-6">
+                <span className="inline-flex items-center gap-2 bg-amber-50 text-amber-700 dark:bg-amber-500/15 dark:text-amber-400 border border-amber-300/60 dark:border-amber-500/25 px-3 py-1.5 md:px-4 md:py-2 rounded-full text-xs font-black uppercase tracking-wider shadow-sm shadow-amber-200/40 dark:shadow-amber-500/10">
+                  <Sparkles size={14} className="text-amber-500 dark:text-amber-400" /> Tính năng độc quyền
                 </span>
-                <h2 className="text-4xl md:text-5xl 2xl:text-6xl font-black text-white leading-[1.1]">
-                  An tâm tuyệt đối <br /> với <span className="bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-secondary">Live Camera</span>
+                <h2 className="text-xl sm:text-3xl md:text-5xl 2xl:text-6xl font-black text-blue-950 dark:text-white leading-tight">
+                  An tâm tuyệt đối với <span className="text-gradient">Live Camera</span>
                 </h2>
-                <p className="text-base md:text-lg 2xl:text-xl text-slate-400 leading-relaxed font-medium">Theo dõi trực tiếp mọi khoảnh khắc của bé yêu 24/7 từ điện thoại. Bạn sẽ luôn cảm thấy gần gũi dù đang ở bất cứ đâu.</p>
+                <p className="text-sm sm:text-base md:text-lg 2xl:text-xl text-slate-600 dark:text-slate-300 leading-relaxed font-medium">Theo dõi trực tiếp mọi khoảnh khắc của bé yêu 24/7 từ điện thoại. Bạn sẽ luôn cảm thấy gần gũi dù đang ở bất cứ đâu.</p>
               </div>
               <div className="space-y-4 2xl:space-y-6">
                 {[
@@ -535,40 +528,40 @@ export default function Home() {
                   { t: "Đàm thoại 2 chiều", d: "Trò chuyện từ xa dễ dàng.", icon: <Video className="text-secondary" /> },
                   { t: "Bảo mật nâng cao", d: "Mã hóa đầu cuối, đảm bảo chỉ bạn mới có quyền xem.", icon: <ShieldCheck className="text-green-500" /> }
                 ].map((item, i) => (
-                  <motion.div key={i} className="flex gap-4 2xl:gap-6 items-start group p-2 2xl:p-4 rounded-3xl hover:bg-white/5 transition-colors">
-                    <div className="w-10 h-10 2xl:w-14 2xl:h-14 rounded-xl 2xl:rounded-2xl bg-white/5 flex items-center justify-center shrink-0 border border-white/10 group-hover:scale-110 transition-transform">
+                  <motion.div key={i} className="flex gap-4 2xl:gap-6 items-start group p-2 2xl:p-4 rounded-3xl border border-transparent hover:border-slate-200/60 dark:hover:border-slate-800/60 hover:bg-white dark:hover:bg-slate-900/60 hover:shadow-lg dark:hover:shadow-none transition-all duration-300">
+                    <div className="w-10 h-10 2xl:w-14 2xl:h-14 rounded-xl 2xl:rounded-2xl bg-slate-100 dark:bg-slate-800 flex items-center justify-center shrink-0 border border-slate-200/60 dark:border-slate-700/60 group-hover:scale-110 transition-transform">
                       {item.icon}
                     </div>
                     <div>
-                      <h4 className="font-black text-white text-base 2xl:text-lg">{item.t}</h4>
-                      <p className="text-slate-500 font-medium text-xs 2xl:text-sm mt-1">{item.d}</p>
+                      <h4 className="font-black text-slate-900 dark:text-white text-base 2xl:text-lg">{item.t}</h4>
+                      <p className="text-slate-500 dark:text-slate-400 font-medium text-xs 2xl:text-sm mt-1">{item.d}</p>
                     </div>
                   </motion.div>
                 ))}
               </div>
-              <button onClick={() => handleAction('/search')} className="w-fit bg-primary text-white px-6 py-3 2xl:px-10 2xl:py-5 rounded-2xl 2xl:rounded-[24px] font-black flex items-center gap-2 2xl:gap-3 hover:bg-white hover:text-slate-900 transition-all shadow-xl hover:shadow-white/20 text-sm 2xl:text-base">
+              <button onClick={() => handleAction('/search')} className="w-fit bg-primary hover:bg-primary/95 dark:bg-blue-600 dark:hover:bg-blue-500 text-white px-6 py-3 2xl:px-10 2xl:py-5 rounded-2xl 2xl:rounded-[24px] font-black flex items-center gap-2 2xl:gap-3 transition-all shadow-lg shadow-primary/20 dark:shadow-blue-500/20 hover:scale-[1.02] text-sm 2xl:text-base">
                 KHÁM PHÁ CƠ SỞ CÓ CAMERA <ArrowRight size={20} className="w-4 h-4 2xl:w-5 2xl:h-5" />
               </button>
             </motion.div>
 
             <motion.div initial={{ opacity: 0, scale: 0.8 }} whileInView={{ opacity: 1, scale: 1 }} viewport={{ once: true }} className="relative">
-              <div className="relative z-10 p-4 glass-dark rounded-[50px] shadow-3xl">
-                <div className="relative aspect-video rounded-[40px] overflow-hidden bg-black">
-                  <img src={cameraPreview} alt="Live feed" className="w-full h-full object-cover opacity-80" />
+              <div className="relative z-10 p-4 glass dark:bg-slate-900/80 dark:border-slate-800 rounded-[50px] shadow-3xl">
+                <div className="relative aspect-[4/3] rounded-[40px] overflow-hidden bg-slate-950">
+                  <img src={cameraPreview} alt="Live feed" className="w-full h-full object-cover object-center scale-110 opacity-80" />
                   <div className="absolute top-6 left-6 flex items-center gap-3">
-                    <div className="px-4 py-2 rounded-full bg-black/60 backdrop-blur-md border border-white/10 text-[10px] font-black text-white flex items-center gap-2">
+                    <div className="px-4 py-2 rounded-full bg-slate-950/80 backdrop-blur-md border border-white/10 text-[10px] font-black text-white flex items-center gap-2">
                       <span className="w-2 h-2 rounded-full bg-red-500 animate-pulse" /> LIVE FEED
                     </div>
-                    <span className="px-3 py-1.5 rounded-full bg-black/40 backdrop-blur-sm border border-white/5 text-[10px] font-bold text-white/80 tracking-widest uppercase">REC 00:42:15</span>
+                    <span className="px-3 py-1.5 rounded-full bg-slate-950/60 backdrop-blur-sm border border-white/5 text-[10px] font-bold text-white/80 tracking-widest uppercase">REC 00:42:15</span>
                   </div>
                   <div className="absolute bottom-6 left-6 right-6 flex items-center justify-between">
-                    <div className="bg-black/60 backdrop-blur-md border border-white/10 p-3 rounded-2xl">
+                    <div className="bg-slate-950/80 backdrop-blur-md border border-white/10 p-3 rounded-2xl">
                       <p className="text-xs font-black text-white">Lucky - Golden Retriever</p>
                       <p className="text-[10px] font-medium text-white/70">Deluxe Room 102</p>
                     </div>
                     <div className="flex gap-2">
-                      <div className="w-10 h-10 rounded-xl bg-black/60 backdrop-blur-md border border-white/10 flex items-center justify-center text-white cursor-pointer hover:bg-white/20 transition-colors"><Video size={16} /></div>
-                      <div className="w-10 h-10 rounded-xl bg-primary flex items-center justify-center text-white cursor-pointer hover:scale-110 transition-transform"><ArrowRight size={16} /></div>
+                      <div className="w-10 h-10 rounded-xl bg-slate-950/80 backdrop-blur-md border border-white/10 flex items-center justify-center text-white cursor-pointer hover:bg-white/25 transition-colors"><Video size={16} /></div>
+                      <div className="w-10 h-10 rounded-xl bg-primary dark:bg-blue-600 flex items-center justify-center text-white cursor-pointer hover:scale-110 transition-transform"><ArrowRight size={16} /></div>
                     </div>
                   </div>
                 </div>
@@ -578,30 +571,23 @@ export default function Home() {
             </motion.div>
           </div>
         </div>
-        
-        {/* Bottom Wave Divider */}
-        <div className="absolute bottom-0 left-0 w-full overflow-hidden leading-none z-30 rotate-180">
-          <svg className="relative block w-full h-[40px] md:h-[60px]" data-name="Layer 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 120" preserveAspectRatio="none">
-            <path d="M0,0V46.29c47.79,22.2,103.59,32.17,158,28,70.36-5.37,136.33-33.31,206.8-37.5C438.64,32.43,512.34,53.67,583,72.05c69.27,18,138.3,24.88,209.4,13.08,36.15-6,69.85-17.84,104.45-29.34C989.49,25,1113-14.29,1200,52.47V0Z" className="fill-slate-50 dark:fill-slate-950"></path>
-          </svg>
-        </div>
       </section>
 
       {/* ─── How it Works (Quy trình) ──────────────────────────────────── */}
-      <section className="py-16 md:py-24 2xl:py-32 px-6 bg-slate-50 dark:bg-slate-950 relative overflow-hidden -mt-[1px] z-10">
+      <section className="py-10 md:py-24 2xl:py-32 px-4 sm:px-6 bg-transparent relative overflow-hidden z-10">
         <div className="absolute top-1/2 left-1/4 w-96 h-96 bg-primary/5 rounded-full blur-[120px] pointer-events-none" />
         <div className="max-w-7xl mx-auto relative z-10">
-          <div className="text-center mb-16 xl:mb-24 space-y-4">
-            <span className="inline-flex items-center gap-2 bg-indigo-100 text-indigo-600 dark:bg-indigo-900/30 dark:text-indigo-400 px-4 py-2 rounded-full text-xs font-black uppercase tracking-wider">
-              <Sparkles size={16} /> Đơn giản & Nhanh chóng
+          <div className="text-center mb-6 md:mb-16 xl:mb-24 space-y-1 md:space-y-4">
+            <span className="inline-flex items-center gap-2 bg-indigo-50 text-indigo-700 dark:bg-indigo-900/30 dark:text-indigo-400 border border-indigo-200/60 dark:border-indigo-500/20 px-3 py-1.5 rounded-full text-xs font-black uppercase tracking-wider">
+              <Zap size={14} className="text-indigo-500 dark:text-indigo-400" /> Đơn giản &amp; Nhanh chóng
             </span>
-            <h2 className="text-4xl md:text-5xl xl:text-6xl font-black text-blue-950 dark:text-white tracking-tight">Sử dụng PetEye <span className="text-gradient">Chỉ với 3 bước</span></h2>
+            <h2 className="text-xl sm:text-3xl md:text-5xl xl:text-6xl font-black text-blue-950 dark:text-white tracking-tight">Sử dụng PetEye <span className="text-gradient">Chỉ với 3 bước</span></h2>
           </div>
-          
+
           <div className="relative max-w-6xl mx-auto mt-12 lg:mt-20">
             {/* Connecting Path Line (Desktop) */}
             <div className="hidden lg:block absolute top-[40%] left-[15%] w-[70%] border-t-[3px] border-dashed border-slate-300 dark:border-slate-700 z-0" />
-            
+
             {/* Arrow Connectors */}
             <div className="hidden lg:flex absolute top-[40%] left-[33.33%] -translate-y-1/2 -translate-x-1/2 w-12 h-12 bg-white dark:bg-slate-800 rounded-full shadow-lg items-center justify-center z-20 text-slate-400 border border-slate-100 dark:border-slate-700 animate-pulse">
               <ArrowRight size={24} className="text-primary dark:text-blue-400" />
@@ -609,10 +595,10 @@ export default function Home() {
             <div className="hidden lg:flex absolute top-[40%] left-[66.66%] -translate-y-1/2 -translate-x-1/2 w-12 h-12 bg-white dark:bg-slate-800 rounded-full shadow-lg items-center justify-center z-20 text-slate-400 border border-slate-100 dark:border-slate-700 animate-pulse" style={{ animationDelay: '500ms' }}>
               <ArrowRight size={24} className="text-primary dark:text-blue-400" />
             </div>
-            
+
             <div className="grid lg:grid-cols-3 gap-8 relative z-10 items-stretch">
               {/* Step 1 */}
-              <motion.div 
+              <motion.div
                 initial={{ opacity: 0, y: 50 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true, margin: "-100px" }}
@@ -620,15 +606,15 @@ export default function Home() {
                 className="group relative bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-6 lg:p-8 rounded-[40px] shadow-xl hover:shadow-2xl hover:shadow-blue-500/10 hover:border-blue-500/50 transition-all duration-500 overflow-hidden flex flex-col h-full"
               >
                 <div className="absolute -top-8 -right-8 text-[180px] font-black text-slate-50 dark:text-slate-800/30 leading-none select-none z-0 transition-transform duration-700 group-hover:scale-110 group-hover:-rotate-6">1</div>
-                
+
                 <div className="relative z-10 flex flex-col h-full">
                   <div className="inline-flex items-center justify-center bg-blue-100 text-blue-600 dark:bg-blue-900/50 dark:text-blue-400 text-xs font-black px-4 py-2 rounded-full mb-6 w-fit uppercase tracking-widest shadow-sm">
                     Bước 1
                   </div>
-                  
+
                   {/* Mock UI */}
                   <div className="w-full h-36 lg:h-40 bg-slate-50 dark:bg-slate-950/50 rounded-3xl mb-6 lg:mb-8 p-4 lg:p-5 border border-slate-100 dark:border-slate-800 flex flex-col justify-center gap-3 group-hover:bg-blue-50 dark:group-hover:bg-blue-900/10 transition-colors duration-500">
-                    <div className="w-full h-10 bg-white dark:bg-slate-800 rounded-full shadow-sm flex items-center px-4 gap-3 animate-pulse" style={{animationDuration: '3s'}}>
+                    <div className="w-full h-10 bg-white dark:bg-slate-800 rounded-full shadow-sm flex items-center px-4 gap-3 animate-pulse" style={{ animationDuration: '3s' }}>
                       <Search size={16} className="text-slate-400" />
                       <div className="h-2 w-1/3 bg-slate-200 dark:bg-slate-700 rounded-full" />
                     </div>
@@ -650,7 +636,7 @@ export default function Home() {
               </motion.div>
 
               {/* Step 2 */}
-              <motion.div 
+              <motion.div
                 initial={{ opacity: 0, y: 50 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true, margin: "-100px" }}
@@ -658,7 +644,7 @@ export default function Home() {
                 className="group relative bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-6 lg:p-8 rounded-[40px] shadow-xl hover:shadow-2xl hover:shadow-purple-500/10 hover:border-purple-500/50 transition-all duration-500 overflow-hidden flex flex-col h-full"
               >
                 <div className="absolute -top-8 -right-8 text-[180px] font-black text-slate-50 dark:text-slate-800/30 leading-none select-none z-0 transition-transform duration-700 group-hover:scale-110 group-hover:-rotate-6">2</div>
-                
+
                 <div className="relative z-10 flex flex-col h-full">
                   <div className="inline-flex items-center justify-center bg-purple-100 text-purple-600 dark:bg-purple-900/50 dark:text-purple-400 text-xs font-black px-4 py-2 rounded-full mb-6 w-fit uppercase tracking-widest shadow-sm">
                     Bước 2
@@ -667,7 +653,7 @@ export default function Home() {
                   <div className="w-full h-36 lg:h-40 bg-slate-50 dark:bg-slate-950/50 rounded-3xl mb-6 lg:mb-8 p-4 lg:p-5 border border-slate-100 dark:border-slate-800 flex flex-col justify-center group-hover:bg-purple-50 dark:group-hover:bg-purple-900/10 transition-colors duration-500">
                     <div className="grid grid-cols-3 gap-2">
                       {['09:00', '10:00', '11:00', '14:00', '15:00', '16:00'].map((time, idx) => (
-                        <div key={time} className={`h-7 lg:h-8 rounded-xl flex items-center justify-center text-[9px] lg:text-[10px] font-black tracking-wider transition-all duration-500 ${idx === 2 ? 'bg-purple-500 text-white shadow-lg shadow-purple-500/30 scale-105' : 'bg-white dark:bg-slate-800 text-slate-400 dark:text-slate-500 shadow-sm'}`}>
+                        <div key={time} className={`h-7 lg:h-8 rounded-xl flex items-center justify-center text-[9px] lg:text-[10px] font-black tracking-wider transition-all duration-500 ${idx === 2 ? 'bg-purple-500 text-white shadow-lg shadow-purple-500/30 scale-105' : 'bg-white dark:bg-slate-800 text-slate-450 dark:text-slate-400 shadow-sm'}`}>
                           {time}
                         </div>
                       ))}
@@ -683,7 +669,7 @@ export default function Home() {
               </motion.div>
 
               {/* Step 3 */}
-              <motion.div 
+              <motion.div
                 initial={{ opacity: 0, y: 50 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true, margin: "-100px" }}
@@ -691,7 +677,7 @@ export default function Home() {
                 className="group relative bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-6 lg:p-8 rounded-[40px] shadow-xl hover:shadow-2xl hover:shadow-rose-500/10 hover:border-rose-500/50 transition-all duration-500 overflow-hidden flex flex-col h-full"
               >
                 <div className="absolute -top-8 -right-8 text-[180px] font-black text-slate-50 dark:text-slate-800/30 leading-none select-none z-0 transition-transform duration-700 group-hover:scale-110 group-hover:-rotate-6">3</div>
-                
+
                 <div className="relative z-10 flex flex-col h-full">
                   <div className="inline-flex items-center justify-center bg-rose-100 text-rose-600 dark:bg-rose-900/50 dark:text-rose-400 text-xs font-black px-4 py-2 rounded-full mb-6 w-fit uppercase tracking-widest shadow-sm">
                     Bước 3
@@ -699,11 +685,11 @@ export default function Home() {
 
                   <div className="w-full h-36 lg:h-40 bg-slate-50 dark:bg-slate-950/50 rounded-3xl mb-6 lg:mb-8 p-4 lg:p-5 border border-slate-100 dark:border-slate-800 flex flex-col justify-center items-center group-hover:bg-rose-50 dark:group-hover:bg-rose-900/10 transition-colors duration-500">
                     <div className="flex gap-1 mb-4">
-                      {[1,2,3,4,5].map((s, idx) => (
+                      {[1, 2, 3, 4, 5].map((s, idx) => (
                         <Star key={s} size={20} className="fill-rose-400 text-rose-400 drop-shadow-sm transition-transform duration-300 hover:scale-125 hover:-rotate-12 cursor-pointer" style={{ animationDelay: `${idx * 100}ms` }} />
                       ))}
                     </div>
-                    <div className="w-full bg-white dark:bg-slate-800 p-3 lg:p-4 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-700">
+                    <div className="w-full bg-white dark:bg-slate-850 p-3 lg:p-4 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-700">
                       <div className="flex items-center gap-3 mb-2 lg:mb-3">
                         <div className="w-6 h-6 lg:w-8 lg:h-8 bg-slate-200 dark:bg-slate-700 rounded-full" />
                         <div className="h-2 w-16 lg:w-20 bg-slate-200 dark:bg-slate-700 rounded-full" />
@@ -719,17 +705,17 @@ export default function Home() {
             </div>
 
             {/* CTA Button */}
-            <motion.div 
+            <motion.div
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               className="mt-12 lg:mt-16 flex justify-center"
             >
-              <button 
+              <button
                 onClick={() => navigate(user ? '/search' : '/login')}
-                className="group relative inline-flex items-center justify-center gap-3 px-8 py-4 lg:px-10 lg:py-5 font-black text-white bg-primary rounded-full overflow-hidden shadow-2xl shadow-primary/30 hover:scale-105 transition-all duration-300"
+                className="group relative inline-flex items-center justify-center gap-3 px-8 py-4 lg:px-10 lg:py-5 font-black text-white bg-primary dark:bg-blue-600 rounded-full overflow-hidden shadow-2xl shadow-primary/30 dark:shadow-blue-500/20 hover:scale-105 transition-all duration-300"
               >
-                <div className="absolute inset-0 bg-gradient-to-r from-primary to-indigo-600 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                <div className="absolute inset-0 bg-gradient-to-r from-primary to-indigo-600 dark:from-blue-600 dark:to-indigo-600 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
                 <span className="relative z-10 flex items-center gap-2 text-sm lg:text-base">
                   {user ? 'ĐẶT LỊCH NGAY' : 'ĐĂNG NHẬP & TRẢI NGHIỆM NGAY'} <ArrowRight size={20} className="group-hover:translate-x-1 transition-transform" />
                 </span>
@@ -740,13 +726,14 @@ export default function Home() {
       </section>
 
       {/* ─── Testimonials (Horizontal Split) ───────────────────────────── */}
-      <section className="py-16 md:py-24 2xl:py-32 bg-slate-50 dark:bg-slate-950 border-t border-slate-100 dark:border-slate-800 overflow-hidden relative -mt-[1px] z-10">
+      <section className="py-16 md:py-24 2xl:py-32 bg-transparent overflow-hidden relative  z-10">
+
         {/* Background Gradients */}
-        <div className="absolute top-0 right-0 w-1/2 h-full bg-primary/5 blur-[150px] pointer-events-none" />
-        
+        {/* <div className="absolute top-0 right-0 w-1/2 h-full bg-primary/5 blur-[150px] pointer-events-none" /> */}
+
         <div className="max-w-7xl mx-auto px-6 relative z-10">
           <div className="grid lg:grid-cols-12 gap-12 lg:gap-8 items-center">
-            
+
             {/* Left Column (Text & Stats) */}
             <div className="lg:col-span-5 space-y-8">
               <div>
@@ -759,7 +746,7 @@ export default function Home() {
                   Kết nối yêu thương, chăm sóc tận tâm. Khám phá lý do hàng ngàn khách hàng luôn tin tưởng và lựa chọn PetEye.
                 </p>
               </div>
-              
+
               <div className="flex items-center gap-4">
                 <div className="flex -space-x-3">
                   <img src="https://i.pravatar.cc/150?img=1" className="w-10 h-10 rounded-full border-2 border-white dark:border-slate-900 object-cover" alt="User" />
@@ -768,7 +755,7 @@ export default function Home() {
                   <div className="w-10 h-10 rounded-full border-2 border-white dark:border-slate-900 bg-primary text-white flex items-center justify-center text-xs font-bold">+</div>
                 </div>
                 <div className="text-sm font-medium text-slate-700 dark:text-slate-300">
-                  <span className="text-primary font-black text-base dark: text-white">1000+</span> Lượt đặt lịch thành công.
+                  <span className="text-primary dark:text-blue-400 font-black text-base">1000+</span> Lượt đặt lịch thành công.
                 </div>
               </div>
             </div>
@@ -776,11 +763,11 @@ export default function Home() {
             {/* Right Column (Horizontal Marquees) */}
             <div className="lg:col-span-7 relative flex flex-col gap-6 overflow-hidden py-4 -mx-6 px-6 lg:mx-0 lg:px-0">
               {/* Overlay Gradients to hide edges smoothly */}
-              <div className="absolute top-0 left-0 bottom-0 w-12 lg:w-24 bg-gradient-to-r from-slate-50 dark:from-slate-950 to-transparent z-10 pointer-events-none" />
-              <div className="absolute top-0 right-0 bottom-0 w-12 lg:w-24 bg-gradient-to-l from-slate-50 dark:from-slate-950 to-transparent z-10 pointer-events-none" />
+              {/* <div className="absolute top-0 left-0 bottom-0 w-12 lg:w-24 bg-gradient-to-r from-slate-50 dark:from-slate-950 to-transparent z-10 pointer-events-none" /> */}
+              {/* <div className="absolute top-0 right-0 bottom-0 w-12 lg:w-24 bg-gradient-to-l from-slate-50 dark:from-slate-950 to-transparent z-10 pointer-events-none" /> */}
 
               {/* Row 1 - Scrolling Left */}
-              <motion.div 
+              <motion.div
                 animate={{ x: ["0%", "-50%"] }}
                 transition={{ duration: 30, ease: "linear", repeat: Infinity }}
                 className="flex gap-6 w-max"
@@ -788,7 +775,7 @@ export default function Home() {
                 {[1, 2].map((loopIdx) => (
                   <React.Fragment key={loopIdx}>
                     {/* Card 1 */}
-                    <div className="w-72 shrink-0 bg-white dark:bg-slate-900 p-6 rounded-[20px] shadow-sm hover:shadow-md dark:shadow-none border border-slate-100 dark:border-slate-800 transition-shadow">
+                    <div className="w-72 shrink-0 bg-white dark:bg-slate-900/60 p-6 rounded-[20px] shadow-md hover:shadow-lg border border-slate-200/80 dark:border-slate-800/80 hover:border-blue-500/20 hover:dark:border-blue-500/30 transition-all duration-300">
                       <div className="flex items-center gap-2 mb-3">
                         <div className="w-7 h-7 rounded-full bg-rose-100 dark:bg-rose-900/30 text-rose-500 flex items-center justify-center"><Heart size={12} /></div>
                         <span className="text-[10px] font-black text-rose-500 uppercase tracking-widest">Tin cậy 100%</span>
@@ -801,15 +788,15 @@ export default function Home() {
                           <img src="https://i.pravatar.cc/150?img=1" className="w-8 h-8 rounded-full object-cover" alt="Thu Trang" />
                           <div>
                             <h4 className="font-black text-xs text-slate-900 dark:text-white">Thu Trang</h4>
-                            <p className="text-[9px] font-bold text-slate-500 uppercase tracking-wider">Mẹ bé Corgi</p>
+                            <p className="text-[9px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Mẹ bé Corgi</p>
                           </div>
                         </div>
                         <div className="flex text-yellow-400"><Star size={10} className="fill-current" /><Star size={10} className="fill-current" /><Star size={10} className="fill-current" /><Star size={10} className="fill-current" /><Star size={10} className="fill-current" /></div>
                       </div>
                     </div>
-                    
+
                     {/* Card 2 */}
-                    <div className="w-72 shrink-0 bg-white dark:bg-slate-900 p-6 rounded-[20px] shadow-sm hover:shadow-md dark:shadow-none border border-slate-100 dark:border-slate-800 transition-shadow">
+                    <div className="w-72 shrink-0 bg-white dark:bg-slate-900/60 p-6 rounded-[20px] shadow-md hover:shadow-lg border border-slate-200/80 dark:border-slate-800/80 hover:border-blue-500/20 hover:dark:border-blue-500/30 transition-all duration-300">
                       <div className="flex items-center gap-2 mb-3">
                         <div className="w-7 h-7 rounded-full bg-blue-100 dark:bg-blue-900/30 text-blue-500 flex items-center justify-center"><Navigation size={12} /></div>
                         <span className="text-[10px] font-black text-blue-500 uppercase tracking-widest">Tiện Lợi</span>
@@ -822,7 +809,7 @@ export default function Home() {
                           <img src="https://i.pravatar.cc/150?img=11" className="w-8 h-8 rounded-full object-cover" alt="Minh Tuấn" />
                           <div>
                             <h4 className="font-black text-xs text-slate-900 dark:text-white">Minh Tuấn</h4>
-                            <p className="text-[9px] font-bold text-slate-500 uppercase tracking-wider">Chủ bé Mèo Anh</p>
+                            <p className="text-[9px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Chủ bé Mèo Anh</p>
                           </div>
                         </div>
                         <div className="flex text-yellow-400"><Star size={10} className="fill-current" /><Star size={10} className="fill-current" /><Star size={10} className="fill-current" /><Star size={10} className="fill-current" /><Star size={10} className="fill-current" /></div>
@@ -830,7 +817,7 @@ export default function Home() {
                     </div>
 
                     {/* Card 3 */}
-                    <div className="w-72 shrink-0 bg-white dark:bg-slate-900 p-6 rounded-[20px] shadow-sm hover:shadow-md dark:shadow-none border border-slate-100 dark:border-slate-800 transition-shadow">
+                    <div className="w-72 shrink-0 bg-white dark:bg-slate-900/60 p-6 rounded-[20px] shadow-md hover:shadow-lg border border-slate-200/80 dark:border-slate-800/80 hover:border-blue-500/20 hover:dark:border-blue-500/30 transition-all duration-300">
                       <div className="flex items-center gap-2 mb-3">
                         <div className="w-7 h-7 rounded-full bg-emerald-100 dark:bg-emerald-900/30 text-emerald-500 flex items-center justify-center"><Shield size={12} /></div>
                         <span className="text-[10px] font-black text-emerald-500 uppercase tracking-widest">An Tâm</span>
@@ -843,7 +830,7 @@ export default function Home() {
                           <img src="https://i.pravatar.cc/150?img=9" className="w-8 h-8 rounded-full object-cover" alt="Hoàng Oanh" />
                           <div>
                             <h4 className="font-black text-xs text-slate-900 dark:text-white">Hoàng Oanh</h4>
-                            <p className="text-[9px] font-bold text-slate-500 uppercase tracking-wider">Mẹ bé Husky</p>
+                            <p className="text-[9px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Mẹ bé Husky</p>
                           </div>
                         </div>
                         <div className="flex text-yellow-400"><Star size={10} className="fill-current" /><Star size={10} className="fill-current" /><Star size={10} className="fill-current" /><Star size={10} className="fill-current" /><Star size={10} className="fill-current" /></div>
@@ -854,7 +841,7 @@ export default function Home() {
               </motion.div>
 
               {/* Row 2 - Scrolling Right */}
-              <motion.div 
+              <motion.div
                 animate={{ x: ["-50%", "0%"] }}
                 transition={{ duration: 35, ease: "linear", repeat: Infinity }}
                 className="flex gap-6 w-max -ml-12"
@@ -862,7 +849,7 @@ export default function Home() {
                 {[1, 2].map((loopIdx) => (
                   <React.Fragment key={loopIdx}>
                     {/* Card 4 */}
-                    <div className="w-72 shrink-0 bg-white dark:bg-slate-900 p-6 rounded-[20px] shadow-sm hover:shadow-md dark:shadow-none border border-slate-100 dark:border-slate-800 transition-shadow">
+                    <div className="w-72 shrink-0 bg-white dark:bg-slate-900/60 p-6 rounded-[20px] shadow-md hover:shadow-lg border border-slate-200/80 dark:border-slate-800/80 hover:border-blue-500/20 hover:dark:border-blue-500/30 transition-all duration-300">
                       <div className="flex items-center gap-2 mb-3">
                         <div className="w-7 h-7 rounded-full bg-purple-100 dark:bg-purple-900/30 text-purple-500 flex items-center justify-center"><Star size={12} /></div>
                         <span className="text-[10px] font-black text-purple-500 uppercase tracking-widest">Chất lượng 5 sao</span>
@@ -875,7 +862,7 @@ export default function Home() {
                           <img src="https://i.pravatar.cc/150?img=5" className="w-8 h-8 rounded-full object-cover" alt="Ngọc Lan" />
                           <div>
                             <h4 className="font-black text-xs text-slate-900 dark:text-white">Ngọc Lan</h4>
-                            <p className="text-[9px] font-bold text-slate-500 uppercase tracking-wider">Mẹ 2 bé Poodle</p>
+                            <p className="text-[9px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Mẹ 2 bé Poodle</p>
                           </div>
                         </div>
                         <div className="flex text-yellow-400"><Star size={10} className="fill-current" /><Star size={10} className="fill-current" /><Star size={10} className="fill-current" /><Star size={10} className="fill-current" /><Star size={10} className="fill-current" /></div>
@@ -883,7 +870,7 @@ export default function Home() {
                     </div>
 
                     {/* Card 5 */}
-                    <div className="w-72 shrink-0 bg-white dark:bg-slate-900 p-6 rounded-[20px] shadow-sm hover:shadow-md dark:shadow-none border border-slate-100 dark:border-slate-800 transition-shadow">
+                    <div className="w-72 shrink-0 bg-white dark:bg-slate-900/60 p-6 rounded-[20px] shadow-md hover:shadow-lg border border-slate-200/80 dark:border-slate-800/80 hover:border-blue-500/20 hover:dark:border-blue-500/30 transition-all duration-300">
                       <div className="flex items-center gap-2 mb-3">
                         <div className="w-7 h-7 rounded-full bg-amber-100 dark:bg-amber-900/30 text-amber-500 flex items-center justify-center"><CheckCircle2 size={12} /></div>
                         <span className="text-[10px] font-black text-amber-500 uppercase tracking-widest">Minh bạch</span>
@@ -896,7 +883,7 @@ export default function Home() {
                           <img src="https://i.pravatar.cc/150?img=12" className="w-8 h-8 rounded-full object-cover" alt="Quốc Hưng" />
                           <div>
                             <h4 className="font-black text-xs text-slate-900 dark:text-white">Quốc Hưng</h4>
-                            <p className="text-[9px] font-bold text-slate-500 uppercase tracking-wider">Chủ 3 bé Mèo</p>
+                            <p className="text-[9px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Chủ 3 bé Mèo</p>
                           </div>
                         </div>
                         <div className="flex text-yellow-400"><Star size={10} className="fill-current" /><Star size={10} className="fill-current" /><Star size={10} className="fill-current" /><Star size={10} className="fill-current" /><Star size={10} className="fill-current" /></div>
@@ -904,7 +891,7 @@ export default function Home() {
                     </div>
 
                     {/* Card 6 */}
-                    <div className="w-72 shrink-0 bg-white dark:bg-slate-900 p-6 rounded-[20px] shadow-sm hover:shadow-md dark:shadow-none border border-slate-100 dark:border-slate-800 transition-shadow">
+                    <div className="w-72 shrink-0 bg-white dark:bg-slate-900/60 p-6 rounded-[20px] shadow-md hover:shadow-lg border border-slate-200/80 dark:border-slate-800/80 hover:border-blue-500/20 hover:dark:border-blue-500/30 transition-all duration-300">
                       <div className="flex items-center gap-2 mb-3">
                         <div className="w-7 h-7 rounded-full bg-pink-100 dark:bg-pink-900/30 text-pink-500 flex items-center justify-center"><Heart size={12} /></div>
                         <span className="text-[10px] font-black text-pink-500 uppercase tracking-widest">Tuyệt Vời</span>
@@ -917,7 +904,7 @@ export default function Home() {
                           <img src="https://i.pravatar.cc/150?img=20" className="w-8 h-8 rounded-full object-cover" alt="Thanh Thảo" />
                           <div>
                             <h4 className="font-black text-xs text-slate-900 dark:text-white">Thanh Thảo</h4>
-                            <p className="text-[9px] font-bold text-slate-500 uppercase tracking-wider">Mẹ bé Samoyed</p>
+                            <p className="text-[9px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Mẹ bé Samoyed</p>
                           </div>
                         </div>
                         <div className="flex text-yellow-400"><Star size={10} className="fill-current" /><Star size={10} className="fill-current" /><Star size={10} className="fill-current" /><Star size={10} className="fill-current" /><Star size={10} className="fill-current" /></div>
@@ -927,13 +914,14 @@ export default function Home() {
                 ))}
               </motion.div>
             </div>
-            
+
           </div>
         </div>
+
       </section>
 
       {/* ─── FAQ Section ───────────────────────────────────────────────── */}
-      <section className="pt-12 md:pt-16 xl:pt-24 pb-12 md:pb-16 xl:pb-20 px-6 bg-slate-50 dark:bg-slate-950 relative">
+      <section className="pt-12 md:pt-16 xl:pt-24 pb-12 md:pb-16 xl:pb-20 px-6 bg-transparent relative">
         <div className="max-w-3xl mx-auto relative z-10">
           <div className="text-center mb-8 xl:mb-16">
             <h2 className="text-3xl xl:text-4xl font-black text-slate-900 dark:text-white mb-4"><span className="text-gradient">Câu hỏi thường gặp</span></h2>
@@ -947,8 +935,8 @@ export default function Home() {
               { q: "Tôi có thể hủy hoặc thay đổi lịch hẹn sau khi đặt không?", a: "Có. Bạn có thể hủy hoặc thay đổi lịch hẹn thông qua tài khoản PetEye trước thời gian sử dụng dịch vụ. Chính sách hoàn tiền và hủy lịch có thể khác nhau tùy theo từng cơ sở. Thông tin chi tiết sẽ được hiển thị trước khi bạn xác nhận đặt lịch để đảm bảo minh bạch ngay từ đầu." },
               { q: "Tôi có thể xem thú cưng của mình khi đang gửi lưu trú không?", a: "Có. Đối với các cơ sở tham gia chương trình Camera Monitoring của PetEye, chủ nuôi có thể truy cập camera trực tuyến trong thời gian thú cưng đang sử dụng dịch vụ. Quyền truy cập chỉ được cấp cho khách hàng có đơn đặt lịch hợp lệ nhằm đảm bảo tính riêng tư và an toàn thông tin." }
             ].map((faq, i) => (
-              <div key={i} className="bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 rounded-2xl overflow-hidden">
-                <button 
+              <div key={i} className="bg-white dark:bg-slate-900/60 border border-slate-200/80 dark:border-slate-800/80 shadow-sm hover:shadow-md transition-all duration-300 rounded-2xl overflow-hidden">
+                <button
                   onClick={() => setActiveFaq(activeFaq === i ? null : i)}
                   className="w-full px-6 py-5 flex items-center justify-between text-left focus:outline-none"
                 >
@@ -958,7 +946,7 @@ export default function Home() {
                 <AnimatePresence>
                   {activeFaq === i && (
                     <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }} exit={{ height: 0, opacity: 0 }} className="overflow-hidden">
-                      <div className="px-6 pb-5 text-slate-500 font-medium leading-relaxed">
+                      <div className="px-6 pb-5 text-slate-500 dark:text-slate-350 font-medium leading-relaxed">
                         {faq.a}
                       </div>
                     </motion.div>
@@ -971,7 +959,9 @@ export default function Home() {
       </section>
 
       {/* ─── News & Community CTA ─────────────────────────────────────────── */}
-      <section className="px-6 py-12 md:py-16 xl:py-20 bg-slate-50 dark:bg-slate-950 relative z-10">
+      <section className="px-6 py-12 md:py-16 xl:py-20 bg-transparent relative z-10">
+        {/* Lớp phủ chuyển màu mịn màng từ phần FAQ nền sáng sang phần News */}
+        {/* <div className="absolute top-0 left-0 right-0 h-24 bg-gradient-to-b from-slate-50 to-transparent dark:from-slate-950 dark:to-transparent pointer-events-none z-10" /> */}
         <div className="max-w-5xl mx-auto relative">
           {/* Decorative Glowing Backdrop */}
           <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[80%] h-[80%] bg-blue-400/20 dark:bg-indigo-500/10 blur-[100px] rounded-full -z-10 pointer-events-none"></div>
@@ -986,17 +976,17 @@ export default function Home() {
               <span className="material-symbols-outlined text-sm">article</span>
               Tin tức & Cộng đồng
             </div>
-            
+
             <h2 className="text-3xl md:text-5xl font-black text-slate-900 dark:text-white mb-6 tracking-tight">
               Cập nhật tin tức <span className="text-blue-600 dark:text-blue-400">mới nhất</span>
             </h2>
-            
+
             <p className="text-slate-500 dark:text-slate-400 font-medium max-w-xl mx-auto mb-10 leading-relaxed text-sm md:text-base">
               Khám phá những kiến thức chăm sóc thú cưng bổ ích và các sự kiện hấp dẫn từ hệ sinh thái PetEye.
             </p>
-            
+
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-              <button onClick={() => window.open('https://web.facebook.com/profile.php?id=61590306674838', '_blank')} className="w-full sm:w-auto bg-[#0B132B] hover:bg-[#15234b] text-white px-8 py-3.5 rounded-full font-black text-sm shadow-xl shadow-slate-900/10 hover:-translate-y-0.5 transition-all active:scale-95">
+              <button onClick={() => window.open('https://web.facebook.com/profile.php?id=61590306674838', '_blank')} className="w-full sm:w-auto bg-[#1877F2] hover:bg-[#166FE5] text-white px-8 py-3.5 rounded-full font-black text-sm shadow-xl shadow-blue-500/10 hover:-translate-y-0.5 transition-all active:scale-95">
                 Tham gia Facebook
               </button>
               <button onClick={() => window.open('https://tiktok.com', '_blank')} className="w-full sm:w-auto bg-white hover:bg-slate-50 text-slate-900 border border-slate-200 dark:border-slate-700 dark:bg-slate-800 dark:text-white dark:hover:bg-slate-700 px-8 py-3.5 rounded-full font-black text-sm shadow-lg shadow-slate-200/50 dark:shadow-none hover:-translate-y-0.5 transition-all active:scale-95">
@@ -1009,8 +999,8 @@ export default function Home() {
 
       {/* ─── Sticky Mobile CTA ─────────────────────────────────────────── */}
       <div className="fixed bottom-0 left-0 right-0 p-4 bg-white/90 dark:bg-slate-900/90 backdrop-blur-xl border-t border-slate-200 dark:border-slate-800 z-[40] md:hidden flex justify-center pb-safe">
-        <button 
-          onClick={() => navigate('/search')} 
+        <button
+          onClick={() => navigate('/search')}
           className="w-full bg-slate-900 dark:bg-white text-white dark:text-slate-900 py-4 rounded-2xl font-black shadow-xl shadow-slate-900/20 dark:shadow-white/10 flex items-center justify-center gap-2 active:scale-95 transition-transform"
         >
           <Search size={18} /> TÌM CƠ SỞ NGAY

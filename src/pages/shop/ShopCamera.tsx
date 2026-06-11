@@ -22,7 +22,7 @@ export default function ShopCamera() {
   const [loading, setLoading] = useState(true);
   const [streamError, setStreamError] = useState(false);
   const [isMuted, setIsMuted] = useState(true);
-  
+
   // Track RTSP input values for each booking by ID
   const [rtspInputs, setRtspInputs] = useState<Record<number, string>>({});
   const [submittingIds, setSubmittingIds] = useState<Record<number, boolean>>({});
@@ -45,7 +45,7 @@ export default function ShopCamera() {
     const checkReady = async () => {
       const ready = await checkStreamReady(selectedBooking.cameraStreamUrl!);
       if (!isMounted) return;
-      
+
       setIsCheckingStream(false);
       if (ready) {
         setIsStreamReady(true);
@@ -81,12 +81,12 @@ export default function ShopCamera() {
     try {
       const allBookings = await bookingService.getShopBookings();
       // Filter: must be lodging with camera enabled, and status accepted
-      const filtered = allBookings.filter(b => 
+      const filtered = allBookings.filter(b =>
         b.cameraEnabled === true &&
         ['CONFIRMED', 'IN_PROGRESS', 'COMPLETED'].includes(b.status)
       );
       setBookings(filtered);
-      
+
       // Initialize inputs with current RTSP urls
       const inputs: Record<number, string> = {};
       filtered.forEach(b => {
@@ -128,7 +128,7 @@ export default function ShopCamera() {
     try {
       const updated = await bookingService.configureCamera(bookingId, rtspUrl);
       toast.success('Cấu hình camera thành công! Đang khởi chạy luồng stream...');
-      
+
       // Update local state
       setBookings(prev => prev.map(b => b.id === bookingId ? updated : b));
       if (selectedBooking?.id === bookingId) {
@@ -147,12 +147,12 @@ export default function ShopCamera() {
 
   const handleDeleteCamera = async (bookingId: number) => {
     if (!window.confirm('Bạn có chắc muốn tắt camera và dừng luồng stream cho đơn này?')) return;
-    
+
     setSubmittingIds(prev => ({ ...prev, [bookingId]: true }));
     try {
       const updated = await bookingService.deleteCamera(bookingId);
       toast.success('Đã tắt camera và dừng Docker container thành công');
-      
+
       setBookings(prev => prev.map(b => b.id === bookingId ? updated : b));
       if (selectedBooking?.id === bookingId) {
         setSelectedBooking(updated);
@@ -237,7 +237,7 @@ export default function ShopCamera() {
           </div>
         ) : (
           <div className="grid grid-cols-1 lg:grid-cols-[1.6fr_1fr] gap-6">
-            
+
             {/* Left: Bookings list with RTSP config inputs */}
             <div className="space-y-4">
               <h2 className={`text-lg font-bold flex items-center gap-2 ${isDark ? 'text-white' : 'text-slate-900'}`}>
@@ -251,15 +251,14 @@ export default function ShopCamera() {
                 {bookings.map((booking) => {
                   const isConfigured = !!booking.cameraStreamUrl;
                   const isSubmitting = submittingIds[booking.id] || false;
-                  
+
                   return (
-                    <div 
+                    <div
                       key={booking.id}
-                      className={`p-6 rounded-2xl border transition-all ${
-                        selectedBooking?.id === booking.id
+                      className={`p-6 rounded-2xl border transition-all ${selectedBooking?.id === booking.id
                           ? (isDark ? 'admin-glass-card border-indigo-500 ring-2 ring-indigo-500/20 shadow-md bg-slate-900/60' : 'border-blue-500 ring-2 ring-blue-500/20 shadow-md bg-white')
                           : (isDark ? 'admin-glass-card border-slate-700 bg-slate-900/40 hover:border-slate-600' : 'bg-white border-slate-100 hover:border-slate-300')
-                      }`}
+                        }`}
                     >
                       {/* Booking meta info */}
                       <div className={`flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 mb-4 border-b ${isDark ? 'border-white/5' : 'border-slate-100'}`}>
@@ -284,21 +283,19 @@ export default function ShopCamera() {
                         </div>
 
                         <div className="flex items-center gap-2 flex-wrap">
-                          <span className={`text-[10px] font-black uppercase tracking-widest px-2.5 py-1 rounded-full ${
-                            booking.status === 'IN_PROGRESS' 
+                          <span className={`text-[10px] font-black uppercase tracking-widest px-2.5 py-1 rounded-full ${booking.status === 'IN_PROGRESS'
                               ? (isDark ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30' : 'bg-emerald-100 text-emerald-600')
                               : booking.status === 'CONFIRMED'
-                              ? (isDark ? 'bg-blue-500/20 text-blue-400 border border-blue-500/30' : 'bg-blue-100 text-blue-600')
-                              : (isDark ? 'bg-slate-800 text-slate-400 border border-slate-700' : 'bg-slate-100 text-slate-600')
-                          }`}>
+                                ? (isDark ? 'bg-blue-500/20 text-blue-400 border border-blue-500/30' : 'bg-blue-100 text-blue-600')
+                                : (isDark ? 'bg-slate-800 text-slate-400 border border-slate-700' : 'bg-slate-100 text-slate-600')
+                            }`}>
                             {booking.status}
                           </span>
-                          
-                          <span className={`text-[10px] font-black uppercase tracking-widest px-2.5 py-1 rounded-full ${
-                            isConfigured 
+
+                          <span className={`text-[10px] font-black uppercase tracking-widest px-2.5 py-1 rounded-full ${isConfigured
                               ? (isDark ? 'bg-green-500/20 text-green-400 border border-green-500/30' : 'bg-green-150 text-green-600 border border-green-200')
                               : (isDark ? 'bg-amber-500/20 text-amber-400 border border-amber-500/30' : 'bg-amber-100 text-amber-600 border border-amber-200')
-                          }`}>
+                            }`}>
                             {isConfigured ? 'Stream Online' : 'Chưa cấu hình'}
                           </span>
                         </div>
@@ -364,9 +361,9 @@ export default function ShopCamera() {
             {/* Right: Live Preview Panel */}
             <div className="space-y-4">
               <h2 className={`text-lg font-bold ${isDark ? 'text-white' : 'text-slate-900'}`}>Xem Trực Tiếp (Preview)</h2>
-              
+
               <div className={`rounded-2xl border overflow-hidden shadow-sm flex flex-col h-[500px] ${isDark ? 'admin-glass-card bg-slate-900/40 border-slate-700' : 'bg-white border-slate-100'}`}>
-                
+
                 {/* Player screen */}
                 <div className="relative bg-black flex-1 flex items-center justify-center overflow-hidden min-h-[250px]">
                   {selectedBooking && selectedBooking.cameraStreamUrl ? (
@@ -408,7 +405,7 @@ export default function ShopCamera() {
                     <>
                       <div className="absolute top-4 left-4 bg-red-500 text-white text-[10px] font-bold px-2.5 py-1 rounded-full shadow-lg flex items-center gap-1.5">
                         <span className="w-1.5 h-1.5 bg-white rounded-full animate-pulse" />
-                        LIVE (DOCKER)
+                        LIVE
                       </div>
                       <div className="absolute bottom-4 right-4 flex items-center gap-2">
                         <button

@@ -674,15 +674,15 @@ export default function ClinicDetail() {
               )}
             </div>
           </div>
-          
+
         </div>
 
         {/* Hero Image Grid */}
         <div className={`w-full h-[280px] md:h-[380px] lg:h-[460px] gap-2 overflow-hidden rounded-2xl mb-8 ${galleryImages.length === 1 ? 'flex' :
-            galleryImages.length === 2 ? 'grid grid-cols-2' :
-              galleryImages.length === 3 ? 'grid grid-cols-3' :
-                galleryImages.length === 4 ? 'grid grid-cols-3 grid-rows-2' :
-                  'grid grid-cols-4 grid-rows-2'
+          galleryImages.length === 2 ? 'grid grid-cols-2' :
+            galleryImages.length === 3 ? 'grid grid-cols-3' :
+              galleryImages.length === 4 ? 'grid grid-cols-3 grid-rows-2' :
+                'grid grid-cols-4 grid-rows-2'
           }`}>
           {/* Layout for 1 image */}
           {galleryImages.length === 1 && (
@@ -933,8 +933,8 @@ export default function ClinicDetail() {
                                 key={tierId}
                                 onClick={() => setSelectedCameraTier(tierId)}
                                 className={`p-4 rounded-xl border-2 cursor-pointer transition-all flex items-center justify-between group ${isSelected
-                                    ? 'bg-white dark:bg-indigo-900/40 border-indigo-500 shadow-md'
-                                    : 'bg-white dark:bg-slate-800 border-slate-100 dark:border-slate-700 hover:border-indigo-200'
+                                  ? 'bg-white dark:bg-indigo-900/40 border-indigo-500 shadow-md'
+                                  : 'bg-white dark:bg-slate-800 border-slate-100 dark:border-slate-700 hover:border-indigo-200'
                                   }`}
                               >
                                 <div className="flex items-center gap-3">
@@ -1268,8 +1268,8 @@ export default function ClinicDetail() {
                               key={svc.id}
                               onClick={() => toggleService(svc.id)}
                               className={`flex items-center justify-between p-3 rounded-xl border cursor-pointer transition-all ${isSelected
-                                  ? 'bg-[#1a2b4c]/5 border-[#1a2b4c]/30 dark:bg-teal-900/20 dark:border-teal-500/50'
-                                  : 'bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700 hover:border-[#1a2b4c]/30'
+                                ? 'bg-[#1a2b4c]/5 border-[#1a2b4c]/30 dark:bg-teal-900/20 dark:border-teal-500/50'
+                                : 'bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700 hover:border-[#1a2b4c]/30'
                                 }`}
                             >
                               <div className="flex flex-col">
@@ -1279,8 +1279,8 @@ export default function ClinicDetail() {
                                 <span className="text-xs text-slate-500">{svc.price.toLocaleString('vi-VN')}đ • {svc.durationMinutes} phút</span>
                               </div>
                               <div className={`w-5 h-5 rounded border-2 flex items-center justify-center transition-all ${isSelected
-                                  ? 'bg-[#1a2b4c] border-[#1a2b4c] dark:bg-teal-500 dark:border-teal-500'
-                                  : 'border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700'
+                                ? 'bg-[#1a2b4c] border-[#1a2b4c] dark:bg-teal-500 dark:border-teal-500'
+                                : 'border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700'
                                 }`}>
                                 {isSelected && (
                                   <span className="material-symbols-outlined text-white text-[13px]" style={{ fontVariationSettings: "'wght' 700" }}>check</span>
@@ -1403,10 +1403,10 @@ export default function ClinicDetail() {
                           className={`w-full bg-slate-50 dark:bg-slate-800 border ${isSelectedDateOff ? 'border-red-500 ring-1 ring-red-500' : 'border-slate-200 dark:border-slate-700'} rounded-xl px-4 py-3 text-sm font-medium text-slate-700 dark:text-slate-300 outline-none focus:ring-1 focus:ring-[#1a2b4c]`}
                         />
                         {isSelectedDateOff && (
-                           <p className="text-red-500 text-xs mt-2 font-bold flex items-center gap-1">
-                             <span className="material-symbols-outlined text-[16px]">error</span>
-                             Shop tạm nghỉ ngày này, hãy chọn ngày khác.
-                           </p>
+                          <p className="text-red-500 text-xs mt-2 font-bold flex items-center gap-1">
+                            <span className="material-symbols-outlined text-[16px]">error</span>
+                            Shop tạm nghỉ ngày này, hãy chọn ngày khác.
+                          </p>
                         )}
                       </div>
 
@@ -1448,10 +1448,10 @@ export default function ClinicDetail() {
                                     onClick={() => isAvailable && setSelectedTime(time)}
                                     title={!isAvailable ? 'Không còn nhân viên rảnh trong khung giờ này' : undefined}
                                     className={`py-2 text-xs font-semibold rounded border transition-all relative ${isSelected
-                                        ? 'bg-[#1a2b4c] text-white border-[#1a2b4c] shadow-md dark:bg-teal-500 dark:border-teal-500'
-                                        : isAvailable
-                                          ? 'bg-white dark:bg-slate-700 border-slate-200 dark:border-slate-500 text-slate-700 dark:text-slate-200 hover:border-[#1a2b4c] hover:text-[#1a2b4c] dark:hover:border-teal-400 dark:hover:text-teal-400 cursor-pointer'
-                                          : 'bg-slate-100 dark:bg-slate-800/50 border-slate-200 dark:border-slate-700 text-slate-300 dark:text-slate-600 cursor-not-allowed line-through'
+                                      ? 'bg-[#1a2b4c] text-white border-[#1a2b4c] shadow-md dark:bg-teal-500 dark:border-teal-500'
+                                      : isAvailable
+                                        ? 'bg-white dark:bg-slate-700 border-slate-200 dark:border-slate-500 text-slate-700 dark:text-slate-200 hover:border-[#1a2b4c] hover:text-[#1a2b4c] dark:hover:border-teal-400 dark:hover:text-teal-400 cursor-pointer'
+                                        : 'bg-slate-100 dark:bg-slate-800/50 border-slate-200 dark:border-slate-700 text-slate-300 dark:text-slate-600 cursor-not-allowed line-through'
                                       }`}
                                   >
                                     {time}
@@ -1531,10 +1531,10 @@ export default function ClinicDetail() {
                                     onClick={() => isAvailable && setSelectedTime(time)}
                                     title={!isAvailable ? 'Không còn nhân viên rảnh trong khung giờ này' : undefined}
                                     className={`py-2 text-xs font-semibold rounded border transition-all relative ${isSelected
-                                        ? 'bg-[#1a2b4c] text-white border-[#1a2b4c] shadow-md dark:bg-teal-500 dark:border-teal-500'
-                                        : isAvailable
-                                          ? 'bg-white dark:bg-slate-700 border-slate-200 dark:border-slate-500 text-slate-700 dark:text-slate-200 hover:border-[#1a2b4c] hover:text-[#1a2b4c] dark:hover:border-teal-400 dark:hover:text-teal-400 cursor-pointer'
-                                          : 'bg-slate-100 dark:bg-slate-800/50 border-slate-200 dark:border-slate-700 text-slate-300 dark:text-slate-600 cursor-not-allowed line-through'
+                                      ? 'bg-[#1a2b4c] text-white border-[#1a2b4c] shadow-md dark:bg-teal-500 dark:border-teal-500'
+                                      : isAvailable
+                                        ? 'bg-white dark:bg-slate-700 border-slate-200 dark:border-slate-500 text-slate-700 dark:text-slate-200 hover:border-[#1a2b4c] hover:text-[#1a2b4c] dark:hover:border-teal-400 dark:hover:text-teal-400 cursor-pointer'
+                                        : 'bg-slate-100 dark:bg-slate-800/50 border-slate-200 dark:border-slate-700 text-slate-300 dark:text-slate-600 cursor-not-allowed line-through'
                                       }`}
                                   >
                                     {time}
@@ -1603,8 +1603,8 @@ export default function ClinicDetail() {
                                 <button
                                   onClick={() => setSelectedStaffId(null)}
                                   className={`flex items-center gap-3 p-2.5 rounded-xl border-2 text-left transition-all ${selectedStaffId === null
-                                      ? 'border-[#1a2b4c] bg-[#1a2b4c]/5 dark:border-teal-400 dark:bg-teal-900/10'
-                                      : 'border-slate-200 dark:border-slate-700 hover:border-slate-300 dark:hover:border-slate-600'
+                                    ? 'border-[#1a2b4c] bg-[#1a2b4c]/5 dark:border-teal-400 dark:bg-teal-900/10'
+                                    : 'border-slate-200 dark:border-slate-700 hover:border-slate-300 dark:hover:border-slate-600'
                                     }`}
                                 >
                                   <div className="w-9 h-9 rounded-full bg-slate-100 dark:bg-slate-700 flex items-center justify-center shrink-0">
@@ -1629,10 +1629,10 @@ export default function ClinicDetail() {
                                       onClick={() => setSelectedStaffId(staff.id)}
                                       disabled={isBusy}
                                       className={`flex items-center gap-3 p-2.5 rounded-xl border-2 text-left transition-all ${isSelected
-                                          ? 'border-[#1a2b4c] bg-[#1a2b4c]/5 dark:border-teal-400 dark:bg-teal-900/10'
-                                          : isBusy
-                                            ? 'border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/50 opacity-60 cursor-not-allowed'
-                                            : 'border-slate-200 dark:border-slate-700 hover:border-[#1a2b4c]/40 dark:hover:border-teal-700 cursor-pointer'
+                                        ? 'border-[#1a2b4c] bg-[#1a2b4c]/5 dark:border-teal-400 dark:bg-teal-900/10'
+                                        : isBusy
+                                          ? 'border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/50 opacity-60 cursor-not-allowed'
+                                          : 'border-slate-200 dark:border-slate-700 hover:border-[#1a2b4c]/40 dark:hover:border-teal-700 cursor-pointer'
                                         }`}
                                     >
                                       <div className="relative shrink-0">
@@ -1733,8 +1733,8 @@ export default function ClinicDetail() {
                     onClick={handleBookClick}
                     disabled={!canBook}
                     className={`w-full h-12 flex items-center justify-center gap-2 rounded-xl font-bold transition-all text-base ${canBook
-                        ? "bg-[#1a2b4c] dark:bg-teal-500 text-white hover:bg-[#243d6b] dark:hover:bg-teal-400 hover:scale-[1.02] shadow-lg shadow-[#1a2b4c]/25 dark:shadow-teal-900/50 cursor-pointer"
-                        : "bg-slate-200 dark:bg-slate-800 text-slate-400 dark:text-slate-500 border dark:border-slate-700 cursor-not-allowed"
+                      ? "bg-[#1a2b4c] dark:bg-teal-500 text-white hover:bg-[#243d6b] dark:hover:bg-teal-400 hover:scale-[1.02] shadow-lg shadow-[#1a2b4c]/25 dark:shadow-teal-900/50 cursor-pointer"
+                      : "bg-slate-200 dark:bg-slate-800 text-slate-400 dark:text-slate-500 border dark:border-slate-700 cursor-not-allowed"
                       }`}
                   >
                     <span className="material-symbols-outlined">calendar_month</span>
@@ -1749,34 +1749,7 @@ export default function ClinicDetail() {
                             : "Đặt lịch ngay"}
                   </button>
 
-                  <div className="flex gap-3">
-                    <button 
-                      onClick={() => {
-                        if (!user) {
-                          setShowLoginPrompt(true);
-                        } else {
-                          window.location.href = `tel:${shop?.phone || ''}`;
-                        }
-                      }}
-                      className="flex-1 h-10 flex items-center justify-center gap-2 rounded-xl border border-slate-200 dark:border-slate-500 bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-100 font-semibold text-sm transition-colors shadow-sm">
-                      <span className="material-symbols-outlined text-lg">call</span>
-                      Gọi điện
-                    </button>
 
-                    <button
-                      onClick={() => {
-                        if (!user) {
-                          setShowLoginPrompt(true);
-                        } else {
-                          navigate(`/messages?shopId=${shop?.id}&shopName=${encodeURIComponent(shop?.shopName || '')}`);
-                        }
-                      }}
-                      className="flex-1 h-10 flex items-center justify-center gap-2 rounded-xl border border-slate-200 dark:border-slate-500 bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-100 font-semibold text-sm transition-colors shadow-sm"
-                    >
-                      <span className="material-symbols-outlined text-lg">chat</span>
-                      Nhắn tin
-                    </button>
-                  </div>
 
                   <div className="flex items-center justify-center gap-1 text-xs text-slate-400 font-medium">
                     <span className="material-symbols-outlined text-sm text-teal-500">
@@ -1882,10 +1855,7 @@ export default function ClinicDetail() {
             <span className="text-xs text-slate-500">Giá khám từ</span>
             <span className="font-black text-xl text-slate-900 dark:text-slate-100">150.000đ</span>
           </div>
-          <div className="flex gap-2 flex-1">
-            <button className="flex items-center justify-center gap-2 h-12 px-4 rounded-xl border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 font-semibold text-sm">
-              <span className="material-symbols-outlined text-base">call</span>
-            </button>
+          <div className="flex flex-1">
             <button
               onClick={() => {
                 document.getElementById('booking-section')?.scrollIntoView({ behavior: 'smooth' });
@@ -1951,10 +1921,10 @@ export default function ClinicDetail() {
                           onClick={() => !isBusy && setSelectedPet(pet)}
                           disabled={isBusy}
                           className={`flex-1 flex items-center gap-3 p-3 rounded-xl border-2 text-left transition-all ${isBusy
-                              ? 'border-slate-200 dark:border-slate-700 opacity-50 cursor-not-allowed bg-slate-50 dark:bg-slate-800/50'
-                              : isSelected
-                                ? 'border-[#1a2b4c] bg-[#1a2b4c]/5 dark:border-teal-400 dark:bg-teal-900/10'
-                                : 'border-slate-200 dark:border-slate-700 hover:border-[#1a2b4c]/40'
+                            ? 'border-slate-200 dark:border-slate-700 opacity-50 cursor-not-allowed bg-slate-50 dark:bg-slate-800/50'
+                            : isSelected
+                              ? 'border-[#1a2b4c] bg-[#1a2b4c]/5 dark:border-teal-400 dark:bg-teal-900/10'
+                              : 'border-slate-200 dark:border-slate-700 hover:border-[#1a2b4c]/40'
                             }`}
                         >
                           <div className="w-12 h-12 rounded-full overflow-hidden shrink-0 bg-slate-100 dark:bg-slate-700 border-2 border-white dark:border-slate-600 shadow">
@@ -2040,8 +2010,8 @@ export default function ClinicDetail() {
                             <div className="flex items-center justify-between mb-1">
                               <span className="font-bold text-slate-800 dark:text-slate-100">#{b.id} · {b.shopName}</span>
                               <span className={`px-2 py-0.5 rounded-full font-bold text-[10px] ${b.status === 'CONFIRMED'
-                                  ? 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400'
-                                  : 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400'
+                                ? 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400'
+                                : 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400'
                                 }`}>
                                 {b.status === 'CONFIRMED' ? 'Đã xác nhận' : 'Đang thực hiện'}
                               </span>
@@ -2170,8 +2140,8 @@ export default function ClinicDetail() {
                             <div
                               key={cert.id}
                               className={`p-3 rounded-xl border flex flex-col gap-2 transition-all ${cert.status === 'VERIFIED'
-                                  ? 'bg-teal-50/50 dark:bg-teal-950/20 border-teal-100 dark:border-teal-900/50'
-                                  : 'bg-slate-50 dark:bg-slate-800 border-slate-100 dark:border-slate-800'
+                                ? 'bg-teal-50/50 dark:bg-teal-950/20 border-teal-100 dark:border-teal-900/50'
+                                : 'bg-slate-50 dark:bg-slate-800 border-slate-100 dark:border-slate-800'
                                 }`}
                             >
                               <div className="flex items-center justify-between">
@@ -2325,8 +2295,8 @@ export default function ClinicDetail() {
                       setSelectedServiceForDetail(null);
                     }}
                     className={`px-6 py-3 rounded-2xl font-bold transition-all shadow-xl flex items-center gap-2 ${selectedServiceIds.includes(selectedServiceForDetail.id)
-                        ? 'bg-red-500 text-white hover:bg-red-600 shadow-red-200 dark:shadow-none'
-                        : 'bg-[#1a2b4c] text-white hover:bg-[#243d6b] shadow-slate-200 dark:shadow-none'
+                      ? 'bg-red-500 text-white hover:bg-red-600 shadow-red-200 dark:shadow-none'
+                      : 'bg-[#1a2b4c] text-white hover:bg-[#243d6b] shadow-slate-200 dark:shadow-none'
                       }`}
                   >
                     <span className="material-symbols-outlined text-base">
@@ -2355,8 +2325,8 @@ export default function ClinicDetail() {
                 exit={{ scale: 0.95, opacity: 0 }}
                 transition={{ type: "spring", bounce: 0.3, duration: 0.5 }}
                 className={`bg-white dark:bg-slate-900 overflow-hidden flex flex-col relative shadow-2xl transition-all duration-300 ${isMapFullscreen
-                    ? 'w-full h-full rounded-none'
-                    : 'rounded-[32px] w-full max-w-5xl h-[85vh]'
+                  ? 'w-full h-full rounded-none'
+                  : 'rounded-[32px] w-full max-w-5xl h-[85vh]'
                   }`}
                 onClick={(e) => e.stopPropagation()}
               >
@@ -2490,7 +2460,7 @@ export default function ClinicDetail() {
                 <p className="text-sm text-slate-500 dark:text-slate-400 mb-8">
                   Bạn cần đăng nhập hoặc tạo tài khoản để có thể đặt lịch hẹn, gọi điện và nhắn tin với cơ sở này.
                 </p>
-                
+
                 <div className="flex flex-col gap-3">
                   <button
                     onClick={() => navigate('/login', { state: { from: `/clinic/${shopId}` } })}

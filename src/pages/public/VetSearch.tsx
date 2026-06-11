@@ -301,14 +301,17 @@ export default function VetSearch() {
   );
 
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-slate-950 font-display">
+    <div className="min-h-screen bg-slate-50 dark:bg-slate-950 font-display relative">
+      {/* Page-wide background decoration — matches LandingPage */}
+      <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none">
+        <div className="absolute top-0 left-0 w-full h-full bg-mesh opacity-10 dark:opacity-20" />
+        <div className="absolute top-[2%] -left-[10%] w-[50%] h-[35%] bg-blue-500/10 dark:bg-blue-500/20 rounded-full blur-[120px]" />
+        <div className="absolute top-[5%] right-[5%] w-[40%] h-[30%] bg-indigo-500/10 dark:bg-indigo-500/15 rounded-full blur-[100px]" />
+        <div className="pattern-dots absolute inset-0 opacity-20" />
+      </div>
+
       {/* ── Hero Banner ── */}
-      <div className="relative bg-slate-900 text-white pt-20 md:pt-24 pb-24 md:pb-32 px-4 md:px-6 overflow-hidden">
-        {/* Dynamic Background */}
-        <div className="absolute inset-0 z-0">
-          <div className="absolute top-0 left-0 w-full h-full bg-mesh opacity-30" />
-          <div className="pattern-dots absolute inset-0 opacity-10 pointer-events-none" />
-        </div>
+      <div className="relative text-blue-950 dark:text-white pt-20 md:pt-24 pb-24 md:pb-32 px-4 md:px-6 overflow-hidden z-10">
 
         <div className="max-w-5xl mx-auto relative z-10 text-center space-y-5 md:space-y-8">
           <motion.div
@@ -316,12 +319,12 @@ export default function VetSearch() {
             animate={{ opacity: 1, y: 0 }}
             className="space-y-3 md:space-y-4"
           >
-            <span className="inline-flex items-center gap-2 px-3 md:px-4 py-1.5 bg-emerald-500/10 border border-emerald-500/20 rounded-full text-[10px] font-black uppercase tracking-[0.15em] md:tracking-[0.2em] text-emerald-400 backdrop-blur-md shadow-lg shadow-emerald-500/10">
+            <span className="inline-flex items-center gap-2 px-3 md:px-4 py-1.5 bg-emerald-500/10 border border-emerald-500/20 rounded-full text-[10px] font-black uppercase tracking-[0.15em] md:tracking-[0.2em] text-emerald-600 dark:text-emerald-400 shadow-sm">
               <CheckCircle2 size={12} />
               Cơ sở đã được xác thực
             </span>
-            <h1 className="text-3xl md:text-6xl font-black tracking-tight leading-tight drop-shadow-sm">
-              Tìm cơ sở <span className="text-gradient dark:text-white">thú y</span> <br />
+            <h1 className="text-3xl md:text-6xl font-black tracking-tight leading-tight text-blue-950 dark:text-white drop-shadow-sm">
+              Tìm cơ sở <span className="text-gradient">thú y</span> <br />
               &amp; Dịch vụ quanh bạn
             </h1>
           </motion.div>
@@ -330,15 +333,15 @@ export default function VetSearch() {
           <motion.div
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
-            className="glass dark:glass-dark p-1.5 md:p-2 rounded-2xl md:rounded-[32px] shadow-3xl max-w-4xl mx-auto group focus-within:ring-4 md:focus-within:ring-8 ring-primary/10 transition-all"
+            className="w-full glass dark:glass-dark p-2 md:p-2 rounded-[32px] md:rounded-full shadow-3xl max-w-4xl mx-auto group focus-within:ring-4 md:focus-within:ring-8 ring-primary/10 transition-all"
           >
-            <div className="flex flex-col md:grid md:grid-cols-12 gap-1.5 md:gap-2">
+            <div className="flex flex-col md:grid md:grid-cols-12 gap-1.5 md:gap-2 w-full">
               <div className="md:col-span-5 relative">
                 <Search className="absolute left-4 md:left-5 top-1/2 -translate-y-1/2 text-primary dark:text-white w-4 h-4 md:w-5 md:h-5" />
                 <input
                   type="text"
                   placeholder="Tên cơ sở, dịch vụ..."
-                  className="w-full pl-11 md:pl-14 pr-4 py-3.5 md:py-5 bg-white/50 dark:bg-slate-900/50 rounded-xl md:rounded-2xl border-none focus:ring-0 text-slate-900 dark:text-white font-bold placeholder:text-slate-400 text-sm md:text-base"
+                  className="w-full pl-11 md:pl-14 pr-4 py-3.5 md:py-5 bg-white/50 dark:bg-slate-900/50 rounded-full border-none focus:ring-0 text-slate-900 dark:text-white font-bold placeholder:text-slate-400 text-sm md:text-base"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                 />
@@ -348,13 +351,13 @@ export default function VetSearch() {
                 <input
                   type="text"
                   placeholder="Khu vực, thành phố..."
-                  className="w-full pl-11 md:pl-14 pr-4 py-3.5 md:py-5 bg-white/30 md:bg-transparent dark:bg-slate-900/30 md:dark:bg-transparent rounded-xl md:rounded-2xl border-none focus:ring-0 text-slate-900 dark:text-white font-bold placeholder:text-slate-400 text-sm md:text-base"
+                  className="w-full pl-11 md:pl-14 pr-4 py-3.5 md:py-5 bg-white/30 md:bg-transparent dark:bg-slate-900/30 md:dark:bg-transparent rounded-full border-none focus:ring-0 text-slate-900 dark:text-white font-bold placeholder:text-slate-400 text-sm md:text-base"
                   value={cityQuery}
                   onChange={(e) => setCityQuery(e.target.value)}
                 />
               </div>
               <div className="md:col-span-3">
-                <button className="w-full h-full bg-primary hover:bg-primary-dark text-white rounded-xl md:rounded-2xl font-black transition-all flex items-center justify-center gap-2 py-3.5 md:py-5 shadow-xl shadow-primary/20 text-sm md:text-base">
+                <button className="w-full h-full bg-primary hover:bg-primary-dark text-white rounded-full font-black transition-all flex items-center justify-center gap-2 py-3.5 md:py-5 shadow-xl shadow-primary/20 text-sm md:text-base">
                   <Search size={16} />
                   TÌM KIẾM
                 </button>
@@ -372,14 +375,14 @@ export default function VetSearch() {
           className="mb-6 md:mb-10"
         >
           <div className="flex overflow-x-auto scrollbar-hide -mx-4 px-4 md:mx-0 md:px-0 pb-2 md:pb-0 snap-x snap-mandatory">
-            <div className="inline-flex bg-white dark:bg-slate-800 border-2 border-slate-100 dark:border-slate-700 p-1 md:p-1.5 rounded-2xl md:rounded-[24px] shadow-lg shadow-slate-200/50 dark:shadow-slate-900/50">
+            <div className="inline-flex bg-white dark:bg-slate-900/80 border border-slate-200/80 dark:border-slate-800 p-1 md:p-1.5 rounded-full shadow-md shadow-slate-200/50 dark:shadow-slate-900/50 backdrop-blur-sm">
               {SHOP_TYPE_TABS.map((tab) => {
                 const isActive = activeService === tab.value;
                 return (
                   <button
                     key={tab.value}
                     onClick={() => setActiveService(tab.value)}
-                    className={`relative flex items-center gap-1.5 md:gap-2 px-4 md:px-6 py-2.5 md:py-3.5 rounded-xl md:rounded-2xl text-xs md:text-sm font-black whitespace-nowrap transition-all z-10 snap-start ${isActive
+                    className={`relative flex items-center gap-1.5 md:gap-2 px-4 md:px-6 py-2.5 md:py-3.5 rounded-full text-xs md:text-sm font-black whitespace-nowrap transition-all z-10 snap-start ${isActive
                         ? 'text-white'
                         : 'text-slate-500 hover:text-slate-900 dark:hover:text-white'
                       }`}
@@ -387,7 +390,7 @@ export default function VetSearch() {
                     {isActive && (
                       <motion.div
                         layoutId="active-pill"
-                        className="absolute inset-0 bg-primary rounded-xl md:rounded-2xl shadow-lg shadow-primary/25"
+                        className="absolute inset-0 bg-primary rounded-full shadow-lg shadow-primary/25"
                         transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
                       />
                     )}
@@ -405,7 +408,7 @@ export default function VetSearch() {
         <div className="flex flex-col lg:flex-row gap-6 lg:gap-10">
           {/* ── Desktop Sidebar ── */}
           <aside className="hidden lg:block w-72 shrink-0 space-y-6">
-            <div className="glass dark:glass-dark p-6 rounded-[32px] space-y-8 sticky top-28">
+            <div className="bg-white dark:bg-slate-900/70 backdrop-blur-xl border border-slate-200/70 dark:border-slate-800/70 p-6 rounded-[32px] space-y-8 sticky top-28 shadow-md shadow-slate-200/40 dark:shadow-slate-900/40">
               <div className="flex items-center justify-between">
                 <h3 className="text-lg font-black text-slate-900 dark:text-white flex items-center gap-2">
                   <SlidersHorizontal size={18} className="text-primary dark:text-white" />
@@ -495,7 +498,7 @@ export default function VetSearch() {
                   <div key={`${shop.id}-${index}`} className="animate-fade-in-up" style={{ animationDelay: `${index * 0.05}s` }}>
                     <Link
                       to={`/clinic/${shop.id}`}
-                      className={`group glass dark:glass-dark rounded-2xl md:rounded-[32px] overflow-hidden hover:shadow-3xl hover:translate-y-[-4px] transition-all duration-500 border-2 border-transparent hover:border-primary/10 h-full ${viewMode === 'list' ? 'flex flex-col sm:flex-row sm:h-64' : 'flex flex-col'}`}
+                      className={`group bg-white dark:bg-slate-900/60 rounded-2xl md:rounded-[32px] overflow-hidden hover:shadow-xl hover:shadow-slate-200/60 dark:hover:shadow-slate-900/50 hover:-translate-y-1 transition-all duration-500 border border-slate-200/85 dark:border-slate-800/80 hover:border-primary/20 dark:hover:border-blue-500/30 h-full ${viewMode === 'list' ? 'flex flex-col sm:flex-row sm:h-64' : 'flex flex-col'}`}
                     >
                       {/* Image */}
                       <div className={`relative overflow-hidden shrink-0 bg-slate-100 dark:bg-slate-800 ${viewMode === 'list' ? 'sm:w-72 w-full h-44 sm:h-auto' : 'h-44 md:h-52'}`}>
@@ -652,7 +655,7 @@ export default function VetSearch() {
       <div className="lg:hidden fixed bottom-6 right-6 z-[80]">
         <button
           onClick={() => setIsMapModalOpen(true)}
-          className="bg-slate-900 text-white p-4 rounded-full shadow-[0_8px_30px_rgb(0,0,0,0.3)] flex items-center justify-center gap-2 hover:bg-primary transition-all border-4 border-white dark:border-slate-800 active:scale-95"
+          className="bg-primary text-white p-4 rounded-full shadow-lg shadow-primary/30 flex items-center justify-center gap-2 hover:bg-blue-600 transition-all border-4 border-white dark:border-slate-800 active:scale-95"
         >
           <MapIcon size={20} />
           <span className="font-bold text-sm pr-1">Bản đồ</span>

@@ -350,7 +350,7 @@ export default function Login() {
                         <div className="relative group">
                           <Mail className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-primary transition-colors" size={18} />
                           <input
-                            className="w-full pl-11 pr-4 py-3.5 rounded-2xl border border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/50 text-slate-900 dark:text-white placeholder-slate-400 focus:bg-white dark:focus:bg-slate-900 focus:ring-4 focus:ring-primary/10 focus:border-primary dark:focus:border-primary-light outline-none transition-all text-sm font-medium"
+                            className="w-full pl-11 pr-4 py-3.5 rounded-2xl border border-slate-300 dark:border-slate-700 bg-transparent text-slate-900 dark:text-white placeholder-slate-400 focus:border-primary dark:focus:border-primary-light outline-none transition-all text-sm font-medium"
                             placeholder="customer@example.com"
                             type="email"
                             value={customerEmail}
@@ -370,7 +370,7 @@ export default function Login() {
                         <div className="relative group">
                           <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-primary transition-colors" size={18} />
                           <input
-                            className="w-full pl-11 pr-11 py-3.5 rounded-2xl border border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/50 text-slate-900 dark:text-white placeholder-slate-400 focus:bg-white dark:focus:bg-slate-900 focus:ring-4 focus:ring-primary/10 focus:border-primary dark:focus:border-primary-light outline-none transition-all text-sm font-medium"
+                            className="w-full pl-11 pr-11 py-3.5 rounded-2xl border border-slate-300 dark:border-slate-700 bg-transparent text-slate-900 dark:text-white placeholder-slate-400 focus:border-primary dark:focus:border-primary-light outline-none transition-all text-sm font-medium"
                             placeholder="••••••••"
                             type={showCustomerPassword ? 'text' : 'password'}
                             value={customerPassword}
@@ -461,7 +461,7 @@ export default function Login() {
                         <div className="relative group">
                           <Mail className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-primary transition-colors" size={18} />
                           <input
-                            className="w-full pl-11 pr-4 py-3.5 rounded-2xl border border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/50 text-slate-900 dark:text-white placeholder-slate-400 focus:bg-white dark:focus:bg-slate-900 focus:ring-4 focus:ring-primary/10 focus:border-primary dark:focus:border-primary-light outline-none transition-all text-sm font-medium"
+                            className="w-full pl-11 pr-4 py-3.5 rounded-2xl border border-slate-300 dark:border-slate-700 bg-transparent text-slate-900 dark:text-white placeholder-slate-400 focus:border-primary dark:focus:border-primary-light outline-none transition-all text-sm font-medium"
                             placeholder="shop@example.com"
                             type="email"
                             value={shopEmail}
@@ -481,7 +481,7 @@ export default function Login() {
                         <div className="relative group">
                           <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-primary transition-colors" size={18} />
                           <input
-                            className="w-full pl-11 pr-11 py-3.5 rounded-2xl border border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/50 text-slate-900 dark:text-white placeholder-slate-400 focus:bg-white dark:focus:bg-slate-900 focus:ring-4 focus:ring-primary/10 focus:border-primary dark:focus:border-primary-light outline-none transition-all text-sm font-medium"
+                            className="w-full pl-11 pr-11 py-3.5 rounded-2xl border border-slate-300 dark:border-slate-700 bg-transparent text-slate-900 dark:text-white placeholder-slate-400 focus:border-primary dark:focus:border-primary-light outline-none transition-all text-sm font-medium"
                             placeholder="••••••••"
                             type={showShopPassword ? 'text' : 'password'}
                             value={shopPassword}
