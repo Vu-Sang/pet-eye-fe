@@ -645,9 +645,9 @@ export default function ClinicDetail() {
   };
 
   return (
-    <div className="flex-1 bg-slate-50 dark:bg-slate-900">
+    <div className="flex-1 bg-slate-50 dark:bg-slate-900 pt-24">
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-6">
         {/* Clinic Header */}
         <div className="flex flex-wrap justify-between items-start gap-4 pb-5">
           <div className="flex flex-col gap-2">
