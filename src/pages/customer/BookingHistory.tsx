@@ -543,15 +543,13 @@ export default function BookingHistory() {
     const [showUpdateBankModal, setShowUpdateBankModal] = useState(false);
 
     const { data: pagedBookings, isLoading, isError, refetch } = useQuery({
-        queryKey: ['my-bookings', page, activeTab],
-        queryFn: () => bookingService.getMyBookings(page + 1, 10, activeTab),
+        queryKey: ['my-bookings', activeTab],
+        queryFn: () => bookingService.getMyBookings(1, 1000, activeTab),
         staleTime: 30_000,
         placeholderData: keepPreviousData,
     });
 
     const bookings = pagedBookings?.content ?? [];
-    const totalPages = pagedBookings?.totalPages ?? 1;
-    const totalElements = pagedBookings?.totalElements ?? 0;
 
     const petsList = useMemo(() => {
         const pets = bookings.map(b => b.petName).filter(Boolean) as string[];
@@ -731,9 +729,14 @@ export default function BookingHistory() {
         return list;
     }, [bookings, searchQuery, selectedPet, selectedCategory, sortOrder]);
 
+    const pageSize = 5;
+    const totalElements = filtered.length;
+    const totalPages = Math.ceil(totalElements / pageSize) || 1;
+    const paginatedBookings = filtered.slice(page * pageSize, (page + 1) * pageSize);
+
     const groupedBookings = useMemo(() => {
         const groups: Record<string, BookingResponse[]> = {};
-        filtered.forEach(b => {
+        paginatedBookings.forEach(b => {
             let monthStr = 'Thời gian khác';
             try {
                 const date = parseISO(b.appointmentDatetime);
@@ -747,7 +750,7 @@ export default function BookingHistory() {
             groups[monthStr].push(b);
         });
         return groups;
-    }, [filtered]);
+    }, [paginatedBookings]);
 
     if (isLoading && !pagedBookings) return (
         <div className="flex-1 flex flex-col items-center justify-center py-32 gap-6">

@@ -53,7 +53,7 @@ export default function ShopReviews() {
   const filteredReviews = reviews.filter(r => filterRating === 'all' || r.rating === filterRating);
 
   return (
-    <div className="max-w-6xl mx-auto px-6 py-10">
+    <div className="p-4 md:p-8 animate-in fade-in duration-500">
       {/* Header Section */}
       <header className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-10">
         <div>

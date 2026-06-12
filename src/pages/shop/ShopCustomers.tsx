@@ -118,13 +118,12 @@ export default function ShopCustomers() {
   };
 
   return (
-    <div className="animate-in fade-in duration-500">
-      <div className="max-w-7xl mx-auto px-6 py-8">
+    <div className="p-4 md:p-8 animate-in fade-in duration-500">
         {/* Header with Image */}
-        <header className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
+        <header className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-10">
           <div>
-            <h1 className={`text-2xl font-black tracking-tight flex items-center gap-3 ${isDark ? 'text-white' : 'text-slate-900'}`}>
-              <User className={`w-6 h-6 ${isDark ? 'text-blue-500 drop-shadow-[0_0_12px_rgba(59,130,246,0.5)]' : 'text-blue-600'}`} />
+            <h1 className={`text-3xl font-black tracking-tight flex items-center gap-3 ${isDark ? 'text-white' : 'text-slate-900'}`}>
+              <User className={`w-8 h-8 ${isDark ? 'text-blue-500 drop-shadow-[0_0_12px_rgba(59,130,246,0.5)]' : 'text-blue-600'}`} />
               Quản lý khách hàng
             </h1>
             <p className={`text-sm font-medium mt-1 ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>
@@ -596,7 +595,6 @@ export default function ShopCustomers() {
         )}
         </AnimatePresence>
 
-      </div>
     </div>
   );
 }

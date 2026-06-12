@@ -10,22 +10,24 @@ export default function TransactionHistory() {
   const [filter, setFilter] = useState('ALL');
   const [downloading, setDownloading] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 10;
+  const itemsPerPage = 5;
   const receiptRef = useRef<HTMLDivElement>(null);
 
   const { data: pageData, isLoading, isFetching } = useQuery({
-    queryKey: ['my-transactions', currentPage],
-    queryFn: () => transactionService.getCustomerTransactions(currentPage, itemsPerPage),
+    queryKey: ['my-transactions'],
+    queryFn: () => transactionService.getCustomerTransactions(1, 1000),
     placeholderData: keepPreviousData,
   });
 
   const transactions = pageData?.content || [];
-  const totalPages = pageData?.totalPages || 1;
 
-  const filteredTx = transactions.filter(tx => {
+  const filteredTxAll = transactions.filter(tx => {
     if (filter === 'ALL') return true;
     return tx.status === filter;
   });
+
+  const totalPages = Math.ceil(filteredTxAll.length / itemsPerPage) || 1;
+  const filteredTx = filteredTxAll.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
 
   const handleDownloadPdf = async () => {
     // Sử dụng trình duyệt native để in ra PDF (hỗ trợ oklch, font đẹp, sắc nét 100%)

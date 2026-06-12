@@ -17,15 +17,13 @@ export default function AdminMembers() {
   const [detail, setDetail] = useState<AdminUserResponse | null>(null);
   const [page, setPage] = useState(0);
 
-  const { data: pagedData, isLoading } = useQuery({
-    queryKey: ['admin-members', page],
-    queryFn: () => adminService.getUsersPaged(page),
+  const { data: allUsers, isLoading } = useQuery({
+    queryKey: ['admin-members'],
+    queryFn: () => adminService.getAllUsers(),
     staleTime: 0,
   });
 
-  const members = pagedData?.content ?? [];
-  const totalPages = pagedData?.totalPages ?? 1;
-  const totalElements = pagedData?.totalElements ?? 0;
+  const members = allUsers ?? [];
 
   const deactivateMutation = useMutation({
     mutationFn: adminService.deactivateUser,
@@ -58,6 +56,11 @@ export default function AdminMembers() {
     const matchRole = roleFilter === 'Tất cả' ? true : role === roleFilter;
     return matchSearch && matchRole;
   });
+
+  const pageSize = 10;
+  const totalElements = filtered.length;
+  const totalPages = Math.ceil(totalElements / pageSize) || 1;
+  const currentData = filtered.slice(page * pageSize, (page + 1) * pageSize);
 
   const roleBadge = (role: string) => {
     const colors: Record<string, string> = isDark ? {
@@ -110,7 +113,7 @@ export default function AdminMembers() {
       <div className={`rounded-2xl overflow-hidden ${isDark ? 'admin-glass-card' : 'bg-white border border-slate-100 shadow-sm'}`}>
         {isLoading ? (
           <div className={`flex items-center justify-center py-16 text-sm ${isDark ? 'text-slate-500' : 'text-slate-400'}`}>Đang tải...</div>
-        ) : filtered.length === 0 ? (
+        ) : currentData.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-16">
             <User size={40} className={`mb-3 ${isDark ? 'text-slate-700' : 'text-slate-300'}`} />
             <p className={`text-sm ${isDark ? 'text-slate-500' : 'text-slate-400'}`}>Không tìm thấy thành viên nào</p>
@@ -130,7 +133,7 @@ export default function AdminMembers() {
                 </tr>
               </thead>
               <tbody className={`divide-y ${isDark ? 'divide-white/5' : 'divide-slate-50'}`}>
-                {filtered.map(m => {
+                {currentData.map(m => {
                   const role = m.roles?.[0]?.name ?? 'USER';
                   const isActive = m.isActive !== false;
                   return (
