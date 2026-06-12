@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Store, Users, DollarSign, Calendar, Clock, MessageCircle, TrendingUp, Wallet, Banknote, AlertCircle, ArrowRight } from 'lucide-react';
+import { Store, Users, DollarSign, Calendar, Clock, MessageCircle, TrendingUp, Wallet, Banknote, AlertCircle, ArrowRight, X, Ticket } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
 import { adminService } from '../../services/admin.service';
 import { walletService } from '../../services/wallet.service';
@@ -11,7 +11,7 @@ import {
 } from 'recharts';
 import ReactApexChart from 'react-apexcharts';
 
-const MONTH_LABELS = ['T1','T2','T3','T4','T5','T6','T7','T8','T9','T10','T11','T12'];
+const MONTH_LABELS = ['T1', 'T2', 'T3', 'T4', 'T5', 'T6', 'T7', 'T8', 'T9', 'T10', 'T11', 'T12'];
 const DAY_LABELS: Record<string, string> = {
   '1': 'Thứ 2', '2': 'Thứ 3', '3': 'Thứ 4', '4': 'Thứ 5', '5': 'Thứ 6', '6': 'Thứ 7', '0': 'Chủ Nhật',
 };
@@ -41,7 +41,7 @@ function Sparkline({ data, color }: { data: number[]; color: string }) {
   });
   const pathData = `M ${points.join(' L ')}`;
   const areaData = `${pathData} L ${width},${height} L 0,${height} Z`;
-  
+
   return (
     <svg width={width} height={height} className="overflow-visible">
       <defs>
@@ -64,17 +64,16 @@ const CustomTooltip = ({ active, payload, label, isRevenue, isDark }: any) => {
       : label;
 
     return (
-      <div className={`p-5 rounded-2xl shadow-[0_8px_32px_rgba(0,0,0,0.12)] border transition-all duration-300 backdrop-blur-xl relative overflow-hidden ${
-        isDark 
-          ? 'bg-[#0f172a]/80 border-white/10 text-white' 
-          : 'bg-white/90 border-slate-200 text-slate-900'
-      }`}>
+      <div className={`p-5 rounded-2xl shadow-[0_8px_32px_rgba(0,0,0,0.12)] border transition-all duration-300 backdrop-blur-xl relative overflow-hidden ${isDark
+        ? 'bg-[#0f172a]/80 border-white/10 text-white'
+        : 'bg-white/90 border-slate-200 text-slate-900'
+        }`}>
         <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-purple-500 to-blue-500"></div>
         <div className="flex items-center gap-3 mb-1">
-            <div className={`w-2 h-2 rounded-full shadow-[0_0_10px_rgba(59,130,246,0.8)] animate-pulse ${isDark ? 'bg-blue-400' : 'bg-blue-500'}`}></div>
-            <p className={`text-[10px] font-black uppercase tracking-widest ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>
+          <div className={`w-2 h-2 rounded-full shadow-[0_0_10px_rgba(59,130,246,0.8)] animate-pulse ${isDark ? 'bg-blue-400' : 'bg-blue-500'}`}></div>
+          <p className={`text-[10px] font-black uppercase tracking-widest ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>
             {displayLabel}
-            </p>
+          </p>
         </div>
         <p className="text-2xl font-black tracking-tight">
           {isRevenue ? fmt(value * 1_000_000) : `${value} lượt đặt`}
@@ -90,17 +89,39 @@ export default function AdminDashboard() {
   const navigate = useNavigate();
   const currentYear = new Date().getFullYear();
 
-  const [dateRange, setDateRange] = useState<'today'|'week'|'month'|'all'|'custom'>('all');
+  const [dateRange, setDateRange] = useState<'today' | 'week' | 'month' | 'all' | 'custom'>('all');
   const [customDateInput, setCustomDateInput] = useState({ start: '', end: '' });
   const [appliedCustomDate, setAppliedCustomDate] = useState({ start: '', end: '' });
   const [showDatePicker, setShowDatePicker] = useState(false);
+  const [selectedMetric, setSelectedMetric] = useState<any>(null);
+  const [compareMonthLeft, setCompareMonthLeft] = useState<number>(new Date().getMonth() === 0 ? 11 : new Date().getMonth() - 1);
+  const [compareMonthRight, setCompareMonthRight] = useState<number>(new Date().getMonth());
+  const [userFilter, setUserFilter] = useState<'all' | 'active' | 'inactive'>('all');
+
+  const handleOpenModal = (metric: any) => {
+    setSelectedMetric(metric);
+    setCompareMonthLeft(new Date().getMonth() === 0 ? 11 : new Date().getMonth() - 1);
+    setCompareMonthRight(new Date().getMonth());
+  };
+
+  const { data: historyLeft = {} } = useQuery({
+    queryKey: ['admin-history', compareMonthLeft + 1, currentYear],
+    queryFn: () => adminService.getMonthlyHistory(compareMonthLeft + 1, currentYear),
+    enabled: selectedMetric !== null,
+  });
+
+  const { data: historyRight = {} } = useQuery({
+    queryKey: ['admin-history', compareMonthRight + 1, currentYear],
+    queryFn: () => adminService.getMonthlyHistory(compareMonthRight + 1, currentYear),
+    enabled: selectedMetric !== null,
+  });
 
   const getDateParams = () => {
     if (dateRange === 'all') return { startDate: undefined, endDate: undefined };
     if (dateRange === 'custom') {
-      return { 
-        startDate: appliedCustomDate.start || undefined, 
-        endDate: appliedCustomDate.end || undefined 
+      return {
+        startDate: appliedCustomDate.start || undefined,
+        endDate: appliedCustomDate.end || undefined
       };
     }
     const end = new Date();
@@ -112,9 +133,9 @@ export default function AdminDashboard() {
     } else if (dateRange === 'month') {
       start.setDate(end.getDate() - 30);
     }
-    return { 
-      startDate: start.toISOString().split('T')[0], 
-      endDate: end.toISOString().split('T')[0] 
+    return {
+      startDate: start.toISOString().split('T')[0],
+      endDate: end.toISOString().split('T')[0]
     };
   };
 
@@ -158,17 +179,17 @@ export default function AdminDashboard() {
 
   const revenueData = MONTH_LABELS.map((name, i) => {
     const found = revenueRaw.find(r => r.month === i + 1);
-    return { name, value: found ? Math.round(found.revenue / 1_000_000) : 0 };
+    return { name, value: found ? Number((found.revenue / 1_000_000).toFixed(2)) : 0 };
   });
 
   const bookingData = bookingsRaw.length > 0
     ? bookingsRaw.map(b => {
-        const d = new Date(b.date);
-        return {
-          name: DAY_LABELS[d.getDay().toString()] ?? b.date,
-          value: b.count,
-        };
-      })
+      const d = new Date(b.date);
+      return {
+        name: DAY_LABELS[d.getDay().toString()] ?? b.date,
+        value: b.count,
+      };
+    })
     : [];
 
   const formatNum = (n: number) => n.toLocaleString('vi-VN');
@@ -176,19 +197,23 @@ export default function AdminDashboard() {
   // Use real trends and sparklines from the backend API, with safe fallbacks
   const cards = stats ? [
     {
+      apiKey: 'totalRevenue',
       label: dateRange === 'all' ? 'Tổng doanh thu' : 'Doanh thu (Kỳ)',
-      value: fmtShort(stats.periodRevenue ?? stats.totalRevenue),
+      value: fmtShort(dateRange === 'all' ? stats.totalRevenue : (stats.periodRevenue ?? stats.totalRevenue)),
+      rawValue: dateRange === 'all' ? stats.totalRevenue : (stats.periodRevenue ?? stats.totalRevenue),
       icon: DollarSign,
       accent: 'blue',
       trend: stats.totalRevenueTrend || '+12.4%',
       trendUp: stats.totalRevenueTrendUp ?? true,
       sparkData: stats.totalRevenueSparkData || [35, 42, 50, 48, 55, 62, 58, 70],
       color: isDark ? '#60a5fa' : '#3b82f6',
-      subText: dateRange === 'all' ? 'so với tháng trước' : `Tổng: ${fmtShort(stats.totalRevenue)}`
+      subText: dateRange === 'all' ? 'thu được từ phí hoa hồng' : `Tổng: ${fmtShort(stats.totalRevenue)}`
     },
     {
+      apiKey: 'systemBalance',
       label: 'Số dư hệ thống',
       value: fmtShort(adminBalance),
+      rawValue: adminBalance,
       icon: Wallet,
       accent: 'indigo',
       trend: 'Real-time',
@@ -198,19 +223,44 @@ export default function AdminDashboard() {
       subText: 'số dư khả dụng'
     },
     {
+      apiKey: userFilter === 'active' ? 'activeUsers' : userFilter === 'inactive' ? 'inactiveUsers' : 'totalUsers',
       label: dateRange === 'all' ? 'Tổng người dùng' : 'Người dùng mới (Kỳ)',
-      value: formatNum(stats.periodUsers ?? stats.totalUsers),
+      value: formatNum(
+        userFilter === 'active' ? stats.activeUsers :
+          userFilter === 'inactive' ? stats.inactiveUsers :
+            (dateRange === 'all' ? stats.totalUsers : (stats.periodUsers ?? stats.totalUsers))
+      ),
+      rawValue: userFilter === 'active' ? stats.activeUsers :
+        userFilter === 'inactive' ? stats.inactiveUsers :
+          (dateRange === 'all' ? stats.totalUsers : (stats.periodUsers ?? stats.totalUsers)),
       icon: Users,
       accent: 'emerald',
       trend: stats.totalUsersTrend || '+8.2%',
       trendUp: stats.totalUsersTrendUp ?? true,
       sparkData: stats.totalUsersSparkData || [100, 110, 118, 125, 140, 155, 172, 185],
       color: isDark ? '#34d399' : '#10b981',
-      subText: dateRange === 'all' ? 'so với tuần trước' : `Tổng: ${formatNum(stats.totalUsers)}`
+      subText: dateRange === 'all' ? 'sử dụng peteye' : `Tổng: ${formatNum(stats.totalUsers)}`,
+      customAction: (
+        <select
+          value={userFilter}
+          onChange={(e: any) => setUserFilter(e.target.value)}
+          onClick={(e) => e.stopPropagation()}
+          className={`ml-2 text-xs font-semibold rounded px-1 py-0.5 outline-none cursor-pointer border transition-colors ${isDark
+            ? 'bg-slate-800 text-slate-300 border-slate-600 hover:border-emerald-400'
+            : 'bg-emerald-50 text-emerald-700 border-emerald-200 hover:border-emerald-400'
+            }`}
+        >
+          <option value="all">Tất cả</option>
+          <option value="active">Active</option>
+          <option value="inactive">Inactive</option>
+        </select>
+      )
     },
     {
+      apiKey: 'totalShops',
       label: 'Tổng shop',
       value: formatNum(stats.totalShops),
+      rawValue: stats.totalShops,
       icon: Store,
       accent: 'amber',
       trend: stats.totalShopsTrend || '+4.5%',
@@ -220,8 +270,10 @@ export default function AdminDashboard() {
       subText: 'cửa hàng hoạt động'
     },
     {
+      apiKey: 'totalBookings',
       label: dateRange === 'all' ? 'Tổng booking' : 'Booking mới (Kỳ)',
-      value: formatNum(stats.periodBookings ?? stats.totalBookings),
+      value: formatNum(dateRange === 'all' ? stats.totalBookings : (stats.periodBookings ?? stats.totalBookings)),
+      rawValue: dateRange === 'all' ? stats.totalBookings : (stats.periodBookings ?? stats.totalBookings),
       icon: Calendar,
       accent: 'purple',
       trend: stats.totalBookingsTrend || '+15.1%',
@@ -231,8 +283,10 @@ export default function AdminDashboard() {
       subText: dateRange === 'all' ? 'đã hoàn thành' : `Tổng: ${formatNum(stats.totalBookings)}`
     },
     {
+      apiKey: 'pendingWithdrawals',
       label: 'Rút tiền chờ duyệt',
       value: formatNum(pendingWithdrawals.length),
+      rawValue: pendingWithdrawals.length,
       icon: Banknote,
       accent: 'rose',
       trend: pendingWithdrawals.length > 0 ? 'Cần xử lý' : 'Hoàn tất',
@@ -242,8 +296,10 @@ export default function AdminDashboard() {
       subText: 'yêu cầu rút tiền'
     },
     {
+      apiKey: 'pendingShops',
       label: 'Shop chờ duyệt',
       value: formatNum(stats.pendingShops),
+      rawValue: stats.pendingShops,
       icon: Clock,
       accent: 'amber',
       trend: stats.pendingShopsTrend || '-18.4%',
@@ -253,34 +309,36 @@ export default function AdminDashboard() {
       subText: 'yêu cầu phê duyệt'
     },
     {
-      label: 'Tin nhắn chưa đọc',
-      value: formatNum(stats.unreadMessages),
-      icon: MessageCircle,
-      accent: 'blue',
-      trend: 'Ổn định',
-      trendUp: null,
-      sparkData: [4, 6, 5, 8, 7, 5, 4, 3],
-      color: isDark ? '#60a5fa' : '#3b82f6',
-      subText: 'hỗ trợ trực tuyến'
+      apiKey: 'totalVouchers',
+      label: 'Voucher đã phát',
+      value: formatNum(stats.totalVouchers),
+      rawValue: stats.totalVouchers,
+      icon: Ticket,
+      accent: 'indigo',
+      trend: '+12.5%',
+      trendUp: true,
+      sparkData: stats.totalVouchersSparkData || [0, 5, 12, 15, 20, 22, 28, stats.totalVouchers || 0],
+      color: isDark ? '#818cf8' : '#6366f1',
+      subText: 'số lượng voucher phát ra'
     },
   ] : [];
 
   const accentMap: Record<string, { iconBg: string; iconText: string; glow: string }> = {
-    blue:    { iconBg: 'bg-blue-500/10',    iconText: 'text-blue-400',    glow: 'group-hover:shadow-[0_0_25px_rgba(59,130,246,0.12)]' },
+    blue: { iconBg: 'bg-blue-500/10', iconText: 'text-blue-400', glow: 'group-hover:shadow-[0_0_25px_rgba(59,130,246,0.12)]' },
     emerald: { iconBg: 'bg-emerald-500/10', iconText: 'text-emerald-400', glow: 'group-hover:shadow-[0_0_25px_rgba(16,185,129,0.12)]' },
-    indigo:  { iconBg: 'bg-indigo-500/10',  iconText: 'text-indigo-400',  glow: 'group-hover:shadow-[0_0_25px_rgba(99,102,241,0.12)]' },
-    purple:  { iconBg: 'bg-purple-500/10',  iconText: 'text-purple-400',  glow: 'group-hover:shadow-[0_0_25px_rgba(139,92,246,0.12)]' },
-    amber:   { iconBg: 'bg-amber-500/10',   iconText: 'text-amber-400',   glow: 'group-hover:shadow-[0_0_25px_rgba(245,158,11,0.12)]' },
-    rose:    { iconBg: 'bg-rose-500/10',    iconText: 'text-rose-400',    glow: 'group-hover:shadow-[0_0_25px_rgba(244,63,94,0.12)]' },
+    indigo: { iconBg: 'bg-indigo-500/10', iconText: 'text-indigo-400', glow: 'group-hover:shadow-[0_0_25px_rgba(99,102,241,0.12)]' },
+    purple: { iconBg: 'bg-purple-500/10', iconText: 'text-purple-400', glow: 'group-hover:shadow-[0_0_25px_rgba(139,92,246,0.12)]' },
+    amber: { iconBg: 'bg-amber-500/10', iconText: 'text-amber-400', glow: 'group-hover:shadow-[0_0_25px_rgba(245,158,11,0.12)]' },
+    rose: { iconBg: 'bg-rose-500/10', iconText: 'text-rose-400', glow: 'group-hover:shadow-[0_0_25px_rgba(244,63,94,0.12)]' },
   };
 
   const accentMapLight: Record<string, { iconBg: string; iconText: string }> = {
-    blue:    { iconBg: 'bg-blue-50',     iconText: 'text-blue-600' },
-    emerald: { iconBg: 'bg-emerald-50',  iconText: 'text-emerald-600' },
-    indigo:  { iconBg: 'bg-indigo-50',   iconText: 'text-indigo-600' },
-    purple:  { iconBg: 'bg-purple-50',   iconText: 'text-purple-600' },
-    amber:   { iconBg: 'bg-amber-50',    iconText: 'text-amber-600' },
-    rose:    { iconBg: 'bg-rose-50',     iconText: 'text-rose-600' },
+    blue: { iconBg: 'bg-blue-50', iconText: 'text-blue-600' },
+    emerald: { iconBg: 'bg-emerald-50', iconText: 'text-emerald-600' },
+    indigo: { iconBg: 'bg-indigo-50', iconText: 'text-indigo-600' },
+    purple: { iconBg: 'bg-purple-50', iconText: 'text-purple-600' },
+    amber: { iconBg: 'bg-amber-50', iconText: 'text-amber-600' },
+    rose: { iconBg: 'bg-rose-50', iconText: 'text-rose-600' },
   };
 
   const tickFill = isDark ? '#64748b' : '#94a3b8';
@@ -302,90 +360,89 @@ export default function AdminDashboard() {
             Thống kê và trực quan hóa toàn bộ hoạt động của Peteye
           </p>
         </div>
-        
+
         {/* Date Filters & Update time */}
         <div className="flex flex-wrap items-center gap-3">
-            <div className="relative">
-                <div className={`flex items-center gap-1 p-1 rounded-2xl border ${isDark ? 'bg-slate-900/60 border-white/10' : 'bg-white border-slate-200'}`}>
-                    {[
-                        { id: 'today', label: 'Hôm nay' },
-                        { id: 'week', label: '7 ngày' },
-                        { id: 'month', label: '30 ngày' },
-                        { id: 'all', label: 'Toàn thời gian' }
-                    ].map(f => (
-                        <button 
-                            key={f.id}
-                            onClick={() => {
-                                setDateRange(f.id as any);
-                                setShowDatePicker(false);
-                            }}
-                            className={`px-4 py-2 text-xs font-bold rounded-xl transition-all ${dateRange === f.id ? (isDark ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-500/20 glow-indigo' : 'bg-indigo-50 text-indigo-700 shadow-sm') : (isDark ? 'text-slate-400 hover:text-white hover:bg-slate-800' : 'text-slate-600 hover:bg-slate-50')}`}
-                        >
-                            {f.label}
-                        </button>
-                    ))}
-                    <button 
-                        onClick={() => {
-                            setShowDatePicker(!showDatePicker);
-                            if (dateRange !== 'custom') setDateRange('custom');
-                        }}
-                        className={`px-4 py-2 text-xs font-bold rounded-xl transition-all flex items-center gap-1.5 ${dateRange === 'custom' ? (isDark ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-500/20 glow-indigo' : 'bg-indigo-50 text-indigo-700 shadow-sm') : (isDark ? 'text-slate-400 hover:text-white hover:bg-slate-800' : 'text-slate-600 hover:bg-slate-50')}`}
-                    >
-                        <Calendar size={14} /> Tuỳ chọn
-                    </button>
-                </div>
+          <div className="relative">
+            <div className={`flex items-center gap-1 p-1 rounded-2xl border ${isDark ? 'bg-slate-900/60 border-white/10' : 'bg-white border-slate-200'}`}>
+              {[
+                { id: 'today', label: 'Hôm nay' },
+                { id: 'week', label: '7 ngày' },
+                { id: 'month', label: '30 ngày' },
+                { id: 'all', label: 'Toàn thời gian' }
+              ].map(f => (
+                <button
+                  key={f.id}
+                  onClick={() => {
+                    setDateRange(f.id as any);
+                    setShowDatePicker(false);
+                  }}
+                  className={`px-4 py-2 text-xs font-bold rounded-xl transition-all ${dateRange === f.id ? (isDark ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-500/20 glow-indigo' : 'bg-indigo-50 text-indigo-700 shadow-sm') : (isDark ? 'text-slate-400 hover:text-white hover:bg-slate-800' : 'text-slate-600 hover:bg-slate-50')}`}
+                >
+                  {f.label}
+                </button>
+              ))}
+              <button
+                onClick={() => {
+                  setShowDatePicker(!showDatePicker);
+                  if (dateRange !== 'custom') setDateRange('custom');
+                }}
+                className={`px-4 py-2 text-xs font-bold rounded-xl transition-all flex items-center gap-1.5 ${dateRange === 'custom' ? (isDark ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-500/20 glow-indigo' : 'bg-indigo-50 text-indigo-700 shadow-sm') : (isDark ? 'text-slate-400 hover:text-white hover:bg-slate-800' : 'text-slate-600 hover:bg-slate-50')}`}
+              >
+                <Calendar size={14} /> Tuỳ chọn
+              </button>
+            </div>
 
-                {showDatePicker && dateRange === 'custom' && (
-                    <div className={`absolute top-full right-0 mt-3 p-5 rounded-3xl border shadow-2xl z-50 animate-in fade-in slide-in-from-top-2 duration-200 ${isDark ? 'bg-slate-900 border-white/10 shadow-black/50' : 'bg-white border-slate-200 shadow-indigo-900/10'}`}>
-                        <div className="flex items-center gap-4">
-                            <div className="flex flex-col gap-1.5">
-                                <label className={`text-[10px] font-bold uppercase tracking-wider pl-1 ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>Từ ngày</label>
-                                <div className={`flex items-center px-4 py-2.5 rounded-2xl border-2 transition-all cursor-pointer ${isDark ? 'bg-slate-800 border-transparent hover:border-indigo-500/30 focus-within:border-indigo-500' : 'bg-slate-50 border-transparent hover:border-indigo-200 focus-within:border-indigo-400'}`}>
-                                    <input 
-                                        type="date" 
-                                        value={customDateInput.start}
-                                        onChange={(e) => setCustomDateInput(prev => ({ ...prev, start: e.target.value }))}
-                                        className={`text-sm font-bold outline-none bg-transparent cursor-pointer w-[120px] ${isDark ? 'text-white [color-scheme:dark]' : 'text-slate-700'}`}
-                                    />
-                                </div>
-                            </div>
-                            <div className="flex flex-col gap-1.5 mt-5">
-                                <span className={`font-black ${isDark ? 'text-slate-600' : 'text-slate-300'}`}>-</span>
-                            </div>
-                            <div className="flex flex-col gap-1.5">
-                                <label className={`text-[10px] font-bold uppercase tracking-wider pl-1 ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>Đến ngày</label>
-                                <div className={`flex items-center px-4 py-2.5 rounded-2xl border-2 transition-all cursor-pointer ${isDark ? 'bg-slate-800 border-transparent hover:border-indigo-500/30 focus-within:border-indigo-500' : 'bg-slate-50 border-transparent hover:border-indigo-200 focus-within:border-indigo-400'}`}>
-                                    <input 
-                                        type="date" 
-                                        value={customDateInput.end}
-                                        onChange={(e) => setCustomDateInput(prev => ({ ...prev, end: e.target.value }))}
-                                        className={`text-sm font-bold outline-none bg-transparent cursor-pointer w-[120px] ${isDark ? 'text-white [color-scheme:dark]' : 'text-slate-700'}`}
-                                    />
-                                </div>
-                            </div>
-                        </div>
-                        <div className="mt-5 flex justify-end">
-                            <button 
-                                onClick={() => {
-                                    setAppliedCustomDate(customDateInput);
-                                    setShowDatePicker(false);
-                                }}
-                                className={`px-5 py-2.5 rounded-xl text-sm font-bold text-white shadow-lg transition-transform active:scale-95 ${isDark ? 'bg-indigo-600 shadow-indigo-500/20 hover:bg-indigo-500' : 'bg-indigo-600 shadow-indigo-500/30 hover:bg-indigo-700'}`}
-                            >
-                                Lấy dữ liệu
-                            </button>
-                        </div>
+            {showDatePicker && dateRange === 'custom' && (
+              <div className={`absolute top-full right-0 mt-3 p-5 rounded-3xl border shadow-2xl z-50 animate-in fade-in slide-in-from-top-2 duration-200 ${isDark ? 'bg-slate-900 border-white/10 shadow-black/50' : 'bg-white border-slate-200 shadow-indigo-900/10'}`}>
+                <div className="flex items-center gap-4">
+                  <div className="flex flex-col gap-1.5">
+                    <label className={`text-[10px] font-bold uppercase tracking-wider pl-1 ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>Từ ngày</label>
+                    <div className={`flex items-center px-4 py-2.5 rounded-2xl border-2 transition-all cursor-pointer ${isDark ? 'bg-slate-800 border-transparent hover:border-indigo-500/30 focus-within:border-indigo-500' : 'bg-slate-50 border-transparent hover:border-indigo-200 focus-within:border-indigo-400'}`}>
+                      <input
+                        type="date"
+                        value={customDateInput.start}
+                        onChange={(e) => setCustomDateInput(prev => ({ ...prev, start: e.target.value }))}
+                        className={`text-sm font-bold outline-none bg-transparent cursor-pointer w-[120px] ${isDark ? 'text-white [color-scheme:dark]' : 'text-slate-700'}`}
+                      />
                     </div>
-                )}
-            </div>
+                  </div>
+                  <div className="flex flex-col gap-1.5 mt-5">
+                    <span className={`font-black ${isDark ? 'text-slate-600' : 'text-slate-300'}`}>-</span>
+                  </div>
+                  <div className="flex flex-col gap-1.5">
+                    <label className={`text-[10px] font-bold uppercase tracking-wider pl-1 ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>Đến ngày</label>
+                    <div className={`flex items-center px-4 py-2.5 rounded-2xl border-2 transition-all cursor-pointer ${isDark ? 'bg-slate-800 border-transparent hover:border-indigo-500/30 focus-within:border-indigo-500' : 'bg-slate-50 border-transparent hover:border-indigo-200 focus-within:border-indigo-400'}`}>
+                      <input
+                        type="date"
+                        value={customDateInput.end}
+                        onChange={(e) => setCustomDateInput(prev => ({ ...prev, end: e.target.value }))}
+                        className={`text-sm font-bold outline-none bg-transparent cursor-pointer w-[120px] ${isDark ? 'text-white [color-scheme:dark]' : 'text-slate-700'}`}
+                      />
+                    </div>
+                  </div>
+                </div>
+                <div className="mt-5 flex justify-end">
+                  <button
+                    onClick={() => {
+                      setAppliedCustomDate(customDateInput);
+                      setShowDatePicker(false);
+                    }}
+                    className={`px-5 py-2.5 rounded-xl text-sm font-bold text-white shadow-lg transition-transform active:scale-95 ${isDark ? 'bg-indigo-600 shadow-indigo-500/20 hover:bg-indigo-500' : 'bg-indigo-600 shadow-indigo-500/30 hover:bg-indigo-700'}`}
+                  >
+                    Lấy dữ liệu
+                  </button>
+                </div>
+              </div>
+            )}
+          </div>
 
-            <div className={`px-4 py-2 rounded-2xl text-xs font-semibold border ${
-              isDark 
-                ? 'bg-slate-900/50 border-white/5 text-slate-400' 
-                : 'bg-white border-slate-200/60 text-slate-500 shadow-sm'
+          <div className={`px-4 py-2 rounded-2xl text-xs font-semibold border ${isDark
+            ? 'bg-slate-900/50 border-white/5 text-slate-400'
+            : 'bg-white border-slate-200/60 text-slate-500 shadow-sm'
             }`}>
-              Cập nhật: {new Date().toLocaleDateString('vi-VN', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
-            </div>
+            Cập nhật: {new Date().toLocaleDateString('vi-VN', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
+          </div>
         </div>
       </div>
 
@@ -393,13 +450,12 @@ export default function AdminDashboard() {
       {((stats?.pendingShops ?? 0) > 0 || pendingWithdrawals.length > 0 || waitingRefunds.length > 0) && (
         <div className="flex flex-col md:flex-row md:flex-wrap gap-4 relative z-10">
           {(stats?.pendingShops ?? 0) > 0 && (
-            <button 
+            <button
               onClick={() => navigate('/admin/shops')}
-              className={`flex-1 flex items-center justify-between p-4 rounded-2xl border transition-all duration-300 ${
-                isDark 
-                  ? 'bg-amber-500/10 border-amber-500/30 text-amber-400 hover:bg-amber-500/20' 
-                  : 'bg-amber-50 border-amber-200 text-amber-700 hover:bg-amber-100'
-              }`}
+              className={`flex-1 flex items-center justify-between p-4 rounded-2xl border transition-all duration-300 ${isDark
+                ? 'bg-amber-500/10 border-amber-500/30 text-amber-400 hover:bg-amber-500/20'
+                : 'bg-amber-50 border-amber-200 text-amber-700 hover:bg-amber-100'
+                }`}
             >
               <div className="flex items-center gap-3">
                 <div className="relative">
@@ -413,13 +469,12 @@ export default function AdminDashboard() {
           )}
 
           {pendingWithdrawals.length > 0 && (
-            <button 
+            <button
               onClick={() => navigate('/admin/withdrawals')}
-              className={`flex-1 flex items-center justify-between p-4 rounded-2xl border transition-all duration-300 ${
-                isDark 
-                  ? 'bg-rose-500/10 border-rose-500/30 text-rose-400 hover:bg-rose-500/20' 
-                  : 'bg-rose-50 border-rose-200 text-rose-700 hover:bg-rose-100'
-              }`}
+              className={`flex-1 flex items-center justify-between p-4 rounded-2xl border transition-all duration-300 ${isDark
+                ? 'bg-rose-500/10 border-rose-500/30 text-rose-400 hover:bg-rose-500/20'
+                : 'bg-rose-50 border-rose-200 text-rose-700 hover:bg-rose-100'
+                }`}
             >
               <div className="flex items-center gap-3">
                 <div className="relative">
@@ -433,13 +488,12 @@ export default function AdminDashboard() {
           )}
 
           {waitingRefunds.length > 0 && (
-            <button 
+            <button
               onClick={() => navigate('/admin/withdrawals')}
-              className={`flex-1 flex items-center justify-between p-4 rounded-2xl border transition-all duration-300 ${
-                isDark 
-                  ? 'bg-purple-500/10 border-purple-500/30 text-purple-400 hover:bg-purple-500/20' 
-                  : 'bg-purple-50 border-purple-200 text-purple-700 hover:bg-purple-100'
-              }`}
+              className={`flex-1 flex items-center justify-between p-4 rounded-2xl border transition-all duration-300 ${isDark
+                ? 'bg-purple-500/10 border-purple-500/30 text-purple-400 hover:bg-purple-500/20'
+                : 'bg-purple-50 border-purple-200 text-purple-700 hover:bg-purple-100'
+                }`}
             >
               <div className="flex items-center gap-3">
                 <div className="relative">
@@ -466,33 +520,31 @@ export default function AdminDashboard() {
           {cards.map(s => {
             const a = isDark ? accentMap[s.accent] : accentMapLight[s.accent];
             return (
-              <div 
-                key={s.label} 
-                className={`group relative overflow-hidden rounded-3xl p-6 transition-all duration-300 ${
-                  isDark 
-                    ? `admin-glass-card ${accentMap[s.accent]?.glow} hover:border-white/15` 
-                    : 'bg-white border border-slate-100 shadow-[0_4px_12px_rgba(0,0,0,0.01)] hover:shadow-[0_12px_30px_rgba(148,163,184,0.12)] hover:border-slate-200'
-                }`}
+              <div
+                key={s.label}
+                onClick={() => handleOpenModal(s)}
+                className={`group relative overflow-hidden rounded-3xl p-6 transition-all duration-300 cursor-pointer ${isDark
+                  ? `admin-glass-card ${accentMap[s.accent]?.glow} hover:border-white/15`
+                  : 'bg-white border border-slate-100 shadow-[0_4px_12px_rgba(0,0,0,0.01)] hover:shadow-[0_12px_30px_rgba(148,163,184,0.12)] hover:border-slate-200'
+                  }`}
               >
                 {/* Background glow pattern */}
-                <div className={`absolute top-0 right-0 w-24 h-24 rounded-full blur-2xl pointer-events-none transition-all duration-500 opacity-0 group-hover:opacity-100 ${
-                  isDark ? 'bg-white/5' : 'bg-slate-100'
-                }`} />
+                <div className={`absolute top-0 right-0 w-24 h-24 rounded-full blur-2xl pointer-events-none transition-all duration-500 opacity-0 group-hover:opacity-100 ${isDark ? 'bg-white/5' : 'bg-slate-100'
+                  }`} />
 
                 {/* Card Header */}
                 <div className="flex justify-between items-center mb-5 relative z-10">
                   <div className={`w-12 h-12 rounded-2xl flex items-center justify-center transition-transform duration-300 group-hover:scale-110 ${a.iconBg} border ${isDark ? 'border-white/5' : 'border-slate-100'}`}>
                     <s.icon size={22} className={a.iconText} />
                   </div>
-                  
+
                   {s.trend && (
-                    <div className={`flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-bold ${
-                      s.trendUp === true 
-                        ? (isDark ? 'bg-emerald-500/10 text-emerald-400' : 'bg-emerald-50 text-emerald-600')
-                        : s.trendUp === false 
-                          ? (isDark ? 'bg-rose-500/10 text-rose-400' : 'bg-rose-50 text-rose-600')
-                          : (isDark ? 'bg-slate-500/10 text-slate-400' : 'bg-slate-100 text-slate-600')
-                    }`}>
+                    <div className={`flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-bold ${s.trendUp === true
+                      ? (isDark ? 'bg-emerald-500/10 text-emerald-400' : 'bg-emerald-50 text-emerald-600')
+                      : s.trendUp === false
+                        ? (isDark ? 'bg-rose-500/10 text-rose-400' : 'bg-rose-50 text-rose-600')
+                        : (isDark ? 'bg-slate-500/10 text-slate-400' : 'bg-slate-100 text-slate-600')
+                      }`}>
                       {s.trendUp === true ? '↑' : s.trendUp === false ? '↓' : '•'} {s.trend}
                     </div>
                   )}
@@ -501,9 +553,10 @@ export default function AdminDashboard() {
                 {/* Card Content & Sparkline */}
                 <div className="flex items-end justify-between relative z-10">
                   <div>
-                    <p className={`text-[10px] font-extrabold uppercase tracking-wider ${isDark ? 'text-slate-400/60' : 'text-slate-400'}`}>
-                      {s.label}
-                    </p>
+                    <div className={`text-[10px] font-extrabold uppercase tracking-wider flex items-center gap-1.5 ${isDark ? 'text-slate-400/60' : 'text-slate-400'}`}>
+                      <span className="whitespace-nowrap">{s.label}</span>
+                      {s.customAction && s.customAction}
+                    </div>
                     <h3 className={`text-3xl font-extrabold tracking-tight mt-1 transition-all duration-300 group-hover:translate-x-1 ${isDark ? 'text-white' : 'text-slate-900'}`}>
                       {s.value}
                     </h3>
@@ -511,7 +564,7 @@ export default function AdminDashboard() {
                       {s.subText}
                     </p>
                   </div>
-                  
+
                   <div className="pb-1 transform transition-all duration-500 group-hover:scale-105">
                     <Sparkline data={s.sparkData} color={s.color} />
                   </div>
@@ -525,11 +578,10 @@ export default function AdminDashboard() {
       {/* Charts Grid */}
       <div className="grid grid-cols-1 xl:grid-cols-2 gap-8 relative z-10">
         {/* Revenue chart */}
-        <div className={`rounded-3xl p-6 transition-all duration-300 relative overflow-hidden ${
-          isDark 
-            ? 'admin-glass-card hover:border-white/15' 
-            : 'bg-white border border-slate-100 shadow-[0_4px_20px_rgba(0,0,0,0.01)] hover:shadow-[0_12px_36px_rgba(148,163,184,0.1)] hover:border-slate-200'
-        }`}>
+        <div className={`rounded-3xl p-6 transition-all duration-300 relative overflow-hidden ${isDark
+          ? 'admin-glass-card hover:border-white/15'
+          : 'bg-white border border-slate-100 shadow-[0_4px_20px_rgba(0,0,0,0.01)] hover:shadow-[0_12px_36px_rgba(148,163,184,0.1)] hover:border-slate-200'
+          }`}>
           <div className="flex items-center justify-between mb-8">
             <div>
               <h3 className={`text-lg font-extrabold tracking-tight ${isDark ? 'text-white' : 'text-slate-900'}`}>
@@ -539,9 +591,8 @@ export default function AdminDashboard() {
                 Đơn vị: triệu đồng — {currentYear}
               </p>
             </div>
-            <div className={`w-10 h-10 rounded-2xl flex items-center justify-center ${
-              isDark ? 'bg-blue-500/10' : 'bg-blue-50'
-            }`}>
+            <div className={`w-10 h-10 rounded-2xl flex items-center justify-center ${isDark ? 'bg-blue-500/10' : 'bg-blue-50'
+              }`}>
               <TrendingUp size={20} className={isDark ? 'text-blue-400' : 'text-blue-600'} />
             </div>
           </div>
@@ -551,7 +602,7 @@ export default function AdminDashboard() {
                 Chưa có dữ liệu doanh thu
               </div>
             ) : (
-              <ReactApexChart 
+              <ReactApexChart
                 options={{
                   chart: {
                     type: 'area',
@@ -604,11 +655,10 @@ export default function AdminDashboard() {
         </div>
 
         {/* Booking chart */}
-        <div className={`rounded-3xl p-6 transition-all duration-300 relative overflow-hidden ${
-          isDark 
-            ? 'admin-glass-card hover:border-white/15' 
-            : 'bg-white border border-slate-100 shadow-[0_4px_20px_rgba(0,0,0,0.01)] hover:shadow-[0_12px_36px_rgba(148,163,184,0.1)] hover:border-slate-200'
-        }`}>
+        <div className={`rounded-3xl p-6 transition-all duration-300 relative overflow-hidden ${isDark
+          ? 'admin-glass-card hover:border-white/15'
+          : 'bg-white border border-slate-100 shadow-[0_4px_20px_rgba(0,0,0,0.01)] hover:shadow-[0_12px_36px_rgba(148,163,184,0.1)] hover:border-slate-200'
+          }`}>
           <div className="flex items-center justify-between mb-8">
             <div>
               <h3 className={`text-lg font-extrabold tracking-tight ${isDark ? 'text-white' : 'text-slate-900'}`}>
@@ -618,9 +668,8 @@ export default function AdminDashboard() {
                 Số lượng đặt lịch 7 ngày gần nhất
               </p>
             </div>
-            <div className={`w-10 h-10 rounded-2xl flex items-center justify-center ${
-              isDark ? 'bg-purple-500/10' : 'bg-purple-50'
-            }`}>
+            <div className={`w-10 h-10 rounded-2xl flex items-center justify-center ${isDark ? 'bg-purple-500/10' : 'bg-purple-50'
+              }`}>
               <Calendar size={20} className={isDark ? 'text-purple-400' : 'text-purple-600'} />
             </div>
           </div>
@@ -702,14 +751,13 @@ export default function AdminDashboard() {
           { label: 'Thông báo', path: '/admin/notifications', count: null },
           { label: 'Tin nhắn', path: '/admin/messages', count: stats?.unreadMessages },
         ].map(q => (
-          <Link 
-            key={q.path} 
-            to={q.path} 
-            className={`group rounded-2xl p-5 transition-all duration-300 relative overflow-hidden ${
-              isDark 
-                ? 'admin-glass-card hover:border-white/20' 
-                : 'bg-white border border-slate-100 shadow-[0_2px_8px_rgba(0,0,0,0.02)] hover:shadow-[0_8px_20px_rgba(148,163,184,0.08)] hover:border-slate-200'
-            }`}
+          <Link
+            key={q.path}
+            to={q.path}
+            className={`group rounded-2xl p-5 transition-all duration-300 relative overflow-hidden ${isDark
+              ? 'admin-glass-card hover:border-white/20'
+              : 'bg-white border border-slate-100 shadow-[0_2px_8px_rgba(0,0,0,0.02)] hover:shadow-[0_8px_20px_rgba(148,163,184,0.08)] hover:border-slate-200'
+              }`}
           >
             {/* Hover visual highlight */}
             <div className="absolute inset-0 bg-blue-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none" />
@@ -733,6 +781,179 @@ export default function AdminDashboard() {
           </Link>
         ))}
       </div>
+
+      {/* Comparison Modal */}
+      {selectedMetric && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+          <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm" onClick={() => setSelectedMetric(null)}></div>
+          <div className={`relative w-full max-w-5xl rounded-3xl p-6 md:p-8 shadow-2xl animate-in fade-in zoom-in-95 duration-300 ${isDark ? 'bg-slate-900 border border-white/10' : 'bg-white border border-slate-200'
+            }`}>
+            <button
+              onClick={() => setSelectedMetric(null)}
+              className={`absolute top-6 right-6 p-2 rounded-full transition-colors z-10 ${isDark ? 'hover:bg-white/10 text-slate-400 hover:text-white' : 'hover:bg-slate-100 text-slate-500 hover:text-slate-900'
+                }`}
+            >
+              <X size={24} />
+            </button>
+
+            <div className="flex items-center gap-4 mb-8">
+              <div className={`w-14 h-14 rounded-2xl flex items-center justify-center ${isDark ? accentMap[selectedMetric.accent].iconBg : accentMapLight[selectedMetric.accent].iconBg
+                }`}>
+                <selectedMetric.icon size={28} className={
+                  isDark ? accentMap[selectedMetric.accent].iconText : accentMapLight[selectedMetric.accent].iconText
+                } />
+              </div>
+              <div>
+                <h2 className={`text-2xl font-extrabold tracking-tight ${isDark ? 'text-white' : 'text-slate-900'}`}>
+                  So sánh: {selectedMetric.label}
+                </h2>
+                <p className={`text-sm font-medium mt-1 ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>
+                  Biến động 30 ngày qua
+                </p>
+              </div>
+            </div>
+
+            {(() => {
+              const apiKey = selectedMetric.apiKey;
+              const dataLeftRaw = (historyLeft as any)[apiKey] || [];
+              const dataRightRaw = (historyRight as any)[apiKey] || [];
+
+              const dataLeft = dataLeftRaw.length > 0 ? dataLeftRaw : [{ day: 'Ngày 1', value: 0 }];
+              const dataRight = dataRightRaw.length > 0 ? dataRightRaw : [{ day: 'Ngày 1', value: 0 }];
+
+              const totalLeft = dataLeftRaw.reduce((sum: number, item: any) => sum + Number(item.value), 0);
+              const totalRight = dataRightRaw.reduce((sum: number, item: any) => sum + Number(item.value), 0);
+
+              const getChartOptions = (color: string) => ({
+                chart: {
+                  type: 'area',
+                  toolbar: { show: false },
+                  background: 'transparent',
+                  animations: { enabled: true, speed: 800 },
+                  dropShadow: { enabled: true, top: 12, left: 0, blur: 8, opacity: 0.15, color: color }
+                },
+                fill: {
+                  type: 'gradient',
+                  gradient: { shadeIntensity: 1, opacityFrom: 0.5, opacityTo: 0.01, stops: [0, 90, 100] }
+                },
+                dataLabels: { enabled: false },
+                stroke: { curve: 'smooth', width: 4 },
+                xaxis: {
+                  categories: dataLeft.map(d => d.day), // fallback, actual categories passed per series is not standard in Apex, but it matches index
+                  labels: { show: false },
+                  axisBorder: { show: false },
+                  axisTicks: { show: false }
+                },
+                yaxis: {
+                  labels: {
+                    style: { colors: tickFill, fontSize: '10px', fontWeight: 700 },
+                    formatter: (val: number) => {
+                      if (val >= 1000000000) return (val / 1000000000).toFixed(1) + 'B';
+                      if (val >= 1000000) return (val / 1000000).toFixed(1) + 'M';
+                      if (val >= 1000) return (val / 1000).toFixed(0) + 'K';
+                      return val;
+                    }
+                  }
+                },
+                grid: { borderColor: isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.05)', strokeDashArray: 4, xaxis: { lines: { show: false } } },
+                theme: { mode: isDark ? 'dark' : 'light' },
+                tooltip: {
+                  theme: isDark ? 'dark' : 'light',
+                  y: {
+                    formatter: (val: number) => {
+                      if (val >= 1000000) return (val / 1000000).toFixed(1) + 'M';
+                      if (val >= 1000) return (val / 1000).toFixed(0) + 'K';
+                      return Math.round(val);
+                    }
+                  }
+                }
+              });
+
+              // Tính toán phần trăm thay đổi
+              let diffPercent = 0;
+              let isDiffUp = null;
+              if (totalLeft > 0) {
+                diffPercent = ((totalRight - totalLeft) / totalLeft) * 100;
+                isDiffUp = diffPercent >= 0;
+              } else if (totalLeft === 0 && totalRight > 0) {
+                diffPercent = 100;
+                isDiffUp = true;
+              }
+
+              return (
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                  {/* Left Month */}
+                  <div className={`p-6 rounded-2xl border relative overflow-hidden transition-all duration-500 ${isDark ? 'bg-slate-800/50 border-white/5 hover:border-white/10 hover:bg-slate-800/70' : 'bg-slate-50 border-slate-100 hover:border-slate-200'}`}>
+                    <div className="flex justify-between items-end mb-6 relative z-10">
+                      <div>
+                        <div className="flex items-center gap-2 mb-1">
+                          <select
+                            value={compareMonthLeft}
+                            onChange={(e) => setCompareMonthLeft(parseInt(e.target.value))}
+                            className={`text-xs font-black uppercase tracking-widest bg-transparent outline-none cursor-pointer border-b-2 transition-colors pb-0.5 ${isDark ? 'text-slate-400 border-slate-600 hover:border-slate-400 hover:text-slate-300' : 'text-slate-500 border-slate-300 hover:border-slate-500 hover:text-slate-700'}`}
+                          >
+                            {MONTH_LABELS.map((m, i) => <option key={i} value={i} className={isDark ? 'bg-slate-800 text-slate-200' : 'bg-white text-slate-800'}>{m}</option>)}
+                          </select>
+                        </div>
+                        <p className={`text-3xl font-black transition-all ${isDark ? 'text-slate-300' : 'text-slate-700'}`}>
+                          {selectedMetric.accent === 'blue' || selectedMetric.accent === 'indigo' ? fmtShort(totalLeft) : formatNum(totalLeft)}
+                        </p>
+                      </div>
+                    </div>
+                    <div className="h-[200px] w-full relative z-10 group-hover:scale-105 transition-transform duration-700">
+                      <ReactApexChart
+                        options={{ ...getChartOptions(isDark ? '#94a3b8' : '#64748b'), colors: [isDark ? '#94a3b8' : '#64748b'], xaxis: { categories: dataLeft.map(d => d.day), labels: { show: false }, axisBorder: { show: false }, axisTicks: { show: false } } }}
+                        series={[{ name: MONTH_LABELS[compareMonthLeft], data: dataLeft.map(d => d.value) }]}
+                        type="area" height="100%" width="100%"
+                      />
+                    </div>
+                  </div>
+
+                  {/* Right Month */}
+                  <div className={`p-6 rounded-2xl border relative overflow-hidden transition-all duration-500 ${isDark ? 'bg-slate-800/80 border-white/10 shadow-[0_0_40px_rgba(0,0,0,0.4)] hover:border-white/20' : 'bg-white border-slate-200 shadow-2xl hover:border-slate-300'}`}>
+                    {/* Glow effect */}
+                    <div className={`absolute -top-24 -right-24 w-56 h-56 rounded-full blur-[80px] opacity-30 pointer-events-none transition-all duration-700`} style={{ backgroundColor: selectedMetric.color }}></div>
+
+                    <div className="flex justify-between items-end mb-6 relative z-10">
+                      <div>
+                        <div className="flex items-center gap-2 mb-1">
+                          <select
+                            value={compareMonthRight}
+                            onChange={(e) => setCompareMonthRight(parseInt(e.target.value))}
+                            className={`text-xs font-black uppercase tracking-widest bg-transparent outline-none cursor-pointer border-b-2 transition-colors pb-0.5`}
+                            style={{ color: selectedMetric.color, borderColor: `${selectedMetric.color}40` }}
+                          >
+                            {MONTH_LABELS.map((m, i) => <option key={i} value={i} className={isDark ? 'bg-slate-800 text-slate-200' : 'bg-white text-slate-800'}>{m}</option>)}
+                          </select>
+                        </div>
+                        <p className={`text-4xl font-black tracking-tight transition-all ${isDark ? 'text-white' : 'text-slate-900'}`}>
+                          {selectedMetric.accent === 'blue' || selectedMetric.accent === 'indigo' ? fmtShort(totalRight) : formatNum(totalRight)}
+                        </p>
+                      </div>
+
+                      {isDiffUp !== null && compareMonthRight !== compareMonthLeft && (
+                        <div className={`flex items-center gap-1.5 px-3.5 py-2 rounded-full text-sm font-black shadow-lg ${isDiffUp
+                          ? (isDark ? 'bg-emerald-500/10 text-emerald-400 shadow-emerald-500/10' : 'bg-emerald-50 text-emerald-600 shadow-emerald-500/5')
+                          : (isDark ? 'bg-rose-500/10 text-rose-400 shadow-rose-500/10' : 'bg-rose-50 text-rose-600 shadow-rose-500/5')
+                          }`}>
+                          {isDiffUp ? '↑' : '↓'} {Math.abs(diffPercent).toFixed(1)}%
+                        </div>
+                      )}
+                    </div>
+                    <div className="h-[200px] w-full relative z-10 group-hover:scale-105 transition-transform duration-700">
+                      <ReactApexChart
+                        options={{ ...getChartOptions(selectedMetric.color), colors: [selectedMetric.color], xaxis: { categories: dataRight.map(d => d.day), labels: { show: false }, axisBorder: { show: false }, axisTicks: { show: false } } }}
+                        series={[{ name: MONTH_LABELS[compareMonthRight], data: dataRight.map(d => d.value) }]}
+                        type="area" height="100%" width="100%"
+                      />
+                    </div>
+                  </div>
+                </div>
+              );
+            })()}
+          </div>
+        </div>
+      )}
     </div>
   );
 }
