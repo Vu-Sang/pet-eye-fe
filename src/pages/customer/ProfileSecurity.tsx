@@ -48,7 +48,7 @@ export default function ProfileSecurity() {
     return (
         <main className="flex-1 flex flex-col gap-6">
             <div>
-                <h1 className="text-3xl font-bold text-slate-900 dark:text-slate-100 tracking-tight">Cài đặt bảo mật & Thông báo</h1>
+                <h1 className="text-3xl text-slate-900 dark:text-slate-100 tracking-tight font-bold">Bảo mật & Mật khẩu</h1>
                 <p className="text-slate-500 dark:text-slate-400 mt-1">Quản lý mật khẩu và tùy chọn nhận thông báo hệ thống.</p>
             </div>
 

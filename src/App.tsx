@@ -38,7 +38,6 @@ import BookingHistory from './pages/customer/BookingHistory';
 import TransactionHistory from './pages/customer/TransactionHistory';
 import ClinicDetail from './pages/public/ClinicDetail';
 import PetProfile from './pages/customer/PetProfile';
-import Messaging from './pages/public/Messaging';
 import VetSearch from './pages/public/VetSearch';
 import Payment from './pages/payment/Payment';
 import ProfilePets from './pages/customer/ProfilePets';
@@ -64,6 +63,7 @@ import ShopWallet from './pages/shop/ShopWallet';
 import AdminVouchers from './pages/admin/AdminVouchers';
 import Chatbot from './components/Chatbot';
 import GiftBoxCelebration from './components/GiftBoxCelebration';
+import FloatingMessaging from './components/chat/FloatingMessaging';
 
 // Routes where the global Navbar + Footer should be hidden
 const SHOP_ROUTES_PREFIX = '/shop';
@@ -178,7 +178,7 @@ function AppLayout() {
           </Route>
           <Route path="/clinic/:id" element={<ClinicDetail />} />
           <Route path="/pet/:id" element={user ? <PetProfile /> : <Navigate to="/" replace />} />
-          <Route path="/messages" element={user ? <Messaging /> : <Navigate to="/" replace />} />
+          <Route path="/messages" element={<Navigate to="/" replace />} />
           <Route path="/camera" element={user ? <CameraView /> : <Navigate to="/" replace />} />
           <Route path="/search" element={<VetSearch />} />
           <Route path="/payment" element={user ? <Payment /> : <Navigate to="/" replace />} />
@@ -196,6 +196,9 @@ function AppLayout() {
 
       {/* Chatbot – hiển thị cho tất cả customer pages (kể cả /home), trừ Camera và Messages. Ẩn nếu chưa đăng nhập */}
       {user && !isShopRoute && !isStaffRoute && !isAdminRoute && !isNoNavbarRoute && !isCameraPage && !isMessagingPage && <Chatbot />}
+
+      {/* Floating Messaging - Thay thế cho trang /messages cũ */}
+      {user && !isShopRoute && !isStaffRoute && !isAdminRoute && !isNoNavbarRoute && <FloatingMessaging />}
 
       {/* Cụm nút cuộn trang thông minh - Hiển thị toàn cục trừ các trang ẩn Navbar/Messaging */}
       {/* {shouldShowCustomerNav && !isMessagingPage && <FloatingScrollButtons />} */}

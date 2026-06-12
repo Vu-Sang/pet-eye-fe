@@ -504,93 +504,95 @@ export default function Payment() {
                 )}
               </button>
 
-              <button
-                onClick={async () => {
-                  if (!agreed || loading) return;
-                  setLoading(true);
-                  setError('');
-                  const serviceIds = serviceList.map(s => s.id);
-                  const summaryData = {
-                    shopName: booking.shopName,
-                    shopAddress: booking.shopAddress,
-                    shopImage: booking.shopImage,
-                    services: serviceList,
-                    totalPrice: payMethod === 'cash' ? depositAmount : totalPrice,
-                    isDeposit: payMethod === 'cash'
-                  };
-                  localStorage.setItem('pendingBookingSummary', JSON.stringify(summaryData));
-                  try {
-                    const dataPayload = {
-                      shopId: booking.shopId,
-                      serviceId: booking.serviceId,
-                      serviceIds: serviceIds,
-                      petId: booking.petId,
-                      staffId: booking.staffId,
-                      appointmentDatetime: booking.appointmentDatetime,
-                      checkIn: booking.checkIn,
-                      checkOut: booking.checkOut,
-                      note: bookingNote.trim()
-                        ? (booking.petNote ? `${booking.petNote}\n—\nGhi chú thêm: ${bookingNote.trim()}` : bookingNote.trim())
-                        : (booking.petNote || ''),
-                      paymentMethod: (payMethod === 'cash' ? 'CASH' : 'PAYOS') as "PAYOS" | "CASH",
-                      cageSize: booking.cageSize,
-                      roomType: booking.roomType,
-                      userVoucherId: payMethod === 'payos' && selectedVoucherId ? selectedVoucherId : undefined,
+              {import.meta.env.DEV && (
+                <button
+                  onClick={async () => {
+                    if (!agreed || loading) return;
+                    setLoading(true);
+                    setError('');
+                    const serviceIds = serviceList.map(s => s.id);
+                    const summaryData = {
+                      shopName: booking.shopName,
+                      shopAddress: booking.shopAddress,
+                      shopImage: booking.shopImage,
+                      services: serviceList,
+                      totalPrice: payMethod === 'cash' ? depositAmount : totalPrice,
+                      isDeposit: payMethod === 'cash'
                     };
-                    const result = payMethod === 'cash' 
-                      ? await bookingService.initiateCashDeposit(dataPayload)
-                      : await bookingService.initiatePayment(dataPayload);
-                    
-                    if (result.orderCode) {
-                      const confirmedBooking = payMethod === 'cash'
-                        ? await bookingService.mockConfirmCashDeposit(result.orderCode)
-                        : await bookingService.mockConfirmPayment(result.orderCode);
-                      localStorage.removeItem('pendingBookingSummary');
+                    localStorage.setItem('pendingBookingSummary', JSON.stringify(summaryData));
+                    try {
+                      const dataPayload = {
+                        shopId: booking.shopId,
+                        serviceId: booking.serviceId,
+                        serviceIds: serviceIds,
+                        petId: booking.petId,
+                        staffId: booking.staffId,
+                        appointmentDatetime: booking.appointmentDatetime,
+                        checkIn: booking.checkIn,
+                        checkOut: booking.checkOut,
+                        note: bookingNote.trim()
+                          ? (booking.petNote ? `${booking.petNote}\n—\nGhi chú thêm: ${bookingNote.trim()}` : bookingNote.trim())
+                          : (booking.petNote || ''),
+                        paymentMethod: (payMethod === 'cash' ? 'CASH' : 'PAYOS') as "PAYOS" | "CASH",
+                        cageSize: booking.cageSize,
+                        roomType: booking.roomType,
+                        userVoucherId: payMethod === 'payos' && selectedVoucherId ? selectedVoucherId : undefined,
+                      };
+                      const result = payMethod === 'cash' 
+                        ? await bookingService.initiateCashDeposit(dataPayload)
+                        : await bookingService.initiatePayment(dataPayload);
                       
-                      navigate('/booking/success', {
-                        state: {
-                          booking: confirmedBooking,
-                          isCashDeposit: payMethod === 'cash',
-                          bookingInfo: {
-                            shopId: confirmedBooking.shopId,
-                            shopName: confirmedBooking.shopName,
-                            shopAddress: confirmedBooking.shopAddress,
-                            serviceId: confirmedBooking.serviceId,
-                            serviceName: confirmedBooking.serviceName,
-                            servicePrice: confirmedBooking.servicePrice,
-                            services: summaryData.services,
-                            petId: confirmedBooking.petId,
-                            petName: confirmedBooking.petName,
-                            petNote: confirmedBooking.note,
-                            staffId: confirmedBooking.staffId,
-                            staffName: confirmedBooking.staffName,
-                            appointmentDatetime: confirmedBooking.appointmentDatetime,
-                            date: confirmedBooking.checkIn && confirmedBooking.checkOut
-                              ? `Lưu trú: ${new Date(confirmedBooking.checkIn).toLocaleDateString('vi-VN', { day: '2-digit', month: '2-digit', year: 'numeric' })} → ${new Date(confirmedBooking.checkOut).toLocaleDateString('vi-VN', { day: '2-digit', month: '2-digit', year: 'numeric' })}`
-                              : new Date(confirmedBooking.appointmentDatetime).toLocaleDateString('vi-VN', {
-                                  weekday: 'long', year: 'numeric', month: '2-digit', day: '2-digit'
-                                }),
-                            time: confirmedBooking.checkIn && confirmedBooking.checkOut
-                              ? `${Math.max(1, Math.round((new Date(confirmedBooking.checkOut).getTime() - new Date(confirmedBooking.checkIn).getTime()) / 86400000))} ngày`
-                              : new Date(confirmedBooking.appointmentDatetime).toLocaleTimeString('vi-VN', {
-                                  hour: '2-digit', minute: '2-digit'
-                                })
-                          }
-                        },
-                        replace: true
-                      });
+                      if (result.orderCode) {
+                        const confirmedBooking = payMethod === 'cash'
+                          ? await bookingService.mockConfirmCashDeposit(result.orderCode)
+                          : await bookingService.mockConfirmPayment(result.orderCode);
+                        localStorage.removeItem('pendingBookingSummary');
+                        
+                        navigate('/booking/success', {
+                          state: {
+                            booking: confirmedBooking,
+                            isCashDeposit: payMethod === 'cash',
+                            bookingInfo: {
+                              shopId: confirmedBooking.shopId,
+                              shopName: confirmedBooking.shopName,
+                              shopAddress: confirmedBooking.shopAddress,
+                              serviceId: confirmedBooking.serviceId,
+                              serviceName: confirmedBooking.serviceName,
+                              servicePrice: confirmedBooking.servicePrice,
+                              services: summaryData.services,
+                              petId: confirmedBooking.petId,
+                              petName: confirmedBooking.petName,
+                              petNote: confirmedBooking.note,
+                              staffId: confirmedBooking.staffId,
+                              staffName: confirmedBooking.staffName,
+                              appointmentDatetime: confirmedBooking.appointmentDatetime,
+                              date: confirmedBooking.checkIn && confirmedBooking.checkOut
+                                ? `Lưu trú: ${new Date(confirmedBooking.checkIn).toLocaleDateString('vi-VN', { day: '2-digit', month: '2-digit', year: 'numeric' })} → ${new Date(confirmedBooking.checkOut).toLocaleDateString('vi-VN', { day: '2-digit', month: '2-digit', year: 'numeric' })}`
+                                : new Date(confirmedBooking.appointmentDatetime).toLocaleDateString('vi-VN', {
+                                    weekday: 'long', year: 'numeric', month: '2-digit', day: '2-digit'
+                                  }),
+                              time: confirmedBooking.checkIn && confirmedBooking.checkOut
+                                ? `${Math.max(1, Math.round((new Date(confirmedBooking.checkOut).getTime() - new Date(confirmedBooking.checkIn).getTime()) / 86400000))} ngày`
+                                : new Date(confirmedBooking.appointmentDatetime).toLocaleTimeString('vi-VN', {
+                                    hour: '2-digit', minute: '2-digit'
+                                  })
+                            }
+                          },
+                          replace: true
+                        });
+                      }
+                    } catch (e: any) {
+                      setError(e?.response?.data?.message || 'Lỗi giả lập thanh toán.');
+                      setLoading(false);
                     }
-                  } catch (e: any) {
-                    setError(e?.response?.data?.message || 'Lỗi giả lập thanh toán.');
-                    setLoading(false);
-                  }
-                }}
-                disabled={!agreed || loading}
-                className="w-full py-4 bg-emerald-500 text-white font-black rounded-xl hover:bg-emerald-600 disabled:opacity-50 transition-all shadow-lg text-base flex items-center justify-center gap-2 mt-3"
-              >
-                <span className="material-symbols-outlined">bug_report</span>
-                Thanh toán giả lập (Test)
-              </button>
+                  }}
+                  disabled={!agreed || loading}
+                  className="w-full py-4 bg-emerald-500 text-white font-black rounded-xl hover:bg-emerald-600 disabled:opacity-50 transition-all shadow-lg text-base flex items-center justify-center gap-2 mt-3"
+                >
+                  <span className="material-symbols-outlined">bug_report</span>
+                  Thanh toán giả lập (Test)
+                </button>
+              )}
 
               <button
                 onClick={() => navigate(-1)}

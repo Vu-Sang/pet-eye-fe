@@ -177,15 +177,10 @@ export default function ProfilePets() {
   return (
     <main className="flex-1 flex flex-col gap-8 p-4 md:p-0">
       {/* Header Section */}
-      <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
+      <div className="flex flex-col md:flex-row md:items-start justify-between gap-6">
         <div>
-          <h1 className="text-3xl font-bold text-slate-900 dark:text-white tracking-tight flex items-center gap-3">
-            Thú cưng của tôi
-            <Sparkles className="text-amber-400 size-6" />
-          </h1>
-          <p className="text-slate-500 dark:text-slate-400 mt-2 font-medium max-w-md">
-            Nơi lưu giữ những khoảnh khắc và chăm sóc sức khỏe toàn diện cho các bé yêu.
-          </p>
+          <h1 className="text-3xl text-slate-900 dark:text-slate-100 tracking-tight font-bold">Thú cưng của tôi</h1>
+          <p className="text-slate-500 dark:text-slate-400 mt-1">Nơi lưu giữ những khoảnh khắc và chăm sóc sức khỏe toàn diện cho các bé yêu.</p>
         </div>
         <motion.button
           whileHover={{ scale: 1.02 }}

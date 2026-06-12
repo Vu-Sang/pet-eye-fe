@@ -989,7 +989,7 @@ export default function Home() {
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            className="bg-gradient-to-b from-indigo-50/50 to-blue-100/50 dark:from-slate-900 dark:to-indigo-950/30 rounded-[3rem] p-10 md:p-16 text-center border border-white dark:border-slate-800 shadow-2xl shadow-indigo-500/5 relative overflow-hidden"
+            className="bg-gradient-to-b from-blue-50/80 to-blue-100/50 dark:from-slate-900 dark:to-blue-950/30 rounded-[3rem] p-10 md:p-16 text-center border-2 border-blue-400 dark:border-blue-500/50 shadow-[0_20px_60px_-15px_rgba(59,130,246,0.3)] dark:shadow-[0_20px_60px_-15px_rgba(59,130,246,0.15)] relative overflow-hidden"
           >
             <div className="inline-flex items-center gap-2 bg-slate-200/50 dark:bg-slate-800 text-slate-600 dark:text-slate-300 px-4 py-2 rounded-full text-xs font-black uppercase tracking-widest mb-6">
               <span className="material-symbols-outlined text-sm">article</span>

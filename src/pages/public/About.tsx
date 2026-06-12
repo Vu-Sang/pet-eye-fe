@@ -72,28 +72,48 @@ export default function About() {
       <section className="py-24 md:py-32 bg-slate-50 relative">
         <div className="max-w-7xl mx-auto px-6 md:px-12 lg:px-20">
           
-          {/* Vision Block - Left Aligned */}
-          <motion.div 
-            initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeIn}
-            className="max-w-3xl mb-32 relative"
-          >
-            <div className="absolute -left-10 -top-10 text-[120px] text-blue-500/10 font-serif leading-none">"</div>
-            <h2 className="text-5xl md:text-6xl lg:text-7xl font-black text-slate-900 leading-tight mb-8 tracking-tighter relative z-10">
-              Trở thành một trong những <span className="bg-clip-text text-transparent bg-gradient-to-r from-primary to-blue-500 pb-2">nền tảng công nghệ đáng tin cậy</span> hàng&nbsp;đầu.
-            </h2>
-            <p className="text-2xl md:text-3xl text-slate-600 font-medium leading-relaxed relative z-10">
-              Kết nối chủ nuôi với hệ sinh thái dịch vụ thú cưng minh bạch và chất lượng.
-            </p>
-            <div className="mt-8 flex items-center gap-4">
-              <div className="w-16 h-1 bg-gradient-to-r from-primary to-blue-500 rounded-full"></div>
-              <div className="text-lg font-bold bg-clip-text text-transparent bg-gradient-to-r from-primary to-blue-500 uppercase tracking-widest">Tầm nhìn PetEye</div>
-            </div>
-          </motion.div>
+          <div className="space-y-24 mb-32">
+            {/* Vision Block - Left Aligned */}
+            <motion.div 
+              initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeIn}
+              className="max-w-3xl relative"
+            >
+              <div className="absolute -left-10 -top-10 text-[120px] text-blue-500/10 font-serif leading-none">"</div>
+              <h2 className="text-5xl md:text-6xl lg:text-7xl font-black text-slate-900 leading-tight mb-8 tracking-tighter relative z-10">
+                Trở thành một trong những <span className="bg-clip-text text-transparent bg-gradient-to-r from-primary to-blue-500 pb-2">nền tảng công nghệ đáng tin cậy</span> hàng&nbsp;đầu.
+              </h2>
+              <p className="text-2xl md:text-3xl text-slate-600 font-medium leading-relaxed relative z-10">
+                Kết nối chủ nuôi với hệ sinh thái dịch vụ thú cưng minh bạch và chất lượng.
+              </p>
+              <div className="mt-8 flex items-center gap-4">
+                <div className="w-16 h-1 bg-gradient-to-r from-primary to-blue-500 rounded-full"></div>
+                <div className="text-lg font-bold bg-clip-text text-transparent bg-gradient-to-r from-primary to-blue-500 uppercase tracking-widest">Tầm nhìn PetEye</div>
+              </div>
+            </motion.div>
+
+            {/* Mission Block - Right Aligned on Desktop */}
+            <motion.div 
+              initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeIn}
+              className="max-w-3xl ml-auto relative md:text-right"
+            >
+              <div className="absolute -left-10 md:left-auto md:-right-10 -top-10 text-[120px] text-blue-500/10 font-serif leading-none">"</div>
+              <h2 className="text-5xl md:text-6xl lg:text-7xl font-black text-slate-900 leading-tight mb-8 tracking-tighter relative z-10">
+                Mang đến <span className="bg-clip-text text-transparent bg-gradient-to-r from-primary to-blue-500 pb-2">sự an tâm</span> cho chủ nuôi.
+              </h2>
+              <p className="text-2xl md:text-3xl text-slate-600 font-medium leading-relaxed relative z-10">
+                Bằng cách kết nối họ với các dịch vụ chăm sóc thú cưng đáng tin cậy thông qua công nghệ.
+              </p>
+              <div className="mt-8 flex items-center gap-4 md:justify-end">
+                <div className="w-16 h-1 bg-gradient-to-r from-primary to-blue-500 rounded-full md:order-2"></div>
+                <div className="text-lg font-bold bg-clip-text text-transparent bg-gradient-to-r from-primary to-blue-500 uppercase tracking-widest md:order-1">Sứ mệnh PetEye</div>
+              </div>
+            </motion.div>
+          </div>
 
           {/* Core Values - Staggered Grid */}
           <div className="flex flex-col md:flex-row justify-between items-end gap-10">
             <div className="md:w-1/3 mb-12 md:mb-0">
-               <h3 className="text-6xl md:text-7xl lg:text-8xl font-black text-slate-900 leading-none tracking-tighter mb-4">Giá trị<br/><span className="bg-clip-text text-transparent bg-gradient-to-r from-primary to-blue-500 pb-2">cốt lõi</span></h3>
+               <h3 className="text-5xl md:text-6xl lg:text-7xl font-black text-slate-900 leading-tight tracking-tighter mb-4">Giá trị<br/><span className="bg-clip-text text-transparent bg-gradient-to-r from-primary to-blue-500 pb-2">cốt lõi</span></h3>
                <p className="text-slate-500 font-medium text-lg">Những trụ cột vững chắc tạo nên sự khác biệt của chúng tôi.</p>
             </div>
             
@@ -128,7 +148,7 @@ export default function About() {
 
         <div className="max-w-6xl mx-auto px-6 md:px-12 lg:px-20">
           <div className="text-center max-w-3xl mx-auto mb-16 md:mb-20">
-            <h2 className="text-4xl md:text-5xl lg:text-6xl font-black text-slate-900 mb-6 tracking-tighter">
+            <h2 className="text-5xl md:text-6xl lg:text-7xl font-black text-slate-900 leading-tight mb-6 tracking-tighter">
               Vì sao hàng nghìn chủ nuôi <br className="hidden md:block"/>
               <span className="bg-clip-text text-transparent bg-gradient-to-r from-primary to-blue-500 pb-2">lựa chọn PetEye?</span>
             </h2>
@@ -178,7 +198,7 @@ export default function About() {
           <div className="grid lg:grid-cols-12 gap-16 items-center">
             
             <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeIn} className="lg:col-span-5">
-              <h2 className="text-5xl md:text-6xl font-black text-white mb-6 tracking-tighter">Cam kết <br/> của PetEye</h2>
+              <h2 className="text-5xl md:text-6xl lg:text-7xl font-black text-white leading-tight mb-6 tracking-tighter">Cam kết <br/> của PetEye</h2>
               <div className="w-20 h-2 bg-blue-500 mb-8 rounded-full"></div>
               <p className="text-3xl text-blue-400 font-bold mb-6">Minh bạch trong mọi quyết định</p>
               <p className="text-xl text-slate-400 font-medium leading-relaxed italic border-l-4 border-slate-700 pl-6">

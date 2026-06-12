@@ -54,10 +54,10 @@ export default function TransactionHistory() {
   };
 
   return (
-    <div className="flex-1 max-w-4xl w-full mx-auto pb-10">
+    <main className="flex-1 flex flex-col gap-6">
       <div className="mb-8">
-        <h1 className="text-3xl font-black text-slate-900 dark:text-white tracking-tight">Lịch sử giao dịch</h1>
-        <p className="text-slate-500 mt-2">Theo dõi các khoản thanh toán và hoàn tiền của bạn</p>
+        <h1 className="text-3xl text-slate-900 dark:text-slate-100 tracking-tight font-bold">Lịch sử giao dịch</h1>
+        <p className="text-slate-500 dark:text-slate-400 mt-1">Theo dõi các khoản thanh toán và hoàn tiền của bạn.</p>
       </div>
 
       <div className="flex gap-2 mb-6 overflow-x-auto pb-2">
@@ -287,6 +287,6 @@ export default function TransactionHistory() {
           </div>
         </div>
       )}
-    </div>
+    </main>
   );
 }

@@ -119,9 +119,9 @@ export default function ProfileNotifications() {
   return (
     <div className="flex-1 flex flex-col gap-6">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-start gap-4">
         <div>
-          <h1 className="text-2xl font-black tracking-tight text-slate-900 dark:text-white flex items-center gap-2">
+          <h1 className="text-3xl text-slate-900 dark:text-slate-100 tracking-tight font-bold flex items-center gap-3">
             Thông báo
             {unreadCount > 0 && (
               <span className="text-sm font-black bg-blue-600 text-white px-2 py-0.5 rounded-full">
@@ -129,7 +129,7 @@ export default function ProfileNotifications() {
               </span>
             )}
           </h1>
-          <p className="text-slate-500 dark:text-slate-400 text-sm mt-0.5">
+          <p className="text-slate-500 dark:text-slate-400 mt-1">
             {unreadCount > 0 ? `Bạn có ${unreadCount} thông báo chưa đọc.` : 'Tất cả thông báo đã được đọc.'}
           </p>
         </div>

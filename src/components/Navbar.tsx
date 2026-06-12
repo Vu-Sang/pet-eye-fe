@@ -31,7 +31,7 @@ function scrollTo(id: string) {
 function ThemeToggle() {
   const { isDark, toggleTheme } = useTheme();
   return (
-    <button onClick={toggleTheme} className="p-1.5 rounded-full bg-slate-100/50 dark:bg-slate-800/50 border border-primary/20 dark:border-blue-500/20 text-slate-500 dark:text-slate-300 hover:text-primary dark:hover:text-blue-400 dark:hover:bg-slate-700 transition-colors flex items-center justify-center">
+    <button onClick={toggleTheme} className="w-8 h-8 rounded-full transition-all hover:-translate-y-0.5 bg-slate-100/50 dark:bg-slate-800/80 text-slate-500 dark:text-slate-300 hover:text-primary dark:hover:text-blue-400 hover:bg-[#D7ECFF] dark:hover:bg-slate-700 flex items-center justify-center">
       {isDark ? <Sun size={16} /> : <Moon size={16} />}
     </button>
   );
@@ -96,9 +96,9 @@ function GuestNavbar() {
 
         <div className="hidden sm:flex items-center gap-3">
           <Link to="/search"
-            className={`flex items-center gap-2 h-8 px-4 rounded-full text-[14px] font-black border border-primary/15 hover:border-primary/45 dark:border-blue-500/15 dark:hover:border-blue-500/45 transition-all ${window.location.pathname === '/search'
-              ? 'text-primary bg-primary/10 border-primary/30 dark:text-blue-400 dark:bg-blue-900/30 dark:border-blue-500/30'
-              : 'text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100/50 dark:hover:bg-slate-800/50'
+            className={`flex items-center gap-2 h-8 px-4 rounded-full text-[14px] font-black transition-all hover:-translate-y-0.5 ${window.location.pathname === '/search'
+              ? 'text-primary bg-[#D7ECFF] dark:text-blue-400 dark:bg-blue-900/30 shadow-sm shadow-primary/10'
+              : 'text-slate-500 dark:text-slate-400 hover:text-primary dark:hover:text-white hover:bg-[#D7ECFF] dark:hover:bg-slate-800/50'
               }`}>
             Cơ sở gần tôi
           </Link>
@@ -241,33 +241,46 @@ function AuthNavbar() {
 
           {/* Nút Tìm cơ sở */}
           <Link to="/search"
-            className={`hidden sm:flex items-center gap-2 h-8 px-4 rounded-full text-[14px] font-black border border-primary/15 hover:border-primary/45 dark:border-blue-500/15 dark:hover:border-blue-500/45 transition-all ${active('/search')
-              ? 'text-primary bg-primary/10 border-primary/30 dark:text-blue-400 dark:bg-blue-900/30 dark:border-blue-500/30'
-              : 'text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100/50 dark:hover:bg-slate-800/50'
+            className={`hidden sm:flex items-center gap-2 h-8 px-4 rounded-full text-[14px] font-black transition-all hover:-translate-y-0.5 ${active('/search')
+              ? 'text-primary bg-[#D7ECFF] dark:text-blue-400 dark:bg-blue-900/30 shadow-sm shadow-primary/10'
+              : 'text-slate-500 dark:text-slate-400 hover:text-primary dark:hover:text-white hover:bg-[#D7ECFF] dark:hover:bg-slate-800/50'
               }`}>
             Cơ sở gần tôi
           </Link>
 
           <div className="w-px h-6 bg-slate-200 dark:bg-slate-700 mx-2 hidden sm:block" />
 
-          {/* Icon Tin nhắn */}
+          {/* Icon Thú cưng */}
           {user && (
-            <Link to="/messages"
-              className={`relative w-8 h-8 flex items-center justify-center rounded-full transition-all ${active('/messages')
-                ? 'bg-primary text-white shadow-lg shadow-primary/20'
-                : 'bg-slate-100/50 dark:bg-slate-800/80 text-slate-500 dark:text-slate-300 hover:text-primary dark:hover:text-blue-400 hover:bg-primary/5 dark:hover:bg-slate-700'
+            <Link to="/profile/pets" title="Thú cưng của tôi"
+              className={`hidden sm:flex relative w-8 h-8 items-center justify-center rounded-full transition-all hover:-translate-y-0.5 ${active('/profile/pets')
+                ? 'bg-[#D7ECFF] text-primary shadow-lg shadow-primary/20'
+                : 'bg-slate-100/50 dark:bg-slate-800/80 text-slate-500 dark:text-slate-300 hover:text-primary dark:hover:text-blue-400 hover:bg-[#D7ECFF] dark:hover:bg-slate-700'
                 }`}>
-              <MessageCircle size={16} />
+              <PawPrint size={16} />
             </Link>
           )}
+
+          {/* Icon Camera */}
+          {user && (
+            <Link to="/camera" title="Theo dõi Camera"
+              className={`hidden sm:flex relative w-8 h-8 items-center justify-center rounded-full transition-all hover:-translate-y-0.5 ${active('/camera')
+                ? 'bg-[#D7ECFF] text-primary shadow-lg shadow-primary/20'
+                : 'bg-slate-100/50 dark:bg-slate-800/80 text-slate-500 dark:text-slate-300 hover:text-primary dark:hover:text-blue-400 hover:bg-[#D7ECFF] dark:hover:bg-slate-700'
+                }`}>
+              <Video size={16} />
+            </Link>
+          )}
+
+          {/* Removed Tin nhắn icon as per user request to move it to a floating button */}
 
           <ThemeToggle />
 
           {/* Notifications */}
           <div ref={notifRef} className="relative">
             <button onClick={() => { setNotifOpen(v => !v); setUserOpen(false); }}
-              className={`relative w-8 h-8 flex items-center justify-center rounded-full transition-all
-                ${notifOpen ? 'bg-primary text-white shadow-lg shadow-primary/20' : 'bg-slate-100/50 dark:bg-slate-800/80 text-slate-500 dark:text-slate-300 hover:text-primary dark:hover:text-blue-400 hover:bg-primary/5 dark:hover:bg-slate-700'}`}>
+              className={`relative w-8 h-8 flex items-center justify-center rounded-full transition-all hover:-translate-y-0.5
+                ${notifOpen ? 'bg-[#D7ECFF] text-primary shadow-lg shadow-primary/20' : 'bg-slate-100/50 dark:bg-slate-800/80 text-slate-500 dark:text-slate-300 hover:text-primary dark:hover:text-blue-400 hover:bg-[#D7ECFF] dark:hover:bg-slate-700'}`}>
               <Bell size={16} />
               {unreadCount > 0 && (
                 <span className="absolute top-1 right-1 w-3 h-3 bg-rose-500 text-[8px] font-black text-white flex items-center justify-center rounded-full border border-white dark:border-slate-900 shadow-sm">
@@ -327,8 +340,8 @@ function AuthNavbar() {
           {/* User avatar / menu */}
           <div ref={userRef} className="relative ml-1">
             <button onClick={() => { setUserOpen(v => !v); setNotifOpen(false); }}
-              className={`flex items-center gap-2 pl-1 pr-3 h-8 rounded-full transition-all border-2
-                ${userOpen ? 'bg-white dark:bg-slate-800 border-primary shadow-lg shadow-primary/10' : 'bg-slate-100/50 dark:bg-slate-800/50 border-transparent hover:border-slate-200/80 dark:hover:border-slate-700/80'}`}>
+              className={`flex items-center gap-2 pl-1 pr-3 h-8 rounded-full transition-all hover:-translate-y-0.5 border-2 border-transparent hover:bg-[#D7ECFF] dark:hover:bg-slate-800/80
+                ${userOpen ? 'bg-[#D7ECFF] dark:bg-slate-800 shadow-lg shadow-primary/10' : 'bg-slate-100/50 dark:bg-slate-800/50'}`}>
               <div className="w-6 h-6 rounded-xl overflow-hidden bg-gradient-to-br from-primary to-blue-600 flex items-center justify-center text-white text-[10px] font-black shadow-lg">
                 {user!.avatar ? (
                   <img src={user!.avatar} alt={user!.name} className="w-full h-full object-cover" />
@@ -361,9 +374,7 @@ function AuthNavbar() {
                   {[
                     { to: '/user/dashboard', icon: <LayoutDashboard size={16} />, label: 'Tổng quan' },
                     { to: '/profile', icon: <User size={16} />, label: 'Quản lý tài khoản' },
-                    { to: '/profile/pets', icon: <PawPrint size={16} />, label: 'Thú cưng của tôi' },
                     { to: '/profile/bookings', icon: <Calendar size={16} />, label: 'Lịch đặt hẹn' },
-                    { to: '/camera', icon: <Video size={16} />, label: 'Theo dõi Camera', badge: 'LIVE' },
                     { to: '/profile/transactions', icon: <ReceiptText size={16} />, label: 'Lịch sử giao dịch' },
                   ].map(item => (
                     <Link key={item.to} to={item.to} onClick={() => setUserOpen(false)}
@@ -406,13 +417,15 @@ function AuthNavbar() {
             className="md:hidden overflow-hidden border-t border-slate-100 dark:border-slate-800 bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl rounded-b-[24px]"
           >
             <div className="px-6 py-8 space-y-2">
-              {[{ to: '/search', label: 'Tìm cơ sở' }, { to: '/camera', label: 'Camera lưu trú' }, { to: '/messages', label: 'Tin nhắn' }].map(item => (
-                <Link key={item.to} to={item.to} onClick={() => setMobileOpen(false)}
-                  className={`flex items-center px-4 py-4 rounded-2xl text-[16px] font-black transition-all
-                    ${active(item.to) ? 'bg-primary text-white shadow-lg shadow-primary/20' : 'text-slate-700 dark:text-slate-300 hover:bg-primary/5 hover:text-primary'}`}>
-                  {item.label}
-                </Link>
-              ))}
+              <Link to="/search" onClick={() => setMobileOpen(false)}
+                className={`flex items-center px-4 py-4 rounded-2xl text-[16px] font-black transition-all ${active('/search') ? 'bg-primary text-white shadow-lg shadow-primary/20' : 'text-slate-700 dark:text-slate-300 hover:bg-primary/5 hover:text-primary'}`}>
+                Tìm cơ sở
+              </Link>
+              <Link to="/camera" onClick={() => setMobileOpen(false)}
+                className={`flex items-center px-4 py-4 rounded-2xl text-[16px] font-black transition-all ${active('/camera') ? 'bg-primary text-white shadow-lg shadow-primary/20' : 'text-slate-700 dark:text-slate-300 hover:bg-primary/5 hover:text-primary'}`}>
+                Camera lưu trú
+              </Link>
+              {/* Removed Tin nhắn icon from mobile menu as well */}
             </div>
           </motion.div>
         )}

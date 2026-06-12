@@ -125,7 +125,7 @@ export function ProfileLayout() {
 
   return (
     <div className="flex-1 bg-slate-50 dark:bg-slate-950">
-      <div className="flex flex-col md:flex-row max-w-[1440px] mx-auto w-full px-4 md:px-10 py-4 md:py-8 gap-6 md:gap-8 relative">
+      <div className="flex flex-col md:flex-row max-w-[1440px] mx-auto w-full px-4 md:px-10 pt-20 pb-4 md:pt-28 md:pb-8 gap-6 md:gap-8 relative">
         
         {/* Mobile Horizontal Nav */}
         <nav className="md:hidden flex overflow-x-auto gap-2 pb-4 hide-scrollbar w-[calc(100%+2rem)] -mx-4 px-4 border-b border-slate-200 dark:border-slate-800 mb-2">

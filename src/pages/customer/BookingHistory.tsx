@@ -145,7 +145,7 @@ function BookingItem({ booking, onCancel, cancelling, onReview, onUpdateBank }: 
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 onClick={() => setIsExpanded(true)}
-                className="group bg-slate-50/50 dark:bg-slate-900/30 hover:bg-white dark:hover:bg-slate-900 rounded-[2rem] border border-slate-100 dark:border-slate-800/80 p-4 flex items-start sm:items-center justify-between gap-2 sm:gap-4 cursor-pointer hover:shadow-lg transition-all duration-300"
+                className="group bg-white dark:bg-slate-900 rounded-[2rem] border-2 border-white dark:border-slate-800 p-4 flex items-start sm:items-center justify-between gap-2 sm:gap-4 cursor-pointer hover:border-blue-200 dark:hover:border-blue-500/30 hover:shadow-lg transition-all duration-300"
             >
                 <div className="flex items-center gap-3 sm:gap-4 min-w-0">
                     <div className="w-14 h-14 rounded-2xl overflow-hidden bg-slate-100 dark:bg-slate-800 shrink-0">
@@ -194,7 +194,7 @@ function BookingItem({ booking, onCancel, cancelling, onReview, onUpdateBank }: 
         <motion.div
             layout
             initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }}
-            className="group bg-white dark:bg-slate-900 rounded-[3rem] border border-slate-100 dark:border-slate-800 p-6 flex flex-col md:flex-row gap-8 hover:shadow-[0_32px_64px_-12px_rgba(0,0,0,0.08)] transition-all relative overflow-hidden"
+            className="group bg-white dark:bg-slate-900 rounded-[3rem] border-2 border-white dark:border-slate-800 p-6 flex flex-col md:flex-row gap-8 hover:border-blue-200 dark:hover:border-blue-500/30 hover:shadow-[0_32px_64px_-12px_rgba(0,0,0,0.08)] transition-all duration-300 relative overflow-hidden"
         >
             {/* Left: Visual & Category */}
             <div className="w-full md:w-56 h-48 rounded-[2.5rem] bg-slate-100 dark:bg-slate-800 overflow-hidden relative shrink-0">
@@ -239,7 +239,7 @@ function BookingItem({ booking, onCancel, cancelling, onReview, onUpdateBank }: 
                     </div>
                 </div>
 
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 bg-slate-50 dark:bg-slate-800/50 p-4 rounded-3xl border border-slate-100 dark:border-slate-800">
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 bg-white dark:bg-slate-800/50 p-4 rounded-3xl border border-slate-100 dark:border-slate-800 shadow-sm hover:shadow-md transition-shadow">
                     <div className="flex items-center gap-3">
                         <div className="w-10 h-10 rounded-xl bg-white dark:bg-slate-900 flex items-center justify-center text-primary shadow-sm">
                             <cat.icon size={20} />
@@ -298,7 +298,7 @@ function BookingItem({ booking, onCancel, cancelling, onReview, onUpdateBank }: 
                                 <h4 className="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest">Chi tiết dịch vụ & Thanh toán</h4>
                             </div>
 
-                            <div className="bg-slate-50 dark:bg-slate-800/30 rounded-3xl p-5 border border-slate-100 dark:border-slate-800 space-y-4">
+                            <div className="bg-white dark:bg-slate-800/30 rounded-3xl p-5 border border-slate-100 dark:border-slate-800 space-y-4 shadow-sm hover:shadow-md transition-shadow">
                                 <div className="space-y-3">
                                     <h5 className="text-[11px] font-bold text-slate-700 dark:text-slate-300">Danh sách dịch vụ</h5>
                                     {booking.services && booking.services.length > 0 ? (
@@ -398,7 +398,7 @@ function BookingItem({ booking, onCancel, cancelling, onReview, onUpdateBank }: 
                                                 <LogIcon size={11} />
                                             </div>
 
-                                            <div className="bg-slate-50 dark:bg-slate-800/30 rounded-2xl p-4 border border-slate-100/80 dark:border-slate-800/55 hover:border-indigo-100 dark:hover:border-indigo-900/30 transition-all duration-300">
+                                            <div className="bg-white dark:bg-slate-800/30 rounded-2xl p-4 border border-slate-100/80 dark:border-slate-800/55 hover:border-indigo-100 dark:hover:border-indigo-900/30 transition-all duration-300 shadow-sm hover:shadow-md">
                                                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1 mb-1.5">
                                                     <div className="flex items-center gap-2">
                                                         <span className="text-xs font-black text-slate-800 dark:text-slate-200">{logType.label}</span>
@@ -468,9 +468,9 @@ function BookingItem({ booking, onCancel, cancelling, onReview, onUpdateBank }: 
                         >
                             <Info size={14} /> Chi tiết
                         </button>
-                        <Link to="/messages" className="px-5 py-2.5 bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 rounded-2xl text-[10px] font-black uppercase tracking-widest hover:bg-primary hover:text-white transition-all">
+                        <button onClick={() => window.dispatchEvent(new Event('open-messaging'))} className="px-5 py-2.5 bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 rounded-2xl text-[10px] font-black uppercase tracking-widest hover:bg-primary hover:text-white transition-all">
                             <MessageCircle size={14} /> Nhắn tin
-                        </Link>
+                        </button>
                     </div>
 
                     <div className="flex items-center gap-2">
@@ -760,17 +760,12 @@ export default function BookingHistory() {
     );
 
     return (
-        <div className="flex-1 flex flex-col gap-10 p-4 md:p-8">
+        <main className="flex-1 flex flex-col gap-6">
             {/* Header Section */}
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
+            <div className="flex flex-col md:flex-row md:items-start justify-between gap-6">
                 <div>
-                    <div className="flex items-center gap-4 mb-2">
-                        <div className="w-12 h-12 bg-primary text-white rounded-2xl flex items-center justify-center shadow-lg shadow-primary/20">
-                            <Calendar size={24} />
-                        </div>
-                        <h1 className="text-3xl font-black text-slate-900 dark:text-white tracking-tight">Lịch sử đặt chỗ</h1>
-                    </div>
-                    <p className="text-slate-400 font-bold uppercase text-[11px] tracking-[0.2em] ml-1">Quản lý sức khỏe & Làm đẹp cho thú cưng</p>
+                    <h1 className="text-3xl text-slate-900 dark:text-slate-100 tracking-tight font-bold">Lịch sử đặt lịch</h1>
+                    <p className="text-slate-500 dark:text-slate-400 mt-1">Quản lý sức khỏe & làm đẹp cho thú cưng.</p>
                 </div>
                 <div className="flex items-center gap-3">
                     <button onClick={() => refetch()} className="p-4 rounded-2xl bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 text-slate-400 hover:text-primary transition-all">
@@ -783,11 +778,11 @@ export default function BookingHistory() {
             </div>
 
             {/* Filters & Search Control Panel */}
-            <div className="flex flex-col gap-6 bg-slate-50/50 dark:bg-slate-900/30 p-6 rounded-[2.5rem] border border-slate-100 dark:border-slate-800/80">
+            <div className="flex flex-col gap-6 bg-white dark:bg-slate-900 p-6 rounded-[2.5rem] border border-slate-100 dark:border-slate-800/80">
                 {/* Tabs & Search */}
                 <div className="flex flex-col lg:flex-row lg:items-center gap-4 w-full justify-between">
                     {/* Navigation Tabs */}
-                    <div className="flex items-center gap-2 p-1 bg-white dark:bg-slate-900 rounded-[1.5rem] border border-slate-100 dark:border-slate-800 w-fit overflow-x-auto shrink-0 max-w-full">
+                    <div className="flex items-center gap-2 p-1 bg-slate-50 dark:bg-slate-900 rounded-[1.5rem] border border-slate-200 dark:border-slate-700 w-fit overflow-x-auto shrink-0 max-w-full">
                         {TABS.map(tab => (
                             <button
                                 key={tab.key} onClick={() => { setActiveTab(tab.key); setPage(0); }}
@@ -806,7 +801,7 @@ export default function BookingHistory() {
                             value={searchQuery}
                             onChange={(e) => { setSearchQuery(e.target.value); setPage(0); }}
                             placeholder="Tìm kiếm cửa hàng, dịch vụ..."
-                            className="w-full pl-11 pr-10 py-3 bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 rounded-2xl outline-none font-bold text-xs text-slate-800 dark:text-white placeholder-slate-400 focus:border-primary/50 transition-all shadow-sm"
+                            className="w-full pl-11 pr-10 py-3 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-2xl outline-none font-bold text-xs text-slate-800 dark:text-white placeholder-slate-400 focus:border-primary/50 transition-all shadow-sm focus:ring-4 focus:ring-primary/10"
                         />
                         {searchQuery && (
                             <button
@@ -831,7 +826,7 @@ export default function BookingHistory() {
                                     onClick={() => { setSelectedPet(petName); setPage(0); }}
                                     className={`px-3 py-1.5 rounded-xl text-[10px] font-bold transition-all border ${selectedPet === petName
                                         ? 'bg-slate-900 dark:bg-white text-white dark:text-slate-900 border-transparent shadow-sm'
-                                        : 'bg-white dark:bg-slate-900 text-slate-500 hover:text-slate-800 border-slate-100 dark:border-slate-800'
+                                        : 'bg-white dark:bg-slate-900 text-slate-500 hover:text-slate-800 border-slate-200 dark:border-slate-700 hover:border-slate-300 hover:shadow-sm'
                                         }`}
                                 >
                                     {petName === 'all' ? 'Tất cả' : petName}
@@ -858,7 +853,7 @@ export default function BookingHistory() {
                                     onClick={() => { setSelectedCategory(cat.key); }}
                                     className={`px-3 py-1.5 rounded-xl text-[10px] font-bold transition-all border ${selectedCategory === cat.key
                                         ? 'bg-slate-900 dark:bg-white text-white dark:text-slate-900 border-transparent shadow-sm'
-                                        : 'bg-white dark:bg-slate-900 text-slate-500 hover:text-slate-800 border-slate-100 dark:border-slate-800'
+                                        : 'bg-white dark:bg-slate-900 text-slate-500 hover:text-slate-800 border-slate-200 dark:border-slate-700 hover:border-slate-300 hover:shadow-sm'
                                         }`}
                                 >
                                     {cat.label}
@@ -873,7 +868,7 @@ export default function BookingHistory() {
                     {/* Sort Order */}
                     <div className="flex items-center gap-2">
                         <span className="text-[10px] font-black text-slate-400 uppercase tracking-wider shrink-0">Ngày tạo:</span>
-                        <div className="flex items-center gap-1.5 bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 rounded-xl p-1">
+                        <div className="flex items-center gap-1.5 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl p-1">
                             <button
                                 onClick={() => setSortOrder('desc')}
                                 className={`px-3 py-1 rounded-lg text-[10px] font-bold transition-all ${sortOrder === 'desc'
@@ -1409,6 +1404,6 @@ export default function BookingHistory() {
                     </div>
                 )}
             </AnimatePresence>
-        </div>
+        </main>
     );
 }

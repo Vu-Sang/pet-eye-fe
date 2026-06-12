@@ -548,8 +548,16 @@ const TIER_TRIGGER_PHRASES = [
 ];
 
 // ── Main Chatbot Component ───────────────────────────────────────────────────
-const WELCOME_MSG_FN = (name?: string) =>
-  'Xin chào' + (name ? ' **' + name + '**' : '') + '! 👋 Tôi là **PetEye Assistant**.\n\nTôi có thể giúp bạn:\n• 🔍 Tìm shop chăm sóc thú cưng phù hợp\n• 🐾 Xem thông tin thú cưng của bạn\n• 📅 Đặt lịch hẹn trực tiếp\n• 🏅 Kiểm tra **cấp bậc thành viên** & voucher\n• 🎁 Xem đặc quyền theo hạng (Đồng → Bạc → Vàng → Kim Cương)\n\nBạn cần tìm gì hôm nay?';
+const WELCOME_MSG_FN = (name?: string, isVoucherEnabled: boolean = true) => {
+  let msg = 'Xin chào' + (name ? ' **' + name + '**' : '') + '! 👋 Tôi là **PetEye Assistant**.\n\nTôi có thể giúp bạn:\n• 🔍 Tìm shop chăm sóc thú cưng phù hợp\n• 🐾 Xem thông tin thú cưng của bạn\n• 📅 Đặt lịch hẹn trực tiếp';
+  
+  if (isVoucherEnabled) {
+    msg += '\n• 🏅 Kiểm tra **cấp bậc thành viên** & voucher\n• 🎁 Xem đặc quyền theo hạng (Đồng → Bạc → Vàng → Kim Cương)';
+  }
+  
+  msg += '\n\nBạn cần tìm gì hôm nay?';
+  return msg;
+};
 
 const generateId = () => Math.random().toString(36).slice(2);
 
@@ -570,11 +578,28 @@ export default function Chatbot() {
     return null;
   }
 
-  const welcomeMsg = WELCOME_MSG_FN(user?.name);
+  const [isVoucherEnabled, setIsVoucherEnabled] = useState(true);
+
+  const welcomeMsg = WELCOME_MSG_FN(user?.name, isVoucherEnabled);
   const { messages, setMessages, isLoading: aiLoading, sendMessage, clearHistory } = useAIChat({
     agentType: 'USER_CHAT',
     welcomeMessage: welcomeMsg,
   });
+
+  useEffect(() => {
+    userService.getVoucherServiceConfig()
+      .then(config => {
+        setIsVoucherEnabled(config);
+        setMessages(prev => {
+          if (prev.length > 0 && prev[0].id === 'welcome') {
+            const newWelcome = { ...prev[0], content: WELCOME_MSG_FN(user?.name, config) };
+            return [newWelcome, ...prev.slice(1)];
+          }
+          return prev;
+        });
+      })
+      .catch(console.error);
+  }, [user?.name, setMessages]);
 
   const [open, setOpen] = useState(false);
   const [input, setInput] = useState('');
@@ -583,6 +608,11 @@ export default function Chatbot() {
   const [showHistory, setShowHistory] = useState(false);
   const bottomRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+
+  const activeSuggestions = QUICK_SUGGESTIONS.filter(s => {
+    if (!isVoucherEnabled && (s.text.includes('Cấp bậc') || s.text.includes('Voucher'))) return false;
+    return true;
+  });
 
   const isProcessing = aiLoading || loading;
 
@@ -641,6 +671,21 @@ export default function Chatbot() {
     const lower = text.toLowerCase();
     return TIER_TRIGGER_PHRASES.some(p => lower.includes(p));
   }, []);
+
+  useEffect(() => {
+    const handleClose = () => setOpen(false);
+    window.addEventListener('close-chatbot', handleClose);
+    return () => {
+      window.removeEventListener('close-chatbot', handleClose);
+    };
+  }, []);
+
+  const toggleOpen = () => {
+    if (!open) {
+      window.dispatchEvent(new CustomEvent('close-messaging'));
+    }
+    setOpen(!open);
+  };
 
   useEffect(() => { bottomRef.current?.scrollIntoView({ behavior: 'smooth' }); }, [messages]);
   useEffect(() => { if (open) { setTimeout(() => inputRef.current?.focus(), 100); setHasUnread(false); } }, [open]);
@@ -720,7 +765,7 @@ export default function Chatbot() {
   return (
     <>
       {/* Floating button */}
-      <button onClick={() => setOpen(v => !v)} className="fixed bottom-24 lg:bottom-5 right-4 lg:right-5 z-50 group" aria-label="Mo chatbot">
+      <button onClick={toggleOpen} className="fixed bottom-24 lg:bottom-5 right-4 lg:right-5 z-50 group" aria-label="Mo chatbot">
         <div className="relative">
           <div className="absolute inset-0 rounded-full bg-indigo-500 blur-lg opacity-40 group-hover:opacity-70 transition duration-300"></div>
           {/* NOTE: Bạn có thể đổi w-16 h-16 thành w-14 h-14 (nhỏ hơn) hoặc w-20 h-20 (lớn hơn) ở class bên dưới để tùy chỉnh kích thước */}
@@ -746,7 +791,7 @@ export default function Chatbot() {
 
       {/* Chat window */}
       {open && (
-        <div className="fixed bottom-24 right-6 z-50 w-[370px] max-w-[calc(100vw-24px)] flex flex-col rounded-3xl shadow-2xl shadow-slate-900/20 overflow-hidden border border-slate-200 bg-white" style={{ height: 'min(640px, calc(100vh - 120px))' }}>
+        <div className="fixed bottom-24 lg:bottom-5 right-[85px] lg:right-[95px] z-[60] w-[370px] max-w-[calc(100vw-110px)] flex flex-col rounded-3xl shadow-2xl shadow-slate-900/20 overflow-hidden border border-slate-200 bg-white" style={{ height: 'min(640px, calc(100vh - 120px))' }}>
 
           {/* Header */}
           <div className="flex items-center gap-3 px-4 py-3 bg-gradient-to-r from-[#1a2b4c] to-indigo-600 shrink-0">
@@ -848,7 +893,7 @@ export default function Chatbot() {
               {/* Quick suggestions */}
               <div className="px-3 py-2 bg-white border-t border-slate-100 shrink-0">
                 <div className="flex gap-1.5 overflow-x-auto pb-0.5">
-                  {QUICK_SUGGESTIONS.map(s => (
+                  {activeSuggestions.map(s => (
                     <button key={s.text} onClick={() => handleSend(s.text)} disabled={isProcessing}
                       className="shrink-0 flex items-center gap-1 px-2.5 py-1.5 bg-slate-50 hover:bg-indigo-50 hover:text-indigo-700 border border-slate-200 hover:border-indigo-200 rounded-full text-[11px] font-semibold text-slate-600 transition-colors whitespace-nowrap disabled:opacity-40">
                       <span>{s.icon}</span>{s.text}
