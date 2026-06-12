@@ -138,9 +138,9 @@ export default function ShopProfile() {
     const file = e.target.files?.[0];
     if (!file) return;
 
-    // Validate file size (e.g., 5MB)
-    if (file.size > 5 * 1024 * 1024) {
-      toast.error('Kích thước ảnh không được vượt quá 5MB');
+    // Validate file size (2MB)
+    if (file.size > 2 * 1024 * 1024) {
+      toast.error('Kích thước ảnh không được vượt quá 2MB');
       return;
     }
 
@@ -160,17 +160,33 @@ export default function ShopProfile() {
 
       const url = await fileService.upload(file);
       
+      let updatedInfo = { ...shopInfo };
       if (type === 'gallery') {
-        setShopInfo(prev => ({
-          ...prev,
-          galleryUrls: prev.galleryUrls ? `${prev.galleryUrls},${url}` : url
-        }));
+        updatedInfo.galleryUrls = updatedInfo.galleryUrls ? `${updatedInfo.galleryUrls},${url}` : url;
       } else {
-        setShopInfo(prev => ({
-          ...prev,
-          [type === 'logo' ? 'logoUrl' : 'bannerUrl']: url
-        }));
+        updatedInfo[type === 'logo' ? 'logoUrl' : 'bannerUrl'] = url;
       }
+      setShopInfo(updatedInfo);
+      
+      // Auto-save
+      const updateData = {
+        shopName: updatedInfo.name,
+        shopType: updatedInfo.type,
+        email: updatedInfo.email,
+        phone: updatedInfo.phone,
+        address: updatedInfo.address,
+        city: updatedInfo.city,
+        description: updatedInfo.description,
+        openTime: updatedInfo.openTime,
+        closeTime: updatedInfo.closeTime,
+        workingDays: updatedInfo.workingDays.join(','),
+        offDays: updatedInfo.offDays.join(','),
+        logoUrl: updatedInfo.logoUrl,
+        bannerUrl: updatedInfo.bannerUrl,
+        galleryUrls: updatedInfo.galleryUrls,
+        lateGracePeriod: updatedInfo.lateGracePeriod,
+      };
+      await shopService.updateMyShop(updateData);
       
       toast.success(`Đã tải ${type === 'logo' ? 'logo' : type === 'banner' ? 'ảnh bìa' : 'ảnh thư viện'} lên thành công!`);
     } catch (err) {
@@ -183,10 +199,36 @@ export default function ShopProfile() {
     }
   };
 
-  const removeGalleryImage = (urlToRemove: string) => {
+  const removeGalleryImage = async (urlToRemove: string) => {
     const currentUrls = shopInfo.galleryUrls.split(',').filter(Boolean);
     const updatedUrls = currentUrls.filter(url => url !== urlToRemove).join(',');
-    setShopInfo({ ...shopInfo, galleryUrls: updatedUrls });
+    const updatedInfo = { ...shopInfo, galleryUrls: updatedUrls };
+    setShopInfo(updatedInfo);
+    
+    try {
+      const updateData = {
+        shopName: updatedInfo.name,
+        shopType: updatedInfo.type,
+        email: updatedInfo.email,
+        phone: updatedInfo.phone,
+        address: updatedInfo.address,
+        city: updatedInfo.city,
+        description: updatedInfo.description,
+        openTime: updatedInfo.openTime,
+        closeTime: updatedInfo.closeTime,
+        workingDays: updatedInfo.workingDays.join(','),
+        offDays: updatedInfo.offDays.join(','),
+        logoUrl: updatedInfo.logoUrl,
+        bannerUrl: updatedInfo.bannerUrl,
+        galleryUrls: updatedInfo.galleryUrls,
+        lateGracePeriod: updatedInfo.lateGracePeriod,
+      };
+      await shopService.updateMyShop(updateData);
+      toast.success('Đã xóa ảnh thành công!');
+    } catch (err) {
+      console.error('Remove failed:', err);
+      toast.error('Xóa ảnh thất bại.');
+    }
   };
 
   const weekDays = ['Thứ 2', 'Thứ 3', 'Thứ 4', 'Thứ 5', 'Thứ 6', 'Thứ 7', 'Chủ nhật'];

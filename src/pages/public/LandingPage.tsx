@@ -62,10 +62,10 @@ export default function Home() {
   const topFeaturedShops = featuredShops.slice(0, 4);
 
   const handleAction = (target: string) => {
-    if (target === '/search') {
-      const params = new URLSearchParams();
-      if (heroCity.trim()) params.set('city', heroCity.trim());
-      if (heroType !== 'Tất cả') params.set('type', heroType);
+    if (target.startsWith('/search')) {
+      const params = new URLSearchParams(target.split('?')[1] || '');
+      if (heroCity.trim() && !params.has('city')) params.set('city', heroCity.trim());
+      if (heroType !== 'Tất cả' && !params.has('type')) params.set('type', heroType);
       navigate(`/search?${params.toString()}`);
       return;
     }
@@ -260,7 +260,7 @@ export default function Home() {
         </div>
 
         {/* Animated Scroll Indicator - Pet Theme */}
-        <div
+        {/* <div
           onClick={() => document.getElementById('co-so')?.scrollIntoView({ behavior: 'smooth' })}
           className="absolute bottom-6 lg:bottom-10 left-1/2 -translate-x-1/2 flex flex-col items-center gap-3 z-20 opacity-80 hover:opacity-100 transition-opacity cursor-pointer group"
         >
@@ -271,7 +271,7 @@ export default function Home() {
           >
             <PawPrint size={20} className="rotate-180" />
           </motion.div>
-        </div>
+        </div> */}
       </section>
 
       {/* ─── Featured Services Showcase (API) ──────────────────────────── */}
@@ -284,8 +284,12 @@ export default function Home() {
                 Đánh giá cao nhất
               </span>
               <h2 className="text-xl sm:text-3xl md:text-5xl xl:text-6xl font-black text-blue-950 dark:text-white leading-tight">
-                Khám phá cơ sở <span className="text-gradient">Được yêu thích</span>
+                Khám phá cơ sở <br />
+                <span className="text-gradient">Được yêu thích</span>
               </h2>
+              <p className="text-slate-600 dark:text-slate-300 text-sm sm:text-base md:text-lg font-medium max-w-xl">
+                Những phòng khám, spa và khách sạn thú cưng hàng đầu được cộng đồng PetEye tin tưởng và đánh giá cao nhất.
+              </p>
             </div>
             <button onClick={() => navigate('/search')} className="flex items-center gap-2 font-black text-sm text-slate-500 dark:text-slate-400 hover:text-primary dark:hover:text-blue-400 transition-colors group">
               Xem tất cả cơ sở <ChevronRight className="group-hover:translate-x-1 transition-transform" />
@@ -343,10 +347,10 @@ export default function Home() {
         {/* Full Right Background Map */}
         <div className="absolute top-0 right-0 w-full lg:w-[75%] h-full pointer-events-none [mask-image:linear-gradient(to_right,transparent,black_20%,black_100%),linear-gradient(to_bottom,transparent,black_15%,black_85%,transparent)] [mask-composite:intersect] [-webkit-mask-composite:source-in]">
           {/* Actual Map Background */}
-          <img 
-            src={isDark ? mockMapBgDark : mockMapBg} 
-            alt="Map Background" 
-            className="absolute inset-0 w-full h-full object-cover opacity-60 dark:opacity-90 mix-blend-multiply dark:mix-blend-normal grayscale-[20%] dark:grayscale-0" 
+          <img
+            src={isDark ? mockMapBgDark : mockMapBg}
+            alt="Map Background"
+            className="absolute inset-0 w-full h-full object-cover opacity-60 dark:opacity-90 mix-blend-multiply dark:mix-blend-normal grayscale-[20%] dark:grayscale-0"
           />
 
 
@@ -355,7 +359,7 @@ export default function Home() {
             <div className="absolute top-[20%] left-[85%] md:top-1/2 md:left-[65%] -translate-x-1/2 -translate-y-1/2 w-40 h-40 bg-blue-500/20 rounded-full animate-ping" style={{ animationDuration: '3s' }} />
             <div className="absolute top-[20%] left-[85%] md:top-1/2 md:left-[65%] -translate-x-1/2 -translate-y-1/2 w-64 h-64 border border-blue-500/30 rounded-full" />
             <div className="absolute top-[20%] left-[85%] md:top-1/2 md:left-[65%] -translate-x-1/2 -translate-y-1/2 w-96 h-96 border border-blue-500/10 rounded-full" />
-            
+
             {/* Center User Pin */}
             <div className="absolute top-[20%] left-[85%] md:top-1/2 md:left-[65%] -translate-x-1/2 -translate-y-1/2 flex flex-col items-center z-20">
               <div className="w-10 h-10 md:w-14 md:h-14 bg-blue-600 rounded-full flex items-center justify-center text-white shadow-[0_0_30px_rgba(37,99,235,0.6)] border-4 border-white dark:border-blue-900/50">
@@ -374,7 +378,7 @@ export default function Home() {
               { t: "60%", l: "80%", delay: 1.5, dist: "4.0" },
               { t: "80%", l: "65%", delay: 2.1, dist: "2.8" },
             ].map((pin, i) => (
-              <motion.div 
+              <motion.div
                 key={i}
                 initial={{ opacity: 0, scale: 0, y: 20 }}
                 animate={{ opacity: 1, scale: 1, y: 0 }}
@@ -401,8 +405,9 @@ export default function Home() {
             <div className="lg:w-1/2 relative z-20">
               <div className="bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl p-6 sm:p-8 md:p-0 md:bg-transparent md:dark:bg-transparent md:backdrop-blur-none rounded-[32px] md:rounded-none border border-white/50 dark:border-slate-700/50 md:border-transparent shadow-xl md:shadow-none">
                 <div className="mb-8">
-                  <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400 font-bold text-xs mb-6">
-                    <Navigation size={14} /> Hệ thống định vị
+                  <div className="inline-flex items-center gap-1.5 bg-rose-50 text-rose-600 dark:bg-rose-500/15 dark:text-rose-400 border border-rose-200/60 dark:border-rose-500/20 px-3 py-1.5 rounded-full text-xs font-black uppercase tracking-wider w-fit mb-6">
+                    <Navigation size={12} className="text-rose-500 dark:text-rose-400" />
+                    Hệ thống định vị
                   </div>
                   <h2 className="text-4xl md:text-5xl xl:text-6xl font-black text-blue-950 dark:text-white leading-[1.1]">
                     Tìm cơ sở <br className="hidden lg:block" />
@@ -415,7 +420,7 @@ export default function Home() {
 
                 {!nearbyCoords && (
                   <div className="flex flex-col items-center lg:items-start">
-                    <button 
+                    <button
                       onClick={handleGetLocation}
                       disabled={locationStatus === 'loading'}
                       className="w-full sm:w-auto px-8 py-5 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300 hover:border-blue-500 hover:text-blue-500 rounded-[24px] font-black flex items-center justify-center gap-3 transition-all shadow-xl hover:shadow-blue-500/20 hover:-translate-y-1 group"
@@ -430,21 +435,21 @@ export default function Home() {
                       TÌM QUANH ĐÂY BẰNG GPS
                     </button>
                     <p className="text-xs text-slate-500 dark:text-white mt-4 italic flex items-center gap-1">
-                      <span className="material-symbols-outlined text-[14px]">info</span> 
+                      <span className="material-symbols-outlined text-[14px]">info</span>
                       Hệ thống sẽ tự động quét bản đồ
                     </p>
                   </div>
                 )}
               </div>
             </div>
-            
+
             <div className="hidden lg:block"></div>
           </div>
 
           {/* Results Area (Now placed inside the map overlay area so it shares the background) */}
           <AnimatePresence>
             {nearbyCoords && (
-              <motion.div 
+              <motion.div
                 initial={{ opacity: 0, y: 50 }}
                 animate={{ opacity: 1, y: 0 }}
                 className="w-full mt-12 relative z-20"
@@ -457,7 +462,7 @@ export default function Home() {
                 ) : (() => {
                   const sortedShops = [...nearbyShops].sort((a: any, b: any) => (a.distanceKm || 0) - (b.distanceKm || 0));
                   const displayedShops = sortedShops.slice(0, 4);
-                  
+
                   if (sortedShops.length === 0) {
                     return (
                       <div className="text-center text-slate-500 py-12 bg-white/60 backdrop-blur-md dark:bg-slate-900/60 rounded-3xl border border-dashed border-slate-300 dark:border-slate-700 shadow-sm">
@@ -485,10 +490,10 @@ export default function Home() {
                           </div>
                         ))}
                       </div>
-                      
+
                       {sortedShops.length > 4 && (
                         <div className="flex justify-center pt-2">
-                          <button 
+                          <button
                             onClick={() => navigate(`/search?lat=${nearbyCoords.lat}&lng=${nearbyCoords.lng}&radius=10`)}
                             className="px-8 py-4 bg-white dark:bg-slate-900 border-2 border-primary/20 text-primary hover:bg-primary hover:text-white rounded-[20px] font-black text-sm uppercase tracking-wider flex items-center gap-3 transition-all shadow-lg shadow-primary/10 hover:shadow-primary/30 hover:-translate-y-1"
                           >
@@ -508,7 +513,7 @@ export default function Home() {
 
 
       {/* ─── Live Camera Showcase ──────────────────────────────────────── */}
-      <section id="camera" className="py-10 md:py-24 xl:py-28 px-4 sm:px-6 bg-transparent relative overflow-hidden z-20">
+      <section id="camera" className="pt-10 pb-10 md:pt-24 md:pb-16 xl:pt-28 xl:pb-16 px-4 sm:px-6 bg-transparent relative overflow-hidden z-20">
         {/* <div className="absolute top-0 right-0 w-[50%] h-full bg-primary/10 blur-[150px] -rotate-12 pointer-events-none" /> */}
         <div className="max-w-7xl mx-auto relative z-10">
           <div className="grid lg:grid-cols-2 gap-8 lg:gap-12 2xl:gap-20 items-center">
@@ -539,7 +544,7 @@ export default function Home() {
                   </motion.div>
                 ))}
               </div>
-              <button onClick={() => handleAction('/search')} className="w-fit bg-primary hover:bg-primary/95 dark:bg-blue-600 dark:hover:bg-blue-500 text-white px-6 py-3 2xl:px-10 2xl:py-5 rounded-2xl 2xl:rounded-[24px] font-black flex items-center gap-2 2xl:gap-3 transition-all shadow-lg shadow-primary/20 dark:shadow-blue-500/20 hover:scale-[1.02] text-sm 2xl:text-base">
+              <button onClick={() => handleAction('/search?type=HOTEL')} className="w-fit bg-primary hover:bg-primary/95 dark:bg-blue-600 dark:hover:bg-blue-500 text-white px-6 py-3 2xl:px-10 2xl:py-5 rounded-2xl 2xl:rounded-[24px] font-black flex items-center gap-2 2xl:gap-3 transition-all shadow-lg shadow-primary/20 dark:shadow-blue-500/20 hover:scale-[1.02] text-sm 2xl:text-base">
                 KHÁM PHÁ CƠ SỞ CÓ CAMERA <ArrowRight size={20} className="w-4 h-4 2xl:w-5 2xl:h-5" />
               </button>
             </motion.div>
@@ -574,7 +579,7 @@ export default function Home() {
       </section>
 
       {/* ─── How it Works (Quy trình) ──────────────────────────────────── */}
-      <section className="py-10 md:py-24 2xl:py-32 px-4 sm:px-6 bg-transparent relative overflow-hidden z-10">
+      <section className="pt-10 pb-10 md:pt-16 md:pb-24 2xl:pt-20 2xl:pb-32 px-4 sm:px-6 bg-transparent relative overflow-hidden z-10">
         <div className="absolute top-1/2 left-1/4 w-96 h-96 bg-primary/5 rounded-full blur-[120px] pointer-events-none" />
         <div className="max-w-7xl mx-auto relative z-10">
           <div className="text-center mb-6 md:mb-16 xl:mb-24 space-y-1 md:space-y-4">
@@ -589,14 +594,25 @@ export default function Home() {
             <div className="hidden lg:block absolute top-[40%] left-[15%] w-[70%] border-t-[3px] border-dashed border-slate-300 dark:border-slate-700 z-0" />
 
             {/* Arrow Connectors */}
-            <div className="hidden lg:flex absolute top-[40%] left-[33.33%] -translate-y-1/2 -translate-x-1/2 w-12 h-12 bg-white dark:bg-slate-800 rounded-full shadow-lg items-center justify-center z-20 text-slate-400 border border-slate-100 dark:border-slate-700 animate-pulse">
-              <ArrowRight size={24} className="text-primary dark:text-blue-400" />
+            <div className="hidden lg:flex absolute top-[40%] left-[calc(33.333%-8px)] -translate-y-1/2 -translate-x-1/2 z-20 items-center justify-center pointer-events-none text-blue-500">
+              <motion.div animate={{ opacity: [0.2, 1, 0.2], x: [0, 5, 0] }} transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut", delay: 0 }} className="-mr-5">
+                <ChevronRight size={40} strokeWidth={3} />
+              </motion.div>
+              <motion.div animate={{ opacity: [0.2, 1, 0.2], x: [0, 5, 0] }} transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut", delay: 0.2 }}>
+                <ChevronRight size={40} strokeWidth={3} />
+              </motion.div>
             </div>
-            <div className="hidden lg:flex absolute top-[40%] left-[66.66%] -translate-y-1/2 -translate-x-1/2 w-12 h-12 bg-white dark:bg-slate-800 rounded-full shadow-lg items-center justify-center z-20 text-slate-400 border border-slate-100 dark:border-slate-700 animate-pulse" style={{ animationDelay: '500ms' }}>
-              <ArrowRight size={24} className="text-primary dark:text-blue-400" />
+            
+            <div className="hidden lg:flex absolute top-[40%] left-[calc(66.666%+8px)] -translate-y-1/2 -translate-x-1/2 z-20 items-center justify-center pointer-events-none text-blue-500">
+              <motion.div animate={{ opacity: [0.2, 1, 0.2], x: [0, 5, 0] }} transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut", delay: 0 }} className="-mr-5">
+                <ChevronRight size={40} strokeWidth={3} />
+              </motion.div>
+              <motion.div animate={{ opacity: [0.2, 1, 0.2], x: [0, 5, 0] }} transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut", delay: 0.2 }}>
+                <ChevronRight size={40} strokeWidth={3} />
+              </motion.div>
             </div>
 
-            <div className="grid lg:grid-cols-3 gap-8 relative z-10 items-stretch">
+            <div className="grid lg:grid-cols-3 gap-8 lg:gap-12 relative z-10 items-stretch">
               {/* Step 1 */}
               <motion.div
                 initial={{ opacity: 0, y: 50 }}
@@ -608,7 +624,7 @@ export default function Home() {
                 <div className="absolute -top-8 -right-8 text-[180px] font-black text-slate-50 dark:text-slate-800/30 leading-none select-none z-0 transition-transform duration-700 group-hover:scale-110 group-hover:-rotate-6">1</div>
 
                 <div className="relative z-10 flex flex-col h-full">
-                  <div className="inline-flex items-center justify-center bg-blue-100 text-blue-600 dark:bg-blue-900/50 dark:text-blue-400 text-xs font-black px-4 py-2 rounded-full mb-6 w-fit uppercase tracking-widest shadow-sm">
+                  <div className="inline-flex items-center justify-center text-[#005FFF] bg-[#F7FBFF] border border-[#D7ECFF] dark:bg-blue-900/50 dark:text-blue-400 dark:border-blue-800 text-xs font-black px-4 py-2 rounded-full mb-6 w-fit uppercase tracking-widest">
                     Bước 1
                   </div>
 
@@ -646,7 +662,7 @@ export default function Home() {
                 <div className="absolute -top-8 -right-8 text-[180px] font-black text-slate-50 dark:text-slate-800/30 leading-none select-none z-0 transition-transform duration-700 group-hover:scale-110 group-hover:-rotate-6">2</div>
 
                 <div className="relative z-10 flex flex-col h-full">
-                  <div className="inline-flex items-center justify-center bg-purple-100 text-purple-600 dark:bg-purple-900/50 dark:text-purple-400 text-xs font-black px-4 py-2 rounded-full mb-6 w-fit uppercase tracking-widest shadow-sm">
+                  <div className="inline-flex items-center justify-center text-[#A800FF] bg-[#FDFAFF] border border-[#F5E8FF] dark:bg-purple-900/50 dark:text-purple-400 dark:border-purple-800 text-xs font-black px-4 py-2 rounded-full mb-6 w-fit uppercase tracking-widest">
                     Bước 2
                   </div>
 
@@ -679,7 +695,7 @@ export default function Home() {
                 <div className="absolute -top-8 -right-8 text-[180px] font-black text-slate-50 dark:text-slate-800/30 leading-none select-none z-0 transition-transform duration-700 group-hover:scale-110 group-hover:-rotate-6">3</div>
 
                 <div className="relative z-10 flex flex-col h-full">
-                  <div className="inline-flex items-center justify-center bg-rose-100 text-rose-600 dark:bg-rose-900/50 dark:text-rose-400 text-xs font-black px-4 py-2 rounded-full mb-6 w-fit uppercase tracking-widest shadow-sm">
+                  <div className="inline-flex items-center justify-center text-[#FF0038] bg-[#FFF9FA] border border-[#FFE3E6] dark:bg-rose-900/50 dark:text-rose-400 dark:border-rose-800 text-xs font-black px-4 py-2 rounded-full mb-6 w-fit uppercase tracking-widest">
                     Bước 3
                   </div>
 
@@ -726,7 +742,7 @@ export default function Home() {
       </section>
 
       {/* ─── Testimonials (Horizontal Split) ───────────────────────────── */}
-      <section className="py-16 md:py-24 2xl:py-32 bg-transparent overflow-hidden relative  z-10">
+      <section className="pt-10 pb-10 md:pt-16 md:pb-24 2xl:pt-20 2xl:pb-32 bg-transparent overflow-hidden relative z-10">
 
         {/* Background Gradients */}
         {/* <div className="absolute top-0 right-0 w-1/2 h-full bg-primary/5 blur-[150px] pointer-events-none" /> */}
@@ -737,6 +753,9 @@ export default function Home() {
             {/* Left Column (Text & Stats) */}
             <div className="lg:col-span-5 space-y-8">
               <div>
+                <span className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 font-black text-xs uppercase tracking-widest mb-6">
+                  <Star size={14} className="text-blue-600 dark:text-blue-400" /> Đánh giá nổi bật
+                </span>
                 <h2 className="text-4xl md:text-5xl xl:text-6xl font-black text-blue-950 dark:text-white leading-[1.1] mb-2">
                   Phản hồi từ <br />
                   người dùng <br />
@@ -921,7 +940,7 @@ export default function Home() {
       </section>
 
       {/* ─── FAQ Section ───────────────────────────────────────────────── */}
-      <section className="pt-12 md:pt-16 xl:pt-24 pb-12 md:pb-16 xl:pb-20 px-6 bg-transparent relative">
+      <section className="pt-10 pb-10 md:pt-16 md:pb-24 2xl:pt-20 2xl:pb-32 px-6 bg-transparent relative">
         <div className="max-w-3xl mx-auto relative z-10">
           <div className="text-center mb-8 xl:mb-16">
             <h2 className="text-3xl xl:text-4xl font-black text-slate-900 dark:text-white mb-4"><span className="text-gradient">Câu hỏi thường gặp</span></h2>
