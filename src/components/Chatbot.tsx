@@ -63,6 +63,8 @@ interface PetDetail extends PetSummary {
 interface BookingPickerData {
   shopId: number; shopName: string; serviceId: number; serviceName: string;
   servicePrice: number; petId: number; petName: string;
+  prefilledDate?: string; prefilledTime?: string;
+  isBoarding?: boolean; prefilledEndDate?: string; prefilledEndTime?: string;
 }
 interface BookingSuccessData {
   bookingId: number; shopName: string; serviceName: string; datetime: string;
@@ -285,15 +287,20 @@ const TIME_SLOTS = ['08:00', '09:00', '10:00', '11:00', '13:00', '14:00', '15:00
 
 function BookingPickerCard({ data, onConfirm }: {
   data: BookingPickerData;
-  onConfirm: (datetime: string, payMethod: PayMethod, onError: (msg: string) => void) => void;
+  onConfirm: (datetime: string, payMethod: PayMethod, onError: (msg: string) => void, endDatetime?: string) => void;
 }) {
   const today = new Date().toISOString().split('T')[0];
-  const [date, setDate] = useState(today);
-  const [time, setTime] = useState('');
+  const [date, setDate] = useState(data.prefilledDate || today);
+  const [time, setTime] = useState(data.prefilledTime || '');
+  const [endDate, setEndDate] = useState(data.prefilledEndDate || data.prefilledDate || today);
+  const [endTime, setEndTime] = useState(data.prefilledEndTime || data.prefilledTime || '');
   const [payMethod, setPayMethod] = useState<PayMethod>('CASH');
   const [confirming, setConfirming] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
-  const canConfirm = !!date && !!time && !confirming;
+  
+  const canConfirm = data.isBoarding 
+    ? !!date && !!time && !!endDate && !!endTime && !confirming
+    : !!date && !!time && !confirming;
 
   // Dynamically filter time slots to avoid picking past times today
   const availableTimeSlots = TIME_SLOTS.filter(t => {
@@ -303,15 +310,19 @@ function BookingPickerCard({ data, onConfirm }: {
     // Allow if the slot is at least 30 minutes in the future
     return (h * 60 + m) > (now.getHours() * 60 + now.getMinutes() + 30);
   });
+  
+  const availableEndTimeSlots = TIME_SLOTS;
 
   const handleConfirm = () => {
     if (!canConfirm) return;
     setConfirming(true);
     setErrorMsg('');
-    onConfirm(date + 'T' + time + ':00', payMethod, (msg: string) => {
+    const datetime = date + 'T' + time + ':00';
+    const endDatetime = data.isBoarding ? (endDate + 'T' + endTime + ':00') : undefined;
+    onConfirm(datetime, payMethod, (msg: string) => {
       setErrorMsg(msg);
       setConfirming(false);
-    });
+    }, endDatetime);
   };
 
   return (
@@ -325,22 +336,50 @@ function BookingPickerCard({ data, onConfirm }: {
         <p className="text-xs text-slate-500 mt-0.5">✂️ {data.serviceName} · 🐾 {data.petName}</p>
       </div>
       <div className="p-3 space-y-3">
-        <div>
-          <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider block mb-1">📆 Ngay hen</label>
-          <input type="date" min={today} value={date} onChange={e => { setDate(e.target.value); setTime(''); }}
-            className="w-full px-3 py-2 text-sm border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-300 focus:border-indigo-400 outline-none" />
+        <div className={data.isBoarding ? "grid grid-cols-2 gap-2" : ""}>
+          <div>
+            <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider block mb-1">
+              {data.isBoarding ? "📆 Nhận phòng" : "📆 Ngay hen"}
+            </label>
+            <input type="date" min={today} value={date} onChange={e => { setDate(e.target.value); setTime(''); }}
+              className="w-full px-3 py-2 text-sm border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-300 focus:border-indigo-400 outline-none" />
+          </div>
+          {data.isBoarding && (
+            <div>
+              <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider block mb-1">📆 Trả phòng</label>
+              <input type="date" min={date || today} value={endDate} onChange={e => { setEndDate(e.target.value); setEndTime(''); }}
+                className="w-full px-3 py-2 text-sm border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-300 focus:border-indigo-400 outline-none" />
+            </div>
+          )}
         </div>
-        <div>
-          <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider block mb-1">⏰ Khung giờ</label>
-          {availableTimeSlots.length === 0 ? (
-            <p className="text-xs text-red-500 bg-red-50 px-2 py-1.5 rounded-lg border border-red-100">Hôm nay đã hết khung giờ khả dụng. Vui lòng chọn ngày khác.</p>
-          ) : (
-            <div className="grid grid-cols-3 gap-1.5">
-              {availableTimeSlots.map(t => (
-                <button key={t} onClick={() => setTime(t)}
-                  className={"py-1.5 text-xs font-semibold rounded-lg border transition-all " + (time === t ? 'bg-indigo-600 text-white border-indigo-600 shadow-sm' : 'bg-white border-slate-200 text-slate-600 hover:border-indigo-300 hover:text-indigo-600')}
-                >{t}</button>
-              ))}
+        
+        <div className={data.isBoarding ? "grid grid-cols-2 gap-2" : ""}>
+          <div>
+            <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider block mb-1">
+              {data.isBoarding ? "⏰ Giờ nhận" : "⏰ Khung giờ"}
+            </label>
+            {availableTimeSlots.length === 0 ? (
+              <p className="text-xs text-red-500 bg-red-50 px-2 py-1.5 rounded-lg border border-red-100">Hôm nay đã hết khung giờ khả dụng.</p>
+            ) : (
+              <div className="grid grid-cols-3 gap-1.5">
+                {availableTimeSlots.map(t => (
+                  <button key={t} onClick={() => setTime(t)}
+                    className={"py-1.5 text-[10px] font-semibold rounded-lg border transition-all " + (time === t ? 'bg-indigo-600 text-white border-indigo-600 shadow-sm' : 'bg-white border-slate-200 text-slate-600 hover:border-indigo-300 hover:text-indigo-600')}
+                  >{t}</button>
+                ))}
+              </div>
+            )}
+          </div>
+          {data.isBoarding && (
+            <div>
+              <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider block mb-1">⏰ Giờ trả</label>
+              <div className="grid grid-cols-3 gap-1.5">
+                {availableEndTimeSlots.map(t => (
+                  <button key={t} onClick={() => setEndTime(t)}
+                    className={"py-1.5 text-[10px] font-semibold rounded-lg border transition-all " + (endTime === t ? 'bg-indigo-600 text-white border-indigo-600 shadow-sm' : 'bg-white border-slate-200 text-slate-600 hover:border-indigo-300 hover:text-indigo-600')}
+                  >{t}</button>
+                ))}
+              </div>
             </div>
           )}
         </div>
@@ -359,12 +398,18 @@ function BookingPickerCard({ data, onConfirm }: {
             </button>
           </div>
         </div>
-        {date && time && (
+        {date && time && (!data.isBoarding || (endDate && endTime)) && (
           <div className="bg-slate-50 rounded-xl px-3 py-2 space-y-1 border border-slate-100">
             <div className="flex justify-between text-xs text-slate-600">
-              <span>📅 Ngày giờ</span>
+              <span>📅 {data.isBoarding ? 'Check-in' : 'Ngày giờ'}</span>
               <span className="font-semibold">{new Date(date + 'T' + time + ':00').toLocaleString('vi-VN', { weekday: 'short', day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' })}</span>
             </div>
+            {data.isBoarding && (
+              <div className="flex justify-between text-xs text-slate-600">
+                <span>📅 Check-out</span>
+                <span className="font-semibold">{new Date(endDate + 'T' + endTime + ':00').toLocaleString('vi-VN', { weekday: 'short', day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' })}</span>
+              </div>
+            )}
             <div className="flex justify-between text-xs text-slate-600">
               <span>💳 Thanh toán</span>
               <span className="font-semibold">{payMethod === 'CASH' ? 'Tiền mặt tại quầy' : 'PayOS (QR)'}</span>
@@ -517,7 +562,7 @@ function ToolResultRenderer({ result, onBookingConfirm }: {
   if (result.type === 'pet_detail') return <PetDetailCard pet={result.data as PetDetail} />;
   if (result.type === 'booking_picker') {
     const d = result.data as BookingPickerData;
-    return <BookingPickerCard data={d} onConfirm={(dt, pm, onError) => onBookingConfirm?.(dt, pm, d, onError)} />;
+    return <BookingPickerCard data={d} onConfirm={(dt, pm, onError, endDt) => onBookingConfirm?.(dt, pm, d, onError, endDt)} />;
   }
   if (result.type === 'booking_success') return <BookingSuccessCard data={result.data as BookingSuccessData} />;
   if (result.type === 'tier_info') return <TierInfoCard data={result.data as TierInfoData} />;
@@ -707,7 +752,8 @@ export default function Chatbot() {
     datetime: string,
     payMethod: PayMethod,
     pickerData: BookingPickerData,
-    onError: (msg: string) => void
+    onError: (msg: string) => void,
+    endDatetime?: string
   ) => {
     setLoading(true);
     try {
@@ -717,6 +763,7 @@ export default function Chatbot() {
           serviceId: pickerData.serviceId,
           petId: pickerData.petId,
           appointmentDatetime: datetime,
+          ...(pickerData.isBoarding && endDatetime ? { checkIn: datetime, checkOut: endDatetime } : {})
         });
         if (result.checkoutUrl) {
           await sendMessage(`Đang chuyển đến trang thanh toán PayOS cho ${pickerData.petName}...`);
@@ -731,6 +778,7 @@ export default function Chatbot() {
           petId: pickerData.petId,
           appointmentDatetime: datetime,
           paymentMethod: 'CASH',
+          ...(pickerData.isBoarding && endDatetime ? { checkIn: datetime, checkOut: endDatetime } : {})
         });
         if (result.checkoutUrl) {
           localStorage.setItem('pendingCashDeposit', result.orderCode.toString());

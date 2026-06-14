@@ -85,7 +85,7 @@ export default function VetSearch() {
 
   const [sortBy, setSortBy] = useState(latParam ? 'Gần nhất' : 'Đánh giá cao nhất');
   const [viewMode, setViewMode] = useState<'list' | 'grid'>('list');
-  const [distanceKm, setDistanceKm] = useState(radiusParam ? parseInt(radiusParam, 10) : 30);
+  const [distanceKm, setDistanceKm] = useState(radiusParam ? parseInt(radiusParam, 10) : 100);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [userLocation, setUserLocation] = useState<{ lat: number; lng: number } | null>(
     latParam && lngParam ? { lat: parseFloat(latParam), lng: parseFloat(lngParam) } : null
@@ -98,7 +98,7 @@ export default function VetSearch() {
   const activeFilterCount = useMemo(() => {
     let count = 0;
     if (minRating > 0) count++;
-    if (distanceKm !== 30) count++;
+    if (distanceKm !== 100) count++;
     if (selectedServices.length > 0) count += selectedServices.length;
     return count;
   }, [minRating, distanceKm, selectedServices]);
@@ -139,7 +139,7 @@ export default function VetSearch() {
     return [...shopsWithDistance].filter((shop: any) => {
       // Filter by distance if we have user location
       if (userLocation && shop.distanceKm !== undefined) {
-        if (shop.distanceKm > distanceKm) return false;
+        if (distanceKm < 100 && shop.distanceKm > distanceKm) return false;
       }
       
 
@@ -266,11 +266,11 @@ export default function VetSearch() {
               <span className="text-lg font-bold">-</span>
             </button>
             <div className="flex items-end">
-              <span className="text-2xl font-black text-primary dark:text-white">{distanceKm}</span>
-              <span className="text-xs font-bold text-slate-400 pb-1 ml-1 dark:text-white">km</span>
+              <span className="text-2xl font-black text-primary dark:text-white">{distanceKm === 100 ? 'Mọi khoảng cách' : distanceKm}</span>
+              {distanceKm !== 100 && <span className="text-xs font-bold text-slate-400 pb-1 ml-1 dark:text-white">km</span>}
             </div>
             <button 
-              onClick={() => setDistanceKm(prev => Math.min(30, prev + 1))}
+              onClick={() => setDistanceKm(prev => Math.min(100, prev + 1))}
               className="w-8 h-8 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-600 dark:text-white hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors"
             >
               <span className="text-lg font-bold">+</span>
@@ -279,14 +279,14 @@ export default function VetSearch() {
           <input
             type="range"
             min={1}
-            max={30}
+            max={100}
             value={distanceKm}
             onChange={(e) => setDistanceKm(Number(e.target.value))}
             className="w-full h-2 rounded-full appearance-none cursor-pointer accent-primary bg-slate-100 dark:bg-slate-800 "
           />
           <div className="flex justify-between text-[10px] font-black text-slate-300 dark:text-white mt-2">
             <span>1 KM</span>
-            <span>30 KM</span>
+            <span>Mọi khoảng cách</span>
           </div>
         </div>
       </div>
@@ -414,9 +414,9 @@ export default function VetSearch() {
                   <SlidersHorizontal size={18} className="text-primary dark:text-white" />
                   Bộ lọc
                 </h3>
-                {(minRating > 0 || distanceKm !== 30 || selectedServices.length > 0) && (
+                {(minRating > 0 || distanceKm !== 100 || selectedServices.length > 0) && (
                   <button
-                    onClick={() => { setMinRating(0); setDistanceKm(30); setSelectedServices([]); }}
+                    onClick={() => { setMinRating(0); setDistanceKm(100); setSelectedServices([]); }}
                     className="text-[10px] font-black text-primary dark:text-white uppercase tracking-wider hover:underline"
                   >
                     Đặt lại
@@ -433,7 +433,7 @@ export default function VetSearch() {
             <div className="flex items-center justify-between mb-6 md:mb-8 gap-3">
               <div className="min-w-0">
                 <h2 className="text-xl md:text-2xl font-black text-slate-900 dark:text-white truncate">
-                  {isLoading ? 'Đang tìm kiếm...' : `${totalElements} kết quả phù hợp`}
+                  {isLoading ? 'Đang tìm kiếm...' : `${sortedClinics.length} kết quả phù hợp`}
                 </h2>
                 <p className="text-xs md:text-sm font-medium text-slate-500 mt-0.5">Dựa trên tiêu chí lựa chọn của bạn</p>
               </div>
@@ -701,7 +701,7 @@ export default function VetSearch() {
                 <div className="flex items-center gap-3">
                   {activeFilterCount > 0 && (
                     <button
-                      onClick={() => { setMinRating(0); setDistanceKm(30); setSelectedServices([]); }}
+                      onClick={() => { setMinRating(0); setDistanceKm(100); setSelectedServices([]); }}
                       className="text-xs font-bold text-red-500 hover:underline"
                     >
                       Xóa hết
@@ -727,7 +727,7 @@ export default function VetSearch() {
                   onClick={() => setIsMobileFilterOpen(false)}
                   className="w-full py-4 bg-primary text-white font-black rounded-2xl shadow-lg shadow-primary/25 text-sm uppercase tracking-widest active:scale-[0.98] transition-transform"
                 >
-                  Áp dụng bộ lọc ({totalElements} kết quả)
+                  Áp dụng bộ lọc ({sortedClinics.length} kết quả)
                 </button>
               </div>
             </motion.div>
