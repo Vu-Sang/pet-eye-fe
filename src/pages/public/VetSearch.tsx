@@ -266,7 +266,7 @@ export default function VetSearch() {
               <span className="text-lg font-bold">-</span>
             </button>
             <div className="flex items-end">
-              <span className="text-2xl font-black text-primary dark:text-white">{distanceKm === 100 ? 'Mọi khoảng cách' : distanceKm}</span>
+              <span className="text-2xl font-black text-primary dark:text-white">{distanceKm === 100 ? '∞' : distanceKm}</span>
               {distanceKm !== 100 && <span className="text-xs font-bold text-slate-400 pb-1 ml-1 dark:text-white">km</span>}
             </div>
             <button 
@@ -286,7 +286,7 @@ export default function VetSearch() {
           />
           <div className="flex justify-between text-[10px] font-black text-slate-300 dark:text-white mt-2">
             <span>1 KM</span>
-            <span>Mọi khoảng cách</span>
+            <span className="text-base leading-[0.5rem] mt-1">∞</span>
           </div>
         </div>
       </div>
@@ -503,7 +503,7 @@ export default function VetSearch() {
                       {/* Image */}
                       <div className={`relative overflow-hidden shrink-0 bg-slate-100 dark:bg-slate-800 ${viewMode === 'list' ? 'sm:w-72 w-full h-44 sm:h-auto' : 'h-44 md:h-52'}`}>
                         <img
-                          src={shop.licenseImageUrl || 'https://images.unsplash.com/photo-1516734212186-a967f81ad0d7?q=80&w=800&auto=format&fit=crop'}
+                          src={shop.logoUrl || shop.licenseImageUrl || 'https://images.unsplash.com/photo-1516734212186-a967f81ad0d7?q=80&w=800&auto=format&fit=crop'}
                           alt={shop.shopName}
                           className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-1000"
                         />

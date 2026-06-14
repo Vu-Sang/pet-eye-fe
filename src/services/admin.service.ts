@@ -33,6 +33,7 @@ export interface AdminDashboardStats {
   pendingShopsSparkData?: number[];
 
   unreadMessages: number;
+  totalBroadcasts?: number;
 }
 
 export interface RevenueMonthly {

@@ -17,7 +17,7 @@ export default function Legal() {
   const termsContent = (
     <div className="space-y-10 text-slate-600 leading-relaxed">
       <div className="bg-blue-50/70 p-5 rounded-2xl border border-blue-100">
-        <p className="text-sm font-semibold text-blue-800 text-center">Chính sách này có hiệu lực kể từ ngày 06/07/2026 cho đến khi có thông báo thay thế hoặc cập nhật mới từ PetEye.</p>
+        <p className="text-sm font-semibold text-blue-800 text-center">Chính sách có hiệu lực kể từ ngày 06/07/2026 cho đến khi có thông báo thay thế hoặc cập nhật mới từ PetEye.</p>
       </div>
 
       <section>
@@ -43,7 +43,7 @@ export default function Legal() {
 
       <section>
         <h3 className="text-2xl font-bold text-slate-900 mb-4">3. Quy định dành cho Người dùng</h3>
-        
+
         <h4 className="text-lg font-bold text-slate-800 mt-6 mb-3">3.1. Thông tin tài khoản</h4>
         <ul className="list-disc pl-6 space-y-2 mb-4">
           <li>Người dùng cam kết cung cấp đầy đủ, chính xác và cập nhật các thông tin cần thiết khi đăng ký tài khoản hoặc đặt dịch vụ trên PetEye.</li>
@@ -218,7 +218,7 @@ export default function Legal() {
   return (
     <div className="min-h-screen bg-slate-50 pt-32 pb-24">
       <div className="max-w-4xl mx-auto px-6">
-        
+
         {/* Header */}
         <div className="mb-12 text-center">
           <h1 className="text-4xl md:text-5xl font-black text-slate-900 mb-6 tracking-tight">
@@ -229,17 +229,17 @@ export default function Legal() {
 
         {/* Content Box */}
         <div className="bg-white rounded-[40px] p-8 md:p-12 shadow-xl border border-slate-100">
-          
+
           {/* Tabs */}
           <div className="flex flex-col sm:flex-row gap-4 mb-12 border-b border-slate-100 pb-6">
-            <Link 
+            <Link
               to="/terms"
               className={`flex-1 flex items-center justify-center gap-3 py-4 rounded-2xl font-bold text-lg transition-all ${activeTab === 'terms' ? 'bg-primary text-white shadow-lg shadow-primary/30' : 'bg-slate-50 text-slate-500 hover:bg-slate-100'}`}
             >
               <FileText size={20} />
               Điều khoản sử dụng
             </Link>
-            <Link 
+            <Link
               to="/privacy"
               className={`flex-1 flex items-center justify-center gap-3 py-4 rounded-2xl font-bold text-lg transition-all ${activeTab === 'privacy' ? 'bg-primary text-white shadow-lg shadow-primary/30' : 'bg-slate-50 text-slate-500 hover:bg-slate-100'}`}
             >
@@ -265,15 +265,15 @@ export default function Legal() {
                 <h4 className="text-2xl font-black text-slate-900 mb-4">Thông tin liên hệ</h4>
                 <div className="space-y-3 text-slate-600 font-medium">
                   <p className="flex items-start gap-3">
-                    <span className="font-bold text-slate-900 min-w-[90px]">Địa chỉ:</span> 
+                    <span className="font-bold text-slate-900 min-w-[90px]">Địa chỉ:</span>
                     <span>7 Đ. D1, Tăng Nhơn Phú, Hồ Chí Minh 700000, Vietnam</span>
                   </p>
                   <p className="flex items-start gap-3">
-                    <span className="font-bold text-slate-900 min-w-[90px]">Điện thoại:</span> 
+                    <span className="font-bold text-slate-900 min-w-[90px]">Điện thoại:</span>
                     <a href="tel:0707185436" className="text-blue-600 hover:text-blue-700 hover:underline">070 718 5436</a>
                   </p>
                   <p className="flex items-start gap-3">
-                    <span className="font-bold text-slate-900 min-w-[90px]">Email:</span> 
+                    <span className="font-bold text-slate-900 min-w-[90px]">Email:</span>
                     <a href="mail to:peteye.contact26@gmail.com" className="text-blue-600 hover:text-blue-700 hover:underline break-all">peteye.contact26@gmail.com</a>
                   </p>
                 </div>

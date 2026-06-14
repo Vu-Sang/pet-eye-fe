@@ -748,7 +748,7 @@ export default function AdminDashboard() {
         {[
           { label: 'Shop chờ duyệt', path: '/admin/shops', count: stats?.pendingShops },
           { label: 'Quản lý member', path: '/admin/members', count: stats?.totalUsers },
-          { label: 'Thông báo', path: '/admin/notifications', count: null },
+          { label: 'Thông báo đã gửi', path: '/admin/notifications', count: stats?.totalBroadcasts },
           { label: 'Tin nhắn', path: '/admin/messages', count: stats?.unreadMessages },
         ].map(q => (
           <Link
@@ -770,12 +770,12 @@ export default function AdminDashboard() {
                 {q.count}
               </p>
             ) : (
-              <p className={`text-sm font-bold ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>
-                Gửi thông báo
+              <p className={`text-sm font-bold mt-2 ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>
+                Đang tải...
               </p>
             )}
             <div className="flex items-center gap-1 text-xs font-bold text-blue-400 mt-4">
-              <span>Xem chi tiết</span>
+              <span>{q.path === '/admin/notifications' && (!q.count || q.count === 0) ? 'Gửi thông báo' : 'Xem chi tiết'}</span>
               <span className="transition-transform duration-300 group-hover:translate-x-1">→</span>
             </div>
           </Link>
