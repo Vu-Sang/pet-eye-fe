@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { bookingService } from '../../services/booking.service';
+import { trackBookingStep4_PaymentStart } from '../../lib/analytics';
 
 type PayMethod = 'payos' | 'cash';
 
@@ -82,6 +83,15 @@ export default function Payment() {
     : [{ id: booking.serviceId, name: booking.serviceName, price: booking.servicePrice }];
 
   const rawTotalPrice = serviceList.reduce((sum, s) => sum + s.price, 0);
+
+  React.useEffect(() => {
+    trackBookingStep4_PaymentStart(
+      booking.shopId,
+      booking.shopName,
+      rawTotalPrice,
+      serviceList.map(s => s.name)
+    );
+  }, [booking.shopId, booking.shopName, rawTotalPrice]);
 
   const getCommissionRateForService = (svc: BookingService) => {
     if (!svc.category) return 0.10;

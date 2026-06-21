@@ -8,6 +8,7 @@ import { shopService, ShopPublicResponse } from '../../services/shop.service';
 import type { Pet } from '../../types';
 import type { ServiceResponse, BookingResponse } from '../../types/api';
 import { reviewService, ReviewResponse } from '../../services/review.service';
+import { trackHomepageQuickAction, trackHomepageSearchService, trackViewPetProfile } from '../../lib/analytics';
 
 
 
@@ -71,6 +72,15 @@ export default function HomePage() {
         };
         fetchData();
     }, [user]);
+
+    // Search tracking with debounce
+    useEffect(() => {
+        if (!searchTerm) return;
+        const timer = setTimeout(() => {
+            trackHomepageSearchService(searchTerm, selectedCategory);
+        }, 1000);
+        return () => clearTimeout(timer);
+    }, [searchTerm, selectedCategory]);
 
     const getGreeting = () => {
         const hour = new Date().getHours();
@@ -156,7 +166,10 @@ export default function HomePage() {
                             <motion.button
                                 whileHover={{ scale: 1.05, y: -5 }}
                                 whileTap={{ scale: 0.95 }}
-                                onClick={() => navigate('/search?type=CLINIC')}
+                                onClick={() => {
+                                    trackHomepageQuickAction('CLINIC');
+                                    navigate('/search?type=CLINIC');
+                                }}
                                 className="flex flex-col items-center justify-center gap-3 p-4 bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-700 hover:shadow-xl hover:shadow-blue-500/10 hover:border-blue-300 dark:hover:border-blue-600 transition-all group"
                             >
                                 <div className="w-12 h-12 rounded-full bg-blue-50 dark:bg-blue-900/30 flex items-center justify-center text-blue-600 dark:text-blue-400 group-hover:bg-blue-600 group-hover:text-white transition-all duration-300">
@@ -168,7 +181,10 @@ export default function HomePage() {
                             <motion.button
                                 whileHover={{ scale: 1.05, y: -5 }}
                                 whileTap={{ scale: 0.95 }}
-                                onClick={() => navigate('/search?type=SPA')}
+                                onClick={() => {
+                                    trackHomepageQuickAction('SPA');
+                                    navigate('/search?type=SPA');
+                                }}
                                 className="flex flex-col items-center justify-center gap-3 p-4 bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-700 hover:shadow-xl hover:shadow-pink-500/10 hover:border-pink-300 dark:hover:border-pink-600 transition-all group"
                             >
                                 <div className="w-12 h-12 rounded-full bg-pink-50 dark:bg-pink-900/30 flex items-center justify-center text-pink-600 dark:text-pink-400 group-hover:bg-pink-600 group-hover:text-white transition-all duration-300">
@@ -180,7 +196,10 @@ export default function HomePage() {
                             <motion.button
                                 whileHover={{ scale: 1.1, y: -5 }}
                                 whileTap={{ scale: 0.98 }}
-                                onClick={() => navigate('/search?type=BOARDING')}
+                                onClick={() => {
+                                    trackHomepageQuickAction('BOARDING');
+                                    navigate('/search?type=BOARDING');
+                                }}
                                 className="relative flex flex-col items-center justify-center gap-3 p-4 bg-gradient-to-br from-orange-50/80 to-amber-50/40 dark:from-orange-950/20 dark:to-amber-950/10 rounded-2xl shadow-md border-2 border-orange-200 dark:border-orange-800 hover:shadow-xl hover:shadow-orange-500/10 hover:border-orange-400 transition-all group scale-105 z-10"
                             >
                                 <span className="absolute -top-2 right-1 bg-rose-500 text-white text-[9px] font-black px-2.5 py-0.5 rounded-full shadow-md animate-pulse z-20">HOT</span>
@@ -328,7 +347,10 @@ export default function HomePage() {
                                 transition={{ delay: idx * 0.1 }}
                                 whileHover={{ y: -8 }}
                                 className="min-w-[240px] bg-white dark:bg-slate-800 p-6 rounded-3xl shadow-sm border border-slate-100 dark:border-slate-700 flex flex-col items-center text-center group cursor-pointer hover:shadow-xl hover:border-primary/30 transition-all"
-                                onClick={() => navigate(`/pet/${pet.id}`)}
+                                onClick={() => {
+                                    trackViewPetProfile(pet.id, pet.name);
+                                    navigate(`/pet/${pet.id}`);
+                                }}
                             >
                                 <div className="w-24 h-24 rounded-full bg-slate-100 dark:bg-slate-700 mb-5 overflow-hidden border-4 border-white dark:border-slate-800 shadow-inner group-hover:border-primary/50 transition-all duration-500">
                                     {pet.avatar ? (
@@ -415,6 +437,7 @@ export default function HomePage() {
                                     <button
                                         key={cat}
                                         onClick={() => {
+                                            trackHomepageSearchService('', cat);
                                             setSelectedCategory(cat);
                                             setVisibleCount(4);
                                         }}

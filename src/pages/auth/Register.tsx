@@ -4,6 +4,7 @@ import { User, Mail, Phone, Lock, MapPin, ArrowRight, ArrowLeft, Shield, Star, S
 import { motion } from 'motion/react';
 import { userService } from '../../services/user.service';
 import Logo from '../../components/Logo';
+import { trackAuth } from '../../lib/analytics';
 
 export default function Register() {
   const navigate = useNavigate();
@@ -60,6 +61,7 @@ export default function Register() {
     setError('');
     try {
       await userService.register({ email, password, fullName, phone, address });
+      trackAuth('register', 'email');
       navigate('/verify-email', { state: { email, password } });
     } catch (err: any) {
       const code = err.response?.data?.code;

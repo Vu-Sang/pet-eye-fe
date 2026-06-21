@@ -6,6 +6,7 @@ import { useAuth } from '../../contexts/AuthContext';
 import { useGoogleLogin } from '@react-oauth/google';
 import { authService } from '../../services/auth.service';
 import Logo from '../../components/Logo';
+import { trackAuth } from '../../lib/analytics';
 
 export default function Login() {
   const navigate = useNavigate();
@@ -90,6 +91,7 @@ export default function Login() {
       return;
     }
     setUserSession(userData);
+    trackAuth('login', 'google');
     if (userData.role === 'ADMIN') navigateToTarget('/admin/dashboard');
     else navigateToTarget('/');
   };
@@ -109,6 +111,7 @@ export default function Login() {
   });
 
   const handleZaloLogin = () => {
+    trackAuth('login', 'zalo');
     const appId = import.meta.env.VITE_ZALO_APP_ID;
     const redirectUri = import.meta.env.VITE_ZALO_REDIRECT_URI || `${window.location.origin}/login/zalo/callback`;
     if (!appId) { setErrorMessage('Chưa cấu hình Zalo Login'); return; }
@@ -126,6 +129,7 @@ export default function Login() {
 
     try {
       const userData = await login(email, password);
+      trackAuth('login', 'email');
 
       if (roleType === 'customer') {
         // Trang customer: chỉ cho phép USER và ADMIN
