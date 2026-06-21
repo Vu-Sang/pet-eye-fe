@@ -12,6 +12,7 @@ import type { ServiceResponse, StaffResponse } from '../../types/api';
 import type { Pet } from '../../types';
 import type { DirectionsResponse } from '../../services/clinic.service';
 import ShopMap from '../../components/ShopMap';
+import { trackBookingStep1_ServiceSelection, trackBookingStep2_TimeSelection, trackBookingStep3_PetSelection, trackUseGpsNearby } from '../../lib/analytics';
 
 
 // Camera tier metadata — default fallbacks (shop can override via cameraTierLabels/cameraTierPrices)
@@ -180,6 +181,7 @@ export default function ClinicDetail() {
         userLocation.lat,
         userLocation.lng
       );
+      trackUseGpsNearby('success');
       setDirections(result);
       setShowMap(true);
 
@@ -378,6 +380,11 @@ export default function ClinicDetail() {
   }, [showPetModal]);
 
   const toggleService = (serviceId: number) => {
+    trackBookingStep1_ServiceSelection(
+      shopId,
+      shop?.shopName || '',
+      [...selectedServiceIds, serviceId].map(id => apiServices.find((s: ServiceResponse) => s.id === id)?.serviceName || '')
+    );
     setSelectedServiceIds(prev =>
       prev.includes(serviceId)
         ? prev.filter(id => id !== serviceId)
@@ -461,6 +468,14 @@ export default function ClinicDetail() {
   function handleBookClick() {
     if (!canBook) return;
 
+    trackBookingStep2_TimeSelection(
+      shopId,
+      shop?.shopName || '',
+      selectedStaffId ? staffWithAvailability.find(s => s.id === selectedStaffId)?.fullName || 'Tùy chọn' : 'Tùy chọn',
+      selectedDate,
+      selectedTime || ''
+    );
+
     const now = new Date();
     if (hasNormalServices && selectedDate && selectedTime) {
       const selectedDateTime = new Date(`${selectedDate}T${selectedTime}:00`);
@@ -490,6 +505,12 @@ export default function ClinicDetail() {
   // ── After pet selected → go to payment page with state ──────────────────────
   async function handleConfirmPet() {
     if (!selectedPet) return;
+
+    trackBookingStep3_PetSelection(
+      shopId,
+      shop?.shopName || '',
+      selectedPet.name
+    );
 
     // appointmentDatetime:
     // - Nếu có dịch vụ thường → dùng date+time của dịch vụ thường (BE validate @Future)

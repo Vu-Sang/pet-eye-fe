@@ -64,6 +64,7 @@ import AdminVouchers from './pages/admin/AdminVouchers';
 import Chatbot from './components/Chatbot';
 import GiftBoxCelebration from './components/GiftBoxCelebration';
 import FloatingMessaging from './components/chat/FloatingMessaging';
+import { usePageTracking } from './hooks/usePageTracking';
 
 // Routes where the global Navbar + Footer should be hidden
 const SHOP_ROUTES_PREFIX = '/shop';
@@ -72,6 +73,7 @@ const ADMIN_ROUTES_PREFIX = '/admin';
 const NO_NAVBAR_ROUTES = ['/login', '/register', '/login/zalo/callback', '/complete-profile', '/verify-email', '/forgot-password', '/shop/login'];
 
 function AppLayout() {
+  usePageTracking();
   const location = useLocation();
   const { user } = useAuth();
   

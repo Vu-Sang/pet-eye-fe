@@ -1,5 +1,6 @@
 import React, { useEffect, useRef } from 'react';
 import { Link, useLocation } from 'react-router-dom';
+import { trackBookingSuccess, trackPurchase } from '../../lib/analytics';
 
 interface BookingServiceItem {
   id: number;
@@ -60,6 +61,34 @@ export default function BookingSuccess() {
     : [{ id: bookingInfo.serviceId ?? 0, name: bookingInfo.serviceName ?? '—', price: bookingInfo.servicePrice ?? 0 }];
 
   const totalPrice = serviceList.reduce((sum: number, s: BookingServiceItem) => sum + s.price, 0);
+
+  useEffect(() => {
+    if (booking && bookingInfo) {
+      const transactionId = booking.id ? booking.id.toString() : Date.now().toString();
+      const serviceNames = serviceList.map((s: BookingServiceItem) => s.name);
+      
+      trackBookingSuccess(
+        bookingInfo.shopId,
+        bookingInfo.shopName,
+        transactionId,
+        totalPrice,
+        serviceNames
+      );
+
+      trackPurchase(
+        transactionId,
+        totalPrice,
+        bookingInfo.shopName,
+        serviceList.map((s: BookingServiceItem) => ({
+          item_id: s.id.toString(),
+          item_name: s.name,
+          price: s.price,
+          quantity: 1
+        }))
+      );
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   return (
     <div className="flex-1 bg-gradient-to-br from-slate-50 via-white to-indigo-50/30 dark:from-slate-900 dark:via-slate-900 dark:to-indigo-950/20 flex items-center justify-center py-6 px-4 min-h-[calc(100vh-64px)]">

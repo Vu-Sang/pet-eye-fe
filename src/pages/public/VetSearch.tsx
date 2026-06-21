@@ -12,6 +12,7 @@ import { motion, AnimatePresence } from 'motion/react';
 import type { NearbyShopResponse } from '../../services/clinic.service';
 import ShopMap from '../../components/ShopMap';
 import NearbyShops from '../../components/NearbyShops';
+import { trackSearch, trackFilterChange } from '../../lib/analytics';
 
 function calculateDistance(lat1: number, lon1: number, lat2: number, lon2: number): number {
   const R = 6371; // km
@@ -114,6 +115,32 @@ export default function VetSearch() {
       }
     }
   }, [latParam, lngParam]);
+
+  // Tracking search
+  useEffect(() => {
+    if (!searchQuery) return;
+    const timer = setTimeout(() => {
+      trackSearch(searchQuery, { city: cityQuery, type: activeService, rating: minRating }, sortedClinics.length);
+    }, 800);
+    return () => clearTimeout(timer);
+  }, [searchQuery, sortedClinics.length]);
+
+  // Tracking filter changes
+  useEffect(() => {
+    if (cityQuery) trackFilterChange('city', cityQuery);
+  }, [cityQuery]);
+  
+  useEffect(() => {
+    trackFilterChange('type', activeService);
+  }, [activeService]);
+
+  useEffect(() => {
+    trackFilterChange('rating', minRating.toString());
+  }, [minRating]);
+
+  useEffect(() => {
+    trackFilterChange('sort', sortBy);
+  }, [sortBy]);
 
   // Lock body scroll when mobile filter is open
   useEffect(() => {

@@ -9,6 +9,7 @@ import {
 import { motion, AnimatePresence } from 'motion/react';
 import { useAuth } from '../../contexts/AuthContext';
 import { useTheme } from '../../contexts/ThemeContext';
+import { trackHeroSearch, trackClickFeaturedShop, trackUseGpsNearby, trackClickCta } from '../../lib/analytics';
 
 // Import assets
 import heroDogImage from '../../assets/landing/hero_dog_v2.png';
@@ -63,6 +64,7 @@ export default function Home() {
 
   const handleAction = (target: string) => {
     if (target.startsWith('/search')) {
+      trackHeroSearch(heroCity, heroType);
       const params = new URLSearchParams(target.split('?')[1] || '');
       if (heroCity.trim() && !params.has('city')) params.set('city', heroCity.trim());
       if (heroType !== 'Tất cả' && !params.has('type')) params.set('type', heroType);
@@ -83,10 +85,12 @@ export default function Home() {
     if ("geolocation" in navigator) {
       navigator.geolocation.getCurrentPosition(
         (pos) => {
+          trackUseGpsNearby('success');
           setNearbyCoords({ lat: pos.coords.latitude, lng: pos.coords.longitude });
           setLocationStatus('success');
         },
         (err) => {
+          trackUseGpsNearby('error');
           console.error(err);
           setLocationStatus('error');
           if (err.code === 3) {
@@ -300,10 +304,13 @@ export default function Home() {
             <div className="flex justify-center py-20"><Loader2 className="animate-spin text-primary w-10 h-10" /></div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-              {topFeaturedShops.map((shop: any) => (
+              {topFeaturedShops.map((shop: any, index: number) => (
                 <motion.div
                   key={shop.id} initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }}
-                  onClick={() => navigate(`/clinic/${shop.id}`)}
+                  onClick={() => {
+                    trackClickFeaturedShop(shop.id, shop.shopName, index + 1);
+                    navigate(`/clinic/${shop.id}`);
+                  }}
                   className="bg-white dark:bg-slate-900/60 rounded-[32px] overflow-hidden shadow-md hover:shadow-xl border border-slate-200/85 dark:border-slate-800/80 hover:border-blue-500/20 hover:dark:border-blue-500/30 hover:-translate-y-2 transition-all cursor-pointer group flex flex-col"
                 >
                   <div className="h-48 bg-slate-200 dark:bg-slate-800 relative overflow-hidden shrink-0">
