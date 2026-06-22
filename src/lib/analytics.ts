@@ -53,17 +53,17 @@ export const trackViewClinic = (shopId: number, shopName: string, shopType: stri
 export const trackBookingStep = (step: number, stepName: string, details?: object) =>
   trackEvent('booking_step', { step, step_name: stepName, ...details });
 
-export const trackBookingStep1_ServiceSelection = (shopName: string, serviceName: string) => 
-  trackEvent('booking_step_1_service', { shopName, serviceName });
+export const trackBookingStep1_ServiceSelection = (shopId: number, shopName: string, serviceNames: string[]) => 
+  trackEvent('booking_step_1_service', { shop_id: shopId, shop_name: shopName, service_names: serviceNames });
 
-export const trackBookingStep2_TimeSelection = (shopName: string, time: string) => 
-  trackEvent('booking_step_2_time', { shopName, time });
+export const trackBookingStep2_TimeSelection = (shopId: number, shopName: string, staffName: string, date: string, time: string) => 
+  trackEvent('booking_step_2_time', { shop_id: shopId, shop_name: shopName, staff_name: staffName, date, time });
 
-export const trackBookingStep3_PetSelection = (shopName: string, petName: string) => 
-  trackEvent('booking_step_3_pet', { shopName, petName });
+export const trackBookingStep3_PetSelection = (shopId: number, shopName: string, petName: string) => 
+  trackEvent('booking_step_3_pet', { shop_id: shopId, shop_name: shopName, pet_name: petName });
 
-export const trackBookingStep4_PaymentStart = (shopName: string, amount: number) => 
-  trackEvent('booking_step_4_payment', { shopName, amount });
+export const trackBookingStep4_PaymentStart = (shopId: number, shopName: string, amount: number, items: string[]) => 
+  trackEvent('booking_step_4_payment', { shop_id: shopId, shop_name: shopName, amount, items });
 
 export const trackShareClinic = (shopId: number, method: string) =>
   trackEvent('share_clinic', { shop_id: shopId, method });

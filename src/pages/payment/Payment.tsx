@@ -63,6 +63,24 @@ export default function Payment() {
     });
   }, []);
 
+  // Dùng services[] nếu có, fallback về serviceName/servicePrice cũ
+  const serviceList: BookingService[] = booking?.services && booking.services.length > 0
+    ? booking.services
+    : booking ? [{ id: booking.serviceId, name: booking.serviceName, price: booking.servicePrice }] : [];
+
+  const rawTotalPrice = serviceList.reduce((sum, s) => sum + s.price, 0);
+
+  React.useEffect(() => {
+    if (booking) {
+      trackBookingStep4_PaymentStart(
+        booking.shopId,
+        booking.shopName,
+        rawTotalPrice,
+        serviceList.map(s => s.name)
+      );
+    }
+  }, [booking?.shopId, booking?.shopName, rawTotalPrice]);
+
   if (!booking) {
     return (
       <div className="flex-1 flex items-center justify-center bg-slate-50 p-8">
@@ -77,21 +95,7 @@ export default function Payment() {
     );
   }
 
-  // Dùng services[] nếu có, fallback về serviceName/servicePrice cũ
-  const serviceList: BookingService[] = booking.services && booking.services.length > 0
-    ? booking.services
-    : [{ id: booking.serviceId, name: booking.serviceName, price: booking.servicePrice }];
 
-  const rawTotalPrice = serviceList.reduce((sum, s) => sum + s.price, 0);
-
-  React.useEffect(() => {
-    trackBookingStep4_PaymentStart(
-      booking.shopId,
-      booking.shopName,
-      rawTotalPrice,
-      serviceList.map(s => s.name)
-    );
-  }, [booking.shopId, booking.shopName, rawTotalPrice]);
 
   const getCommissionRateForService = (svc: BookingService) => {
     if (!svc.category) return 0.10;
