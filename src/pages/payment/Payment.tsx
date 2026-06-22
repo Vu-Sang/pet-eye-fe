@@ -1,8 +1,7 @@
 import React, { useState } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { bookingService } from '../../services/booking.service';
-import { trackBookingStep4_PaymentStart } from '../../lib/analytics';
-
+import { trackBookingStep4_PaymentStart, trackSelectPaymentMethod, trackSelectVoucher } from '../../lib/analytics';
 type PayMethod = 'payos' | 'cash';
 
 function formatVND(n: number) {
@@ -335,7 +334,10 @@ export default function Payment() {
                 ] as { id: PayMethod; icon: string; label: string }[]).map(m => (
                   <button
                     key={m.id}
-                    onClick={() => setPayMethod(m.id)}
+                    onClick={() => {
+                      setPayMethod(m.id);
+                      trackSelectPaymentMethod(m.id);
+                    }}
                     className={`flex flex-col items-center gap-2 p-4 rounded-xl border-2 transition-all ${payMethod === m.id
                       ? 'border-[#1a2b4c] bg-[#1a2b4c]/5 dark:border-teal-400 dark:bg-teal-900/10'
                       : 'border-slate-200 dark:border-slate-700 hover:border-slate-300'
@@ -372,7 +374,16 @@ export default function Payment() {
                   <select
                     className="w-full bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-3 text-sm font-semibold focus:outline-none focus:ring-2 focus:ring-[#1a2b4c] text-slate-700 dark:text-slate-200"
                     value={selectedVoucherId || ''}
-                    onChange={(e) => setSelectedVoucherId(e.target.value ? Number(e.target.value) : null)}
+                    onChange={(e) => {
+                      const vId = e.target.value ? Number(e.target.value) : null;
+                      setSelectedVoucherId(vId);
+                      if (vId) {
+                        const voucher = myVouchers.find(v => v.id === vId)?.voucher;
+                        if (voucher) {
+                          trackSelectVoucher(voucher.code, voucher.discountValue, voucher.discountType);
+                        }
+                      }
+                    }}
                   >
                     <option value="">Không sử dụng voucher</option>
                     {myVouchers.map(uv => {
