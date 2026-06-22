@@ -116,31 +116,7 @@ export default function VetSearch() {
     }
   }, [latParam, lngParam]);
 
-  // Tracking search
-  useEffect(() => {
-    if (!searchQuery) return;
-    const timer = setTimeout(() => {
-      trackSearch(searchQuery, { city: cityQuery, type: activeService, rating: minRating }, sortedClinics.length);
-    }, 800);
-    return () => clearTimeout(timer);
-  }, [searchQuery, sortedClinics.length]);
 
-  // Tracking filter changes
-  useEffect(() => {
-    if (cityQuery) trackFilterChange('city', cityQuery);
-  }, [cityQuery]);
-  
-  useEffect(() => {
-    trackFilterChange('type', activeService);
-  }, [activeService]);
-
-  useEffect(() => {
-    trackFilterChange('rating', minRating.toString());
-  }, [minRating]);
-
-  useEffect(() => {
-    trackFilterChange('sort', sortBy);
-  }, [sortBy]);
 
   // Lock body scroll when mobile filter is open
   useEffect(() => {
@@ -179,6 +155,32 @@ export default function VetSearch() {
       return b.id - a.id;
     });
   }, [shopsWithDistance, userLocation, distanceKm, sortBy]);
+
+  // Tracking search
+  useEffect(() => {
+    if (!searchQuery) return;
+    const timer = setTimeout(() => {
+      trackSearch(searchQuery, { city: cityQuery, type: activeService, rating: minRating }, sortedClinics.length);
+    }, 800);
+    return () => clearTimeout(timer);
+  }, [searchQuery, sortedClinics.length]);
+
+  // Tracking filter changes
+  useEffect(() => {
+    if (cityQuery) trackFilterChange('city', cityQuery);
+  }, [cityQuery]);
+  
+  useEffect(() => {
+    trackFilterChange('type', activeService);
+  }, [activeService]);
+
+  useEffect(() => {
+    trackFilterChange('rating', minRating.toString());
+  }, [minRating]);
+
+  useEffect(() => {
+    trackFilterChange('sort', sortBy);
+  }, [sortBy]);
   const springTransition = {
     type: "spring",
     stiffness: 100,

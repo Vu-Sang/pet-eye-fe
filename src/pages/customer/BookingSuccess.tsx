@@ -41,24 +41,10 @@ export default function BookingSuccess() {
     return () => { document.head.removeChild(style); };
   }, []);
 
-  if (!booking || !bookingInfo) {
-    return (
-      <div className="flex-1 flex items-center justify-center bg-slate-50 dark:bg-slate-900 p-8">
-        <div className="text-center">
-          <span className="material-symbols-outlined text-5xl text-slate-300 block mb-3">error</span>
-          <p className="text-slate-500 font-semibold mb-4">Không có thông tin đặt lịch.</p>
-          <Link to="/" className="px-5 py-2.5 bg-[#1a2b4c] text-white font-bold rounded-xl hover:bg-[#243d6b] transition-colors">
-            Về trang chủ
-          </Link>
-        </div>
-      </div>
-    );
-  }
-
   // Danh sách dịch vụ — dùng services[] nếu có, fallback về serviceName cũ
-  const serviceList: BookingServiceItem[] = bookingInfo.services && bookingInfo.services.length > 0
+  const serviceList: BookingServiceItem[] = bookingInfo?.services && bookingInfo.services.length > 0
     ? bookingInfo.services
-    : [{ id: bookingInfo.serviceId ?? 0, name: bookingInfo.serviceName ?? '—', price: bookingInfo.servicePrice ?? 0 }];
+    : bookingInfo ? [{ id: bookingInfo.serviceId ?? 0, name: bookingInfo.serviceName ?? '—', price: bookingInfo.servicePrice ?? 0 }] : [];
 
   const totalPrice = serviceList.reduce((sum: number, s: BookingServiceItem) => sum + s.price, 0);
 
@@ -89,6 +75,22 @@ export default function BookingSuccess() {
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  if (!booking || !bookingInfo) {
+    return (
+      <div className="flex-1 flex items-center justify-center bg-slate-50 dark:bg-slate-900 p-8">
+        <div className="text-center">
+          <span className="material-symbols-outlined text-5xl text-slate-300 block mb-3">error</span>
+          <p className="text-slate-500 font-semibold mb-4">Không có thông tin đặt lịch.</p>
+          <Link to="/" className="px-5 py-2.5 bg-[#1a2b4c] text-white font-bold rounded-xl hover:bg-[#243d6b] transition-colors">
+            Về trang chủ
+          </Link>
+        </div>
+      </div>
+    );
+  }
+
+
 
   return (
     <div className="flex-1 bg-gradient-to-br from-slate-50 via-white to-indigo-50/30 dark:from-slate-900 dark:via-slate-900 dark:to-indigo-950/20 flex items-center justify-center py-6 px-4 min-h-[calc(100vh-64px)]">
