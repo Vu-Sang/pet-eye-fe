@@ -92,8 +92,9 @@ export default function Login() {
     }
     setUserSession(userData);
     trackAuth('login', 'google');
+    const redirectTo = location.state?.from || '/';
     if (userData.role === 'ADMIN') navigateToTarget('/admin/dashboard');
-    else navigateToTarget('/');
+    else navigateToTarget(redirectTo);
   };
 
   const loginGoogle = useGoogleLogin({
@@ -144,8 +145,9 @@ export default function Login() {
           return;
         }
         // USER hoặc ADMIN
+        const redirectTo = location.state?.from || '/';
         if (userData.role === 'ADMIN') navigateToTarget('/admin/dashboard');
-        else navigateToTarget('/');
+        else navigateToTarget(redirectTo);
 
       } else {
         // Trang shop: chỉ cho phép SHOP_OWNER, STAFF và ADMIN
