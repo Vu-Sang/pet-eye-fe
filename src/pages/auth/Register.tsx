@@ -1,5 +1,5 @@
 import React from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { User, Mail, Phone, Lock, MapPin, ArrowRight, ArrowLeft, Shield, Star, Sparkles, PawPrint, Heart } from 'lucide-react';
 import { motion } from 'motion/react';
 import { userService } from '../../services/user.service';
@@ -8,6 +8,7 @@ import { trackAuth } from '../../lib/analytics';
 
 export default function Register() {
   const navigate = useNavigate();
+  const location = useLocation();
   const [fullName, setFullName] = React.useState('');
   const [email, setEmail] = React.useState('');
   const [phone, setPhone] = React.useState('');
@@ -62,7 +63,7 @@ export default function Register() {
     try {
       await userService.register({ email, password, fullName, phone, address });
       trackAuth('register', 'email');
-      navigate('/verify-email', { state: { email, password } });
+      navigate('/verify-email', { state: { email, password, from: location.state?.from } });
     } catch (err: any) {
       const code = err.response?.data?.code;
       const message = err.response?.data?.message || '';

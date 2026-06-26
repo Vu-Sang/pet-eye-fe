@@ -1,7 +1,7 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import { Link, useParams, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'motion/react';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { shopService } from '../../services/shop.service';
 import { petService } from '../../services/pet.service';
 import { reviewService } from '../../services/review.service';
@@ -54,6 +54,7 @@ export default function ClinicDetail() {
   const shopId = Number(id);
   const navigate = useNavigate();
   const { user } = useAuth();
+  const queryClient = useQueryClient();
 
   // ── Real data from API ──────────────────────────────────────────────────────
   const { data: shop, isLoading: shopLoading } = useQuery({
@@ -341,6 +342,64 @@ export default function ClinicDetail() {
   const [petNote, setPetNote] = useState('');
   const [selectedServiceForDetail, setSelectedServiceForDetail] = useState<ServiceResponse | null>(null);
   const [checkingPet, setCheckingPet] = useState(false);
+
+  // ── Quick Add Pet inline ────────────────────────────────────────────────────
+  const [showQuickAddPet, setShowQuickAddPet] = useState(false);
+  const [quickPetSubmitting, setQuickPetSubmitting] = useState(false);
+  const [quickPetForm, setQuickPetForm] = useState({
+    name: '',
+    species: 'Chó' as string,
+    breed: '',
+    weight: '',
+  });
+
+  const handleQuickAddPet = async () => {
+    if (!quickPetForm.name.trim() || !quickPetForm.weight) return;
+    setQuickPetSubmitting(true);
+    try {
+      const payload = {
+        name: quickPetForm.name.trim(),
+        species: quickPetForm.species,
+        breed: quickPetForm.breed.trim() || 'Chưa rõ',
+        gender: 'Đực',
+        color: '',
+        sterilized: false,
+        weight: Number(quickPetForm.weight) || 0,
+        dob: '',
+        healthNote: '',
+        ownerId: Number(user?.id),
+        avatar: quickPetForm.species === 'Mèo'
+          ? 'https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?q=80&w=2043&auto=format&fit=crop'
+          : 'https://images.unsplash.com/photo-1583511655857-d19b40a7a54e?q=80&w=2069&auto=format&fit=crop',
+        nutritionPlan: [],
+        medicalRecords: [],
+        vaccinations: [],
+        reminders: [],
+        initialDocuments: [],
+        album: [],
+      };
+      const newPet = await petService.create(payload);
+      // Refresh danh sách pet
+      await queryClient.invalidateQueries({ queryKey: ['my-pets', user?.id] });
+      // Tự chọn pet vừa tạo
+      setSelectedPet(newPet);
+      setShowQuickAddPet(false);
+      setQuickPetForm({ name: '', species: 'Chó', breed: '', weight: '' });
+      // Thông báo nhắc bổ sung thông tin
+      import('react-hot-toast').then(({ toast }) => {
+        toast.success(`Đã thêm bé ${newPet.name}! Bạn có thể bổ sung thông tin chi tiết sau tại mục "Thú cưng của tôi".`, {
+          duration: 5000,
+          icon: '🐾',
+        });
+      });
+    } catch (error: any) {
+      import('react-hot-toast').then(({ toast }) => {
+        toast.error(error.message || 'Lỗi khi thêm thú cưng. Vui lòng thử lại.');
+      });
+    } finally {
+      setQuickPetSubmitting(false);
+    }
+  };
 
   // Availability map: petId → true (available) | false (busy) | undefined (loading)
   const [petAvailabilityMap, setPetAvailabilityMap] = useState<Record<number, boolean>>({});
@@ -1912,17 +1971,113 @@ export default function ClinicDetail() {
 
               {/* Pet list */}
               <div className="p-5 space-y-3 max-h-72 overflow-y-auto">
-                {myPets.length === 0 ? (
-                  <div className="text-center py-8 text-slate-400">
-                    <span className="material-symbols-outlined text-4xl block mb-2">pets</span>
-                    <p className="text-sm font-semibold">Bạn chưa có thú cưng nào</p>
-                    <Link
-                      to="/profile/pets"
-                      className="mt-2 inline-block text-sm text-[#1a2b4c] dark:text-teal-400 font-bold hover:underline"
-                      onClick={() => setShowPetModal(false)}
-                    >
-                      + Thêm thú cưng
-                    </Link>
+                {myPets.length === 0 || showQuickAddPet ? (
+                  <div className="space-y-4">
+                    {myPets.length === 0 && !showQuickAddPet && (
+                      <div className="text-center py-6 text-slate-400">
+                        <span className="material-symbols-outlined text-4xl block mb-2">pets</span>
+                        <p className="text-sm font-semibold mb-3">Bạn chưa có thú cưng nào</p>
+                        <button
+                          onClick={() => setShowQuickAddPet(true)}
+                          className="inline-flex items-center gap-1.5 px-4 py-2 bg-[#1a2b4c] text-white text-sm font-bold rounded-xl hover:bg-[#243d6b] transition-colors"
+                        >
+                          <span className="material-symbols-outlined text-base">add</span>
+                          Thêm thú cưng ngay
+                        </button>
+                      </div>
+                    )}
+                    {showQuickAddPet && (
+                      <div className="bg-slate-50 dark:bg-slate-700/50 rounded-xl p-4 space-y-3 border border-slate-200 dark:border-slate-600">
+                        <div className="flex items-center justify-between">
+                          <h4 className="text-sm font-bold text-slate-800 dark:text-white flex items-center gap-1.5">
+                            <span className="material-symbols-outlined text-base text-[#1a2b4c] dark:text-teal-400">add_circle</span>
+                            Thêm thú cưng nhanh
+                          </h4>
+                          <button onClick={() => setShowQuickAddPet(false)} className="text-slate-400 hover:text-slate-600">
+                            <span className="material-symbols-outlined text-lg">close</span>
+                          </button>
+                        </div>
+                        {/* Tên */}
+                        <div>
+                          <label className="text-[11px] font-bold text-slate-600 dark:text-slate-300 uppercase tracking-wider">Tên thú cưng *</label>
+                          <input
+                            type="text"
+                            placeholder="VD: Milo, Lucky..."
+                            value={quickPetForm.name}
+                            onChange={(e) => setQuickPetForm(prev => ({ ...prev, name: e.target.value }))}
+                            className="mt-1 w-full px-3 py-2.5 rounded-xl border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 text-sm text-slate-900 dark:text-white placeholder-slate-400 focus:border-[#1a2b4c] dark:focus:border-teal-400 outline-none transition-colors"
+                          />
+                        </div>
+                        {/* Loài */}
+                        <div>
+                          <label className="text-[11px] font-bold text-slate-600 dark:text-slate-300 uppercase tracking-wider">Loài *</label>
+                          <div className="mt-1 flex gap-2">
+                            {['Chó', 'Mèo'].map((s) => (
+                              <button
+                                key={s}
+                                type="button"
+                                onClick={() => setQuickPetForm(prev => ({ ...prev, species: s }))}
+                                className={`flex-1 py-2.5 rounded-xl text-sm font-bold border-2 transition-all ${
+                                  quickPetForm.species === s
+                                    ? 'border-[#1a2b4c] bg-[#1a2b4c]/5 text-[#1a2b4c] dark:border-teal-400 dark:bg-teal-900/10 dark:text-teal-400'
+                                    : 'border-slate-200 dark:border-slate-600 text-slate-500 hover:border-slate-300'
+                                }`}
+                              >
+                                {s === 'Chó' ? '🐶' : '🐱'} {s}
+                              </button>
+                            ))}
+                          </div>
+                        </div>
+                        {/* Giống + Cân nặng */}
+                        <div className="grid grid-cols-2 gap-3">
+                          <div>
+                            <label className="text-[11px] font-bold text-slate-600 dark:text-slate-300 uppercase tracking-wider">Giống</label>
+                            <input
+                              type="text"
+                              placeholder="VD: Corgi, Munchkin..."
+                              value={quickPetForm.breed}
+                              onChange={(e) => setQuickPetForm(prev => ({ ...prev, breed: e.target.value }))}
+                              className="mt-1 w-full px-3 py-2.5 rounded-xl border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 text-sm text-slate-900 dark:text-white placeholder-slate-400 focus:border-[#1a2b4c] dark:focus:border-teal-400 outline-none transition-colors"
+                            />
+                          </div>
+                          <div>
+                            <label className="text-[11px] font-bold text-slate-600 dark:text-slate-300 uppercase tracking-wider">Cân nặng (kg) *</label>
+                            <input
+                              type="number"
+                              placeholder="VD: 5"
+                              min="0.1"
+                              step="0.1"
+                              value={quickPetForm.weight}
+                              onChange={(e) => setQuickPetForm(prev => ({ ...prev, weight: e.target.value }))}
+                              className="mt-1 w-full px-3 py-2.5 rounded-xl border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 text-sm text-slate-900 dark:text-white placeholder-slate-400 focus:border-[#1a2b4c] dark:focus:border-teal-400 outline-none transition-colors"
+                            />
+                          </div>
+                        </div>
+                        {/* Lưu ý */}
+                        <p className="text-[11px] text-slate-400 dark:text-slate-500 flex items-start gap-1">
+                          <span className="material-symbols-outlined text-xs mt-0.5">info</span>
+                          Bạn có thể bổ sung thêm ngày sinh, ảnh, sức khỏe... sau tại mục "Thú cưng của tôi"
+                        </p>
+                        {/* Nút submit */}
+                        <button
+                          onClick={handleQuickAddPet}
+                          disabled={!quickPetForm.name.trim() || !quickPetForm.weight || quickPetSubmitting}
+                          className="w-full py-3 bg-[#1a2b4c] text-white font-bold rounded-xl hover:bg-[#243d6b] disabled:opacity-40 disabled:cursor-not-allowed transition-all flex items-center justify-center gap-2 text-sm"
+                        >
+                          {quickPetSubmitting ? (
+                            <>
+                              <span className="material-symbols-outlined animate-spin text-lg">progress_activity</span>
+                              Đang thêm...
+                            </>
+                          ) : (
+                            <>
+                              <span className="material-symbols-outlined text-base">pets</span>
+                              Thêm thú cưng
+                            </>
+                          )}
+                        </button>
+                      </div>
+                    )}
                   </div>
                 ) : loadingPetAvailability ? (
                   <div className="flex items-center justify-center py-8 gap-2 text-slate-400">
@@ -2000,6 +2155,17 @@ export default function ClinicDetail() {
                       </div>
                     );
                   })
+                )}
+
+                {/* Nút thêm thú cưng mới (khi đã có pets) */}
+                {myPets.length > 0 && !showQuickAddPet && !loadingPetAvailability && (
+                  <button
+                    onClick={() => setShowQuickAddPet(true)}
+                    className="w-full mt-2 py-2.5 border-2 border-dashed border-slate-300 dark:border-slate-600 text-slate-500 dark:text-slate-400 text-sm font-bold rounded-xl hover:border-[#1a2b4c] hover:text-[#1a2b4c] dark:hover:border-teal-400 dark:hover:text-teal-400 transition-all flex items-center justify-center gap-1.5"
+                  >
+                    <span className="material-symbols-outlined text-base">add</span>
+                    Thêm thú cưng mới
+                  </button>
                 )}
 
                 {/* Panel xem lịch hẹn của pet */}
