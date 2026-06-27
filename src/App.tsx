@@ -196,8 +196,8 @@ function AppLayout() {
       {/* Gift Box Celebration — hiển thị khi user thăng hạng */}
       {user && !isShopRoute && !isStaffRoute && !isAdminRoute && !isNoNavbarRoute && <GiftBoxCelebration />}
 
-      {/* Chatbot – hiển thị cho tất cả customer pages (kể cả /home), trừ Camera và Messages. Ẩn nếu chưa đăng nhập */}
-      {user && !isShopRoute && !isStaffRoute && !isAdminRoute && !isNoNavbarRoute && !isCameraPage && !isMessagingPage && <Chatbot />}
+      {/* Chatbot – hiển thị cho tất cả customer pages (kể cả /home), trừ Messages. Ẩn nếu chưa đăng nhập */}
+      {user && !isShopRoute && !isStaffRoute && !isAdminRoute && !isNoNavbarRoute && !isMessagingPage && <Chatbot />}
 
       {/* Floating Messaging - Thay thế cho trang /messages cũ */}
       {user && !isShopRoute && !isStaffRoute && !isAdminRoute && !isNoNavbarRoute && <FloatingMessaging />}

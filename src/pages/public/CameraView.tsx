@@ -22,7 +22,7 @@ function getLogIconConfig(type: string) {
     if (t === 'feeding') label = 'Cho ăn / Uống nước';
     else if (t === 'cleaning') label = 'Vệ sinh / Tắm';
     else if (t === 'medical') label = 'Kiểm tra sức khoẻ';
-    else if (t === 'playing') label = 'Vận động / Chơi đùa';
+    else if (t === 'playing' || t === 'exercise') label = 'Vui chơi / Vận động';
     else if (t === 'other') label = 'Khác';
 
     const checkStr = t + ' ' + label.toLowerCase();

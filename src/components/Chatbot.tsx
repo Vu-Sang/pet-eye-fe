@@ -4,6 +4,7 @@ import { useAuth } from '../contexts/AuthContext';
 import { bookingService } from '../services/booking.service';
 import { userService } from '../services/user.service';
 import { useAIChat } from '../hooks/useAIChat';
+import ReactPlayer from 'react-player';
 
 // ── Helpers ──────────────────────────────────────────────────────────────────
 function uid() { return Math.random().toString(36).slice(2); }
@@ -65,6 +66,7 @@ interface BookingPickerData {
   servicePrice: number; petId: number; petName: string;
   prefilledDate?: string; prefilledTime?: string;
   isBoarding?: boolean; prefilledEndDate?: string; prefilledEndTime?: string;
+  note?: string;
 }
 interface BookingSuccessData {
   bookingId: number; shopName: string; serviceName: string; datetime: string;
@@ -75,9 +77,10 @@ type ToolResultData =
   | { type: 'shop_detail'; data: { shop: ShopInfo; services: ServiceInfo[] } }
   | { type: 'pet_list'; data: PetSummary[] }
   | { type: 'pet_detail'; data: PetDetail }
-  | { type: 'booking_picker'; data: BookingPickerData }
+  | { type: 'booking_picker'; data: BookingPickerData | BookingPickerData[] }
   | { type: 'booking_success'; data: BookingSuccessData }
   | { type: 'tier_info'; data: TierInfoData }
+  | { type: 'camera_view'; data: { petName: string; shopName: string; streamUrl: string; } }
   | { type: 'error'; data: { message: string } };
 
 interface TierInfoData {
@@ -103,19 +106,34 @@ function Stars({ rating }: { rating: number }) {
 }
 
 // ── Markdown renderer ────────────────────────────────────────────────────────
-function RichText({ text }: { text: string }) {
+function RichText({ text, onAction }: { text: string; onAction?: (text: string) => void }) {
   const lines = text.split('\n');
   return (
     <div className="space-y-1">
       {lines.map((line, i) => {
         if (line.startsWith('## ')) return <p key={i} className="font-bold text-sm text-slate-900">{line.slice(3)}</p>;
         if (line.startsWith('# ')) return <p key={i} className="font-black text-sm text-slate-900">{line.slice(2)}</p>;
-        if (line.startsWith('- ') || line.startsWith('* ')) return (
-          <div key={i} className="flex items-start gap-1.5">
-            <span className="text-indigo-500 mt-0.5 shrink-0">*</span>
-            <span className="text-sm leading-relaxed">{line.slice(2)}</span>
-          </div>
-        );
+        if (line.startsWith('- ') || line.startsWith('* ') || line.startsWith('• ')) {
+          const content = line.slice(2);
+          if (onAction) {
+            return (
+              <div key={i} className="flex items-start gap-1.5 my-1">
+                <button onClick={() => onAction(content.replace(/^[\u2700-\u27BF\uD830-\uD83F\u2000-\u23FF\u2600-\u26FF]\s*/g, '').replace(/\*\*/g, ''))} className="flex items-start gap-1.5 text-left hover:bg-slate-50 p-1.5 -mx-1.5 rounded-lg transition-colors group w-full">
+                  <span className="text-indigo-500 mt-0.5 shrink-0 group-hover:scale-125 transition-transform">•</span>
+                  <span className="text-sm leading-relaxed text-indigo-700 font-medium group-hover:text-indigo-800">
+                    {content.split(/(\*\*[^*]+\*\*)/g).map((p, j) => p.startsWith('**') && p.endsWith('**') ? <strong key={j}>{p.slice(2, -2)}</strong> : p)}
+                  </span>
+                </button>
+              </div>
+            );
+          }
+          return (
+            <div key={i} className="flex items-start gap-1.5">
+              <span className="text-indigo-500 mt-0.5 shrink-0">•</span>
+              <span className="text-sm leading-relaxed">{content}</span>
+            </div>
+          );
+        }
         if (line === '') return <div key={i} className="h-1" />;
         const parts = line.split(/(\*\*[^*]+\*\*)/g);
         return (
@@ -548,10 +566,84 @@ function TierInfoCard({ data }: { data: TierInfoData }) {
   );
 }
 
+// ── Camera Cards ─────────────────────────────────────────────────────────────
+function LiveCameraCard({ data }: { data: { petName: string; shopName: string; streamUrl: string; } }) {
+  const playerRef = useRef<ReactPlayer>(null);
+  const [snapshotUrl, setSnapshotUrl] = useState<string | null>(null);
+  const [isVideoPlaying, setIsVideoPlaying] = useState(false);
+
+  const captureSnapshot = useCallback(() => {
+    if (playerRef.current) {
+      const internalPlayer = playerRef.current.getInternalPlayer() as HTMLVideoElement;
+      if (internalPlayer && internalPlayer.videoWidth) {
+        const canvas = document.createElement('canvas');
+        canvas.width = internalPlayer.videoWidth;
+        canvas.height = internalPlayer.videoHeight;
+        const ctx = canvas.getContext('2d');
+        if (ctx) {
+          ctx.drawImage(internalPlayer, 0, 0, canvas.width, canvas.height);
+          setSnapshotUrl(canvas.toDataURL('image/jpeg'));
+        }
+      }
+    }
+  }, []);
+
+  // Capture snapshot when video starts playing
+  useEffect(() => {
+    if (isVideoPlaying && !snapshotUrl) {
+      // Delay snapshot slightly to ensure frame is rendered
+      const timer = setTimeout(() => {
+        captureSnapshot();
+      }, 1000);
+      return () => clearTimeout(timer);
+    }
+  }, [isVideoPlaying, snapshotUrl, captureSnapshot]);
+
+  return (
+    <div className="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden mt-2">
+      <div className="bg-gradient-to-r from-red-50 to-pink-50 p-3 border-b border-red-100 flex items-center justify-between">
+        <div>
+          <p className="font-bold text-slate-900 text-sm">Live Camera: {data.petName}</p>
+          <p className="text-xs text-slate-600">{data.shopName}</p>
+        </div>
+        <div className="flex items-center gap-1.5 px-2 py-1 bg-red-100 text-red-600 text-[10px] font-bold rounded-full animate-pulse">
+          <div className="w-1.5 h-1.5 bg-red-500 rounded-full"></div>
+          LIVE
+        </div>
+      </div>
+      
+      <div className="relative bg-black aspect-video">
+        <ReactPlayer
+          ref={playerRef}
+          url={data.streamUrl}
+          playing
+          muted
+          controls
+          width="100%"
+          height="100%"
+          onPlay={() => setIsVideoPlaying(true)}
+        />
+      </div>
+
+      {snapshotUrl && (
+        <div className="p-3 border-t border-slate-100">
+          <p className="text-xs font-semibold text-slate-700 mb-2 flex items-center gap-1.5">
+            <span className="material-symbols-outlined text-[14px]">photo_camera</span>
+            Ảnh chụp tự động
+          </p>
+          <div className="rounded-xl overflow-hidden border border-slate-200">
+            <img src={snapshotUrl} alt={`Snapshot of ${data.petName}`} className="w-full h-auto" />
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
 // ── Tool Result Renderer ─────────────────────────────────────────────────────
 function ToolResultRenderer({ result, onBookingConfirm }: {
   result: ToolResultData;
-  onBookingConfirm?: (datetime: string, payMethod: PayMethod, data: BookingPickerData, onError: (msg: string) => void) => void;
+  onBookingConfirm?: (datetime: string, payMethod: PayMethod, data: BookingPickerData, onError: (msg: string) => void, endDatetime?: string) => void;
 }) {
   if (result.type === 'shop_list') return <ShopListCard shops={result.data as ShopWithServices[]} />;
   if (result.type === 'shop_detail') {
@@ -561,8 +653,17 @@ function ToolResultRenderer({ result, onBookingConfirm }: {
   if (result.type === 'pet_list') return <PetListCard pets={result.data as PetSummary[]} />;
   if (result.type === 'pet_detail') return <PetDetailCard pet={result.data as PetDetail} />;
   if (result.type === 'booking_picker') {
+    if (Array.isArray(result.data)) {
+      return (
+        <div className="flex flex-col gap-2 w-full">
+          {result.data.map((d, i) => (
+            <BookingPickerCard key={i} data={d as BookingPickerData} onConfirm={(dt: string, pm: PayMethod, onError: (msg: string) => void, endDt?: string) => onBookingConfirm?.(dt, pm, d as BookingPickerData, onError, endDt)} />
+          ))}
+        </div>
+      );
+    }
     const d = result.data as BookingPickerData;
-    return <BookingPickerCard data={d} onConfirm={(dt, pm, onError, endDt) => onBookingConfirm?.(dt, pm, d, onError, endDt)} />;
+    return <BookingPickerCard data={d} onConfirm={(dt: string, pm: PayMethod, onError: (msg: string) => void, endDt?: string) => onBookingConfirm?.(dt, pm, d, onError, endDt)} />;
   }
   if (result.type === 'booking_success') return <BookingSuccessCard data={result.data as BookingSuccessData} />;
   if (result.type === 'tier_info') return <TierInfoCard data={result.data as TierInfoData} />;
@@ -763,6 +864,7 @@ export default function Chatbot() {
           serviceId: pickerData.serviceId,
           petId: pickerData.petId,
           appointmentDatetime: datetime,
+          note: pickerData.note,
           ...(pickerData.isBoarding && endDatetime ? { checkIn: datetime, checkOut: endDatetime } : {})
         });
         if (result.checkoutUrl) {
@@ -778,6 +880,7 @@ export default function Chatbot() {
           petId: pickerData.petId,
           appointmentDatetime: datetime,
           paymentMethod: 'CASH',
+          note: pickerData.note,
           ...(pickerData.isBoarding && endDatetime ? { checkIn: datetime, checkOut: endDatetime } : {})
         });
         if (result.checkoutUrl) {
@@ -908,7 +1011,7 @@ export default function Chatbot() {
                         ) : msg.role === 'user' ? (
                           <span className="text-sm">{msg.content}</span>
                         ) : (
-                          <RichText text={msg.content} />
+                          <RichText text={msg.content} onAction={handleSend} />
                         )}
                       </div>
                       {msg.toolResult && (
