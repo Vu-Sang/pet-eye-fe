@@ -18,10 +18,10 @@ function calculateDistance(lat1: number, lon1: number, lat2: number, lon2: numbe
   const R = 6371; // km
   const dLat = (lat2 - lat1) * Math.PI / 180;
   const dLon = (lon2 - lon1) * Math.PI / 180;
-  const a = Math.sin(dLat/2) * Math.sin(dLat/2) +
-            Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
-            Math.sin(dLon/2) * Math.sin(dLon/2);
-  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+  const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+    Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+    Math.sin(dLon / 2) * Math.sin(dLon / 2);
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
   return R * c;
 }
 
@@ -144,7 +144,7 @@ export default function VetSearch() {
       if (userLocation && shop.distanceKm !== undefined) {
         if (distanceKm < 100 && shop.distanceKm > distanceKm) return false;
       }
-      
+
 
       return true;
     }).sort((a: any, b: any) => {
@@ -169,7 +169,7 @@ export default function VetSearch() {
   useEffect(() => {
     if (cityQuery) trackFilterChange('city', cityQuery);
   }, [cityQuery]);
-  
+
   useEffect(() => {
     trackFilterChange('type', activeService);
   }, [activeService]);
@@ -241,8 +241,8 @@ export default function VetSearch() {
               key={opt.value}
               onClick={() => setMinRating(opt.value)}
               className={`w-full flex items-center justify-between p-3 rounded-xl transition-all border-2 ${minRating === opt.value
-                  ? 'bg-primary/5 dark:bg-primary/20 border-primary text-primary'
-                  : 'border-transparent hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-400'
+                ? 'bg-primary/5 dark:bg-primary/20 border-primary text-primary'
+                : 'border-transparent hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-400'
                 }`}
             >
               <span className="text-sm font-bold">{opt.label}</span>
@@ -288,7 +288,7 @@ export default function VetSearch() {
         <p className="text-xs font-black text-slate-400 uppercase tracking-widest">Khoảng cách</p>
         <div className="px-2">
           <div className="flex justify-between items-center mb-4">
-            <button 
+            <button
               onClick={() => setDistanceKm(prev => Math.max(1, prev - 1))}
               className="w-8 h-8 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-600 dark:text-white hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors"
             >
@@ -298,7 +298,7 @@ export default function VetSearch() {
               <span className="text-2xl font-black text-primary dark:text-white">{distanceKm === 100 ? '∞' : distanceKm}</span>
               {distanceKm !== 100 && <span className="text-xs font-bold text-slate-400 pb-1 ml-1 dark:text-white">km</span>}
             </div>
-            <button 
+            <button
               onClick={() => setDistanceKm(prev => Math.min(100, prev + 1))}
               className="w-8 h-8 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-600 dark:text-white hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors"
             >
@@ -320,7 +320,7 @@ export default function VetSearch() {
         </div>
       </div>
 
-      <button 
+      <button
         onClick={() => { setIsMapModalOpen(true); setIsMobileFilterOpen(false); }}
         className="w-full flex items-center justify-center gap-2 p-4 rounded-2xl bg-slate-900 text-white font-black text-xs hover:bg-primary transition-all shadow-xl hover:shadow-primary/20 uppercase tracking-widest">
         <MapIcon size={16} />
@@ -388,7 +388,7 @@ export default function VetSearch() {
               <div className="md:col-span-3">
                 <button className="w-full h-full bg-primary hover:bg-primary-dark text-white rounded-full font-black transition-all flex items-center justify-center gap-2 py-3.5 md:py-5 shadow-xl shadow-primary/20 text-sm md:text-base">
                   <Search size={16} />
-                  TÌM KIẾM
+                  TÌM CƠ SỞ
                 </button>
               </div>
             </div>
@@ -412,8 +412,8 @@ export default function VetSearch() {
                     key={tab.value}
                     onClick={() => setActiveService(tab.value)}
                     className={`relative flex items-center gap-1.5 md:gap-2 px-4 md:px-6 py-2.5 md:py-3.5 rounded-full text-xs md:text-sm font-black whitespace-nowrap transition-all z-10 snap-start ${isActive
-                        ? 'text-white'
-                        : 'text-slate-500 hover:text-slate-900 dark:hover:text-white'
+                      ? 'text-white'
+                      : 'text-slate-500 hover:text-slate-900 dark:hover:text-white'
                       }`}
                   >
                     {isActive && (
@@ -469,7 +469,7 @@ export default function VetSearch() {
 
               <div className="flex items-center gap-2 md:gap-3 shrink-0">
                 {/* Mobile filter button */}
-                <button 
+                <button
                   onClick={() => setIsMobileFilterOpen(true)}
                   className="lg:hidden relative p-2.5 glass dark:glass-dark rounded-xl text-slate-600 dark:text-white hover:text-primary transition-colors"
                 >
@@ -629,18 +629,17 @@ export default function VetSearch() {
                       return Math.abs(i - page) <= range;
                     })
                     .map(i => (
-                    <button
-                      key={i}
-                      onClick={() => setPage(i)}
-                      className={`w-8 h-8 md:w-10 md:h-10 rounded-lg md:rounded-xl text-[11px] md:text-xs font-black transition-all ${
-                        i === page
-                          ? 'bg-primary text-white shadow-lg shadow-primary/25'
-                          : 'glass dark:glass-dark text-slate-600 dark:text-white hover:border-primary/50'
-                      }`}
-                    >
-                      {i + 1}
-                    </button>
-                  ))}
+                      <button
+                        key={i}
+                        onClick={() => setPage(i)}
+                        className={`w-8 h-8 md:w-10 md:h-10 rounded-lg md:rounded-xl text-[11px] md:text-xs font-black transition-all ${i === page
+                            ? 'bg-primary text-white shadow-lg shadow-primary/25'
+                            : 'glass dark:glass-dark text-slate-600 dark:text-white hover:border-primary/50'
+                          }`}
+                      >
+                        {i + 1}
+                      </button>
+                    ))}
                   <button
                     onClick={() => setPage(p => Math.min(totalPages - 1, p + 1))}
                     disabled={page >= totalPages - 1}
@@ -736,7 +735,7 @@ export default function VetSearch() {
                       Xóa hết
                     </button>
                   )}
-                  <button 
+                  <button
                     onClick={() => setIsMobileFilterOpen(false)}
                     className="w-8 h-8 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-500 hover:text-slate-700 transition-colors"
                   >
@@ -788,7 +787,7 @@ export default function VetSearch() {
 
               <div className="w-full md:w-2/3 h-[45%] md:h-full relative bg-slate-100 dark:bg-slate-800">
                 {userLocation ? (
-                  <ShopMap 
+                  <ShopMap
                     userLocation={userLocation}
                     nearbyShops={shopsForMap}
                   />
@@ -845,7 +844,7 @@ export default function VetSearch() {
                 <p className="text-sm md:text-base text-slate-500 dark:text-slate-400 leading-relaxed font-medium">
                   Hệ thống đang hiển thị tất cả các cơ sở thú y quanh bạn trong bán kính <span className="font-black text-primary text-base md:text-lg">{radiusParam} km</span>.
                 </p>
-                <button 
+                <button
                   onClick={() => setShowRadiusModal(false)}
                   className="mt-6 md:mt-8 w-full py-3.5 md:py-4 bg-primary text-white rounded-2xl font-black text-sm uppercase tracking-widest shadow-lg shadow-primary/20 hover:shadow-primary/40 hover:-translate-y-1 transition-all active:scale-95"
                 >

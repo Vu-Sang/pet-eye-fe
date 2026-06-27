@@ -159,7 +159,7 @@ export default function Home() {
                   <span className="relative inline-flex rounded-full h-2 w-2 bg-primary dark:bg-cyan-400"></span>
                 </span>
                 <span className="text-[11px] md:text-[13px] font-black uppercase tracking-widest text-primary dark:text-blue-400">
-                  HỆ SINH THÁI THÚ Y TOÀN DIỆN
+                  NỀN TẢNG CHĂM SÓC THÚ CƯNG MINH BẠCH
                 </span>
               </motion.div>
 
@@ -170,7 +170,7 @@ export default function Home() {
               </motion.h1>
 
               <motion.p variants={fadeIn} className="text-sm sm:text-base md:text-lg text-slate-600 dark:text-slate-300 max-w-xl mx-auto lg:mx-0 leading-relaxed font-medium">
-                Kết nối với mạng lưới chuyên gia, đặt lịch khám nhanh chóng và theo dõi bé yêu mọi lúc qua Live Camera 24/7.
+                Tìm kiếm dịch vụ thú cưng đáng tin cậy, đặt lịch nhanh chóng và theo dõi bé yêu mọi lúc qua Live Camera 24/7.
               </motion.p>
 
               {/* Glassmorphic Search Bar */}
@@ -204,7 +204,7 @@ export default function Home() {
                       onClick={() => handleAction('/search')}
                       className="w-full h-full bg-primary hover:bg-primary/95 dark:bg-blue-600 dark:hover:bg-blue-500 text-white rounded-full font-black transition-all flex items-center justify-center gap-2 py-3.5 md:py-4 shadow-lg shadow-primary/20 dark:shadow-blue-500/20 group-hover:scale-[1.02] text-sm"
                     >
-                      <Search size={18} /> TÌM KIẾM
+                      <Search size={18} /> TÌM CƠ SỞ
                     </button>
                   </div>
                 </div>
@@ -227,8 +227,9 @@ export default function Home() {
                       <Heart size={20} />
                     </div>
                     <div>
-                      <p className="text-sm font-black text-slate-900 dark:text-white">Khám tổng quát</p>
-                      <p className="text-[10px] text-slate-500 font-bold">Chăm sóc toàn diện</p>
+                      <p className="text-sm font-black text-slate-900 dark:text-white">Live Camera 24/7
+                      </p>
+                      <p className="text-[10px] text-slate-500 font-bold">Theo dõi bé mọi lúc</p>
                     </div>
                   </div>
                 </motion.div>
@@ -249,8 +250,8 @@ export default function Home() {
                       <ShieldCheck size={20} />
                     </div>
                     <div>
-                      <p className="text-sm font-black text-slate-900 dark:text-white">Đối tác uy tín</p>
-                      <p className="text-[10px] text-slate-500 font-bold">Xác thực 100%</p>
+                      <p className="text-sm font-black text-slate-900 dark:text-white">Đối tác xác thực</p>
+                      <p className="text-[10px] text-slate-500 font-bold">Thông tin minh bạch</p>
                     </div>
                   </div>
                 </motion.div>
@@ -559,21 +560,42 @@ export default function Home() {
             <motion.div initial={{ opacity: 0, scale: 0.8 }} whileInView={{ opacity: 1, scale: 1 }} viewport={{ once: true }} className="relative">
               <div className="relative z-10 p-4 glass dark:bg-slate-900/80 dark:border-slate-800 rounded-[50px] shadow-3xl">
                 <div className="relative aspect-[4/3] rounded-[40px] overflow-hidden bg-slate-950">
-                  <img src={cameraPreview} alt="Live feed" className="w-full h-full object-cover object-center scale-110 opacity-80" />
-                  <div className="absolute top-6 left-6 flex items-center gap-3">
-                    <div className="px-4 py-2 rounded-full bg-slate-950/80 backdrop-blur-md border border-white/10 text-[10px] font-black text-white flex items-center gap-2">
-                      <span className="w-2 h-2 rounded-full bg-red-500 animate-pulse" /> LIVE FEED
-                    </div>
-                    <span className="px-3 py-1.5 rounded-full bg-slate-950/60 backdrop-blur-sm border border-white/5 text-[10px] font-bold text-white/80 tracking-widest uppercase">REC 00:42:15</span>
+                  {/* Lớp phủ giả lập viền tối của Camera */}
+                  <div className="absolute top-0 left-0 w-full h-full pointer-events-none z-10 shadow-[inset_0_0_50px_rgba(0,0,0,0.4)]"></div>
+                  
+                  {/* Video Live Stream thực tế */}
+                  <video 
+                    src="/video/video.mp4" 
+                    poster={cameraPreview}
+                    autoPlay 
+                    loop 
+                    muted 
+                    playsInline 
+                    className="w-full h-full object-cover object-center opacity-90 pointer-events-none grayscale-[30%] contrast-125 sepia-[.15]" 
+                  />
+                  
+                  {/* Hiển thị Ngày/Giờ CCTV */}
+                  <div className="absolute top-6 right-6 font-mono text-white/95 text-sm md:text-base font-black tracking-widest drop-shadow-[0_2px_4px_rgba(0,0,0,0.9)] z-20">
+                    2025-07-22 09:42:27
                   </div>
-                  <div className="absolute bottom-6 left-6 right-6 flex items-center justify-between">
-                    <div className="bg-slate-950/80 backdrop-blur-md border border-white/10 p-3 rounded-2xl">
-                      <p className="text-xs font-black text-white">Lucky - Golden Retriever</p>
-                      <p className="text-[10px] font-medium text-white/70">Deluxe Room 102</p>
+
+                  {/* Hiển thị Tên Camera CCTV */}
+                  <div className="absolute bottom-6 left-6 font-mono text-white/95 text-xl md:text-2xl font-black tracking-widest drop-shadow-[0_2px_4px_rgba(0,0,0,0.9)] z-20 flex items-center gap-3">
+                    CAM01
+                  </div>
+                  
+                  {/* Trạng thái LIVE góc trái */}
+                  <div className="absolute top-6 left-6 z-20 flex items-center gap-3">
+                    <div className="px-3 py-1.5 rounded-sm bg-black/40 backdrop-blur-md border border-white/10 text-[10px] font-black text-white flex items-center gap-2 tracking-widest uppercase">
+                      <span className="w-2 h-2 rounded-full bg-red-500 animate-pulse" /> LIVE
                     </div>
-                    <div className="flex gap-2">
-                      <div className="w-10 h-10 rounded-xl bg-slate-950/80 backdrop-blur-md border border-white/10 flex items-center justify-center text-white cursor-pointer hover:bg-white/25 transition-colors"><Video size={16} /></div>
-                      <div className="w-10 h-10 rounded-xl bg-primary dark:bg-blue-600 flex items-center justify-center text-white cursor-pointer hover:scale-110 transition-transform"><ArrowRight size={16} /></div>
+                  </div>
+
+                  {/* Giữ lại Box thông tin mô phỏng PetEye để trang trí */}
+                  <div className="absolute bottom-6 right-6 flex items-center gap-2 z-20">
+                     <div className="bg-slate-950/70 backdrop-blur-md border border-white/10 p-3 rounded-2xl text-right">
+                      <p className="text-xs font-black text-white">Mochi - Scottish Fold</p>
+                      <p className="text-[10px] font-medium text-white/70">Đang được chăm sóc</p>
                     </div>
                   </div>
                 </div>
@@ -609,7 +631,7 @@ export default function Home() {
                 <ChevronRight size={40} strokeWidth={3} />
               </motion.div>
             </div>
-            
+
             <div className="hidden lg:flex absolute top-[40%] left-[calc(66.666%+8px)] -translate-y-1/2 -translate-x-1/2 z-20 items-center justify-center pointer-events-none text-blue-500">
               <motion.div animate={{ opacity: [0.2, 1, 0.2], x: [0, 5, 0] }} transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut", delay: 0 }} className="-mr-5">
                 <ChevronRight size={40} strokeWidth={3} />
