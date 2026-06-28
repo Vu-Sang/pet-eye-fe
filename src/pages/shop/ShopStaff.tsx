@@ -3,11 +3,12 @@ import {
     Users, UserPlus, Search, Shield, CheckCircle, XCircle,
     Settings, Save, Info, Briefcase, Loader2, X, Eye, EyeOff,
     Award, FileText, Trash2, ExternalLink, Mail, Phone, UserCircle,
-    Zap, Star, ShieldCheck, GraduationCap, LayoutDashboard, ChevronDown
+    Zap, Star, ShieldCheck, GraduationCap, LayoutDashboard, ChevronDown, Camera
 } from 'lucide-react';
 import { staffService, type StaffResponse, type StaffCreationRequest } from '../../services/staff.service';
 import { shopService } from '../../services/shop.service';
 import { userService } from '../../services/user.service';
+import { fileService } from '../../services/file.service';
 import { useTheme } from '../../contexts/ThemeContext';
 import toast from 'react-hot-toast';
 import { motion, AnimatePresence } from 'motion/react';
@@ -33,9 +34,11 @@ export default function ShopStaff() {
     const [assignMode, setAssignMode] = useState<'MANUAL' | 'OPEN_POOL' | 'AUTO'>('MANUAL');
     const [savingMode, setSavingMode] = useState(false);
     const [viewingCerts, setViewingCerts] = useState<StaffResponse | null>(null);
+    const [uploadingAvatar, setUploadingAvatar] = useState(false);
+    const avatarInputRef = React.useRef<HTMLInputElement>(null);
     
     const [form, setForm] = useState<StaffCreationRequest>({
-        fullName: '', email: '', password: '', phone: '', role: '', specialization: '', certificates: []
+        fullName: '', email: '', password: '', phone: '', role: '', specialization: '', avatar: '', certificates: []
     });
 
     useEffect(() => {
@@ -64,7 +67,7 @@ export default function ShopStaff() {
 
     const handleOpenCreate = () => {
         setEditingStaff(null);
-        setForm({ fullName: '', email: '', password: '', phone: '', role: '', specialization: '', certificates: [] });
+        setForm({ fullName: '', email: '', password: '', phone: '', role: '', specialization: '', avatar: '', certificates: [] });
         setShowForm(true);
     };
 
@@ -77,6 +80,7 @@ export default function ShopStaff() {
             phone: staff.phone || '',
             role: staff.role || '',
             specialization: staff.specialization || '',
+            avatar: staff.avatar || '',
             certificates: []
         });
         setShowForm(true);
@@ -105,7 +109,26 @@ export default function ShopStaff() {
         });
     };
 
+    const handleAvatarUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (!file) return;
 
+        if (file.size > 2 * 1024 * 1024) {
+            toast.error('Kích thước ảnh không được vượt quá 2MB');
+            return;
+        }
+
+        try {
+            setUploadingAvatar(true);
+            const url = await fileService.upload(file);
+            setForm(prev => ({ ...prev, avatar: url }));
+            toast.success('Tải ảnh đại diện lên thành công!');
+        } catch (err) {
+            toast.error('Tải ảnh lên thất bại');
+        } finally {
+            setUploadingAvatar(false);
+        }
+    };
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -250,6 +273,40 @@ export default function ShopStaff() {
 
                                         <div className="flex-1 overflow-y-auto p-6 custom-scrollbar">
                                             <form onSubmit={handleSubmit} className="space-y-6">
+                                                {/* Avatar Upload */}
+                                                <div className="flex flex-col items-center mb-6">
+                                                    <div className="relative">
+                                                        <div className={`w-24 h-24 rounded-full overflow-hidden border-4 shadow-lg ${isDark ? 'border-slate-800 bg-slate-900' : 'border-white bg-slate-100'}`}>
+                                                            {uploadingAvatar ? (
+                                                                <div className="w-full h-full flex items-center justify-center">
+                                                                    <Loader2 className="animate-spin text-primary" size={24} />
+                                                                </div>
+                                                            ) : form.avatar ? (
+                                                                <img src={form.avatar} alt="Avatar" className="w-full h-full object-cover" />
+                                                            ) : (
+                                                                <div className="w-full h-full flex items-center justify-center">
+                                                                    <UserCircle size={40} className={isDark ? 'text-slate-700' : 'text-slate-300'} />
+                                                                </div>
+                                                            )}
+                                                        </div>
+                                                        <input 
+                                                            type="file" 
+                                                            ref={avatarInputRef} 
+                                                            className="hidden" 
+                                                            accept="image/*"
+                                                            onChange={handleAvatarUpload}
+                                                        />
+                                                        <button 
+                                                            type="button" 
+                                                            onClick={() => avatarInputRef.current?.click()}
+                                                            disabled={uploadingAvatar}
+                                                            className={`absolute bottom-0 right-0 p-2 rounded-full shadow-lg hover:scale-110 transition-transform disabled:opacity-50 text-white ${isDark ? 'bg-indigo-600' : 'bg-primary'}`}
+                                                        >
+                                                            <Camera size={14} />
+                                                        </button>
+                                                    </div>
+                                                </div>
+
                                                 {/* Section 1: Thông tin cơ bản */}
                                                 <div className="space-y-4">
                                                     <div className="flex items-center gap-2 mb-1">
@@ -501,8 +558,12 @@ export default function ShopStaff() {
                                                     <tr key={s.id} className={`group transition-colors ${isDark ? 'hover:bg-slate-800/30' : 'hover:bg-slate-50/50'}`}>
                                                         <td className="px-10 py-8">
                                                             <div className="flex items-center gap-5">
-                                                                <div className={`w-14 h-14 rounded-2xl flex items-center justify-center font-black text-xl shadow-inner border ${isDark ? 'bg-indigo-500/10 text-indigo-400 border-indigo-500/20' : 'bg-gradient-to-br from-primary/10 to-primary/5 text-primary border-primary/10'}`}>
-                                                                    {s.fullName.charAt(0)}
+                                                                <div className={`w-14 h-14 rounded-2xl overflow-hidden flex items-center justify-center font-black text-xl shadow-inner border ${isDark ? 'bg-indigo-500/10 text-indigo-400 border-indigo-500/20' : 'bg-gradient-to-br from-primary/10 to-primary/5 text-primary border-primary/10'}`}>
+                                                                    {s.avatar ? (
+                                                                        <img src={s.avatar} alt={s.fullName} className="w-full h-full object-cover" />
+                                                                    ) : (
+                                                                        s.fullName.charAt(0)
+                                                                    )}
                                                                 </div>
                                                                 <div>
                                                                     <p className={`font-black text-base whitespace-nowrap ${isDark ? 'text-white' : 'text-slate-900'}`}>{s.fullName}</p>
