@@ -1,5 +1,5 @@
 import React, { useState, useMemo, useEffect } from 'react';
-import { Link, useParams, useNavigate } from 'react-router-dom';
+import { Link, useParams, useNavigate, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'motion/react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { shopService } from '../../services/shop.service';
@@ -53,6 +53,8 @@ export default function ClinicDetail() {
   const { id } = useParams<{ id: string }>();
   const shopId = Number(id);
   const navigate = useNavigate();
+  const location = useLocation();
+  const editBooking = location.state?.editBooking;
   const { user } = useAuth();
   const queryClient = useQueryClient();
 
@@ -204,21 +206,22 @@ export default function ClinicDetail() {
   });
 
   // ── Booking state ───────────────────────────────────────────────────────────
-  const [selectedTime, setSelectedTime] = useState<string | null>(null);
-  const [selectedDate, setSelectedDate] = useState(today.toISOString().split('T')[0]);
+  const [selectedTime, setSelectedTime] = useState<string | null>(editBooking?.appointmentDatetime ? editBooking.appointmentDatetime.substring(11, 16) : null);
+  const [selectedDate, setSelectedDate] = useState(editBooking?.appointmentDatetime ? editBooking.appointmentDatetime.substring(0, 10) : today.toISOString().split('T')[0]);
   // BOARDING: check-in / check-out dates
-  const [checkInDate, setCheckInDate] = useState(today.toISOString().split('T')[0]);
+  const [checkInDate, setCheckInDate] = useState(editBooking?.checkIn ? editBooking.checkIn.substring(0, 10) : today.toISOString().split('T')[0]);
   const [checkOutDate, setCheckOutDate] = useState(() => {
+    if (editBooking?.checkOut) return editBooking.checkOut.substring(0, 10);
     const d = new Date(today); d.setDate(d.getDate() + 1);
     return d.toISOString().split('T')[0];
   });
   const [isFavorited, setIsFavorited] = useState(false);
   const [reviewFilter, setReviewFilter] = useState('Tất cả');
-  const [selectedServiceIds, setSelectedServiceIds] = useState<number[]>([]);
-  const [isHotelSelected, setIsHotelSelected] = useState(false);
+  const [selectedServiceIds, setSelectedServiceIds] = useState<number[]>(editBooking ? editBooking.services?.map((s: any) => s.serviceId) || [] : []);
+  const [isHotelSelected, setIsHotelSelected] = useState(editBooking?.services?.some((s: any) => s.category?.toUpperCase() === 'BOARDING' || s.category?.toUpperCase() === 'HOTEL') || false);
   const [selectedCameraTier, setSelectedCameraTier] = useState<string>('BASIC');
-  const [selectedCageSize, setSelectedCageSize] = useState<string>('');
-  const [selectedRoomType, setSelectedRoomType] = useState<string>('');
+  const [selectedCageSize, setSelectedCageSize] = useState<string>(editBooking?.cageSize || '');
+  const [selectedRoomType, setSelectedRoomType] = useState<string>(editBooking?.roomType || '');
 
   // Derive the boarding service from API data
   const boardingService = apiServices.find((s: ServiceResponse) => (s.category === 'BOARDING' || s.category.toUpperCase() === 'HOTEL') && s.active);
@@ -256,7 +259,7 @@ export default function ClinicDetail() {
 
   // ── Staff selection ─────────────────────────────────────────────────────────
   const [selectedStaff, setSelectedStaff] = useState<StaffResponse | null>(null);
-  const [selectedStaffId, setSelectedStaffId] = useState<number | null>(null);
+  const [selectedStaffId, setSelectedStaffId] = useState<number | null>(editBooking?.staffId || null);
   const [staffAvailabilityLoading, setStaffAvailabilityLoading] = useState(false);
   const [staffWithAvailability, setStaffWithAvailability] = useState<StaffResponse[]>([]);
   const [staffAvailabilityError, setStaffAvailabilityError] = useState(false);
@@ -641,6 +644,7 @@ export default function ClinicDetail() {
 
     navigate('/payment', {
       state: {
+        updateBookingId: editBooking?.id,
         shopId,
         shopName: shop?.shopName,
         shopAddress: shop ? `${shop.address}${shop.city ? `, ${shop.city}` : ''}` : '',
@@ -1830,14 +1834,14 @@ export default function ClinicDetail() {
                   >
                     <span className="material-symbols-outlined">calendar_month</span>
                     {canBook
-                      ? "Đặt lịch ngay"
+                      ? (editBooking ? "Cập nhật lịch" : "Đặt lịch ngay")
                       : !isHotelSelected && !hasNormalServices
                         ? "Chọn dịch vụ trước"
                         : isHotelSelected && !boardingReady
                           ? "Chọn ngày nhận & trả phòng"
                           : hasNormalServices && !normalReady
                             ? "Chọn ngày & giờ hẹn"
-                            : "Đặt lịch ngay"}
+                            : (editBooking ? "Cập nhật lịch" : "Đặt lịch ngay")}
                   </button>
 
 
@@ -1954,7 +1958,7 @@ export default function ClinicDetail() {
               className="flex-1 h-12 flex items-center justify-center gap-2 rounded-xl bg-[#1a2b4c] text-white font-bold text-sm shadow-lg shadow-[#1a2b4c]/25"
             >
               <span className="material-symbols-outlined text-base">calendar_month</span>
-              Đặt lịch ngay
+              {editBooking ? "Cập nhật lịch" : "Đặt lịch ngay"}
             </button>
           </div>
         </div>

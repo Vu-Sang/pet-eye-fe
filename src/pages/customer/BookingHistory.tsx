@@ -1,12 +1,12 @@
 import React, { useState, useMemo } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient, keepPreviousData } from '@tanstack/react-query';
 import {
     Calendar, Clock, Plus, Home, Stethoscope, Scissors,
     Video, Star, CheckCircle, AlertCircle, XCircle, Wifi, Loader2,
     ChevronRight, MessageCircle, RefreshCw, Sparkles,
     Search, ArrowUpRight, Wallet, Heart, Info, X, Check, UserPlus, User,
-    Activity, Utensils, Syringe, BookOpen, Save, Bookmark
+    Activity, Utensils, Syringe, BookOpen, Save, Bookmark, Settings
 } from 'lucide-react';
 import { bookingService } from '../../services/booking.service';
 import { reviewService } from '../../services/review.service';
@@ -18,6 +18,7 @@ import { format, parseISO } from 'date-fns';
 import { vi } from 'date-fns/locale';
 import toast from 'react-hot-toast';
 import { motion, AnimatePresence } from 'motion/react';
+import EditBookingModal from './EditBookingModal';
 
 // ─── Helpers & Meta ──────────────────────────────────────────────────────────
 
@@ -103,12 +104,13 @@ function StatCard({ label, value, icon: Icon, color, delay }: any) {
     );
 }
 
-function BookingItem({ booking, onCancel, cancelling, onReview, onUpdateBank }: any) {
+function BookingItem({ booking, onCancel, cancelling, onReview, onUpdateBank, onEdit }: any) {
     const category = getCategory(booking);
     const cat = CATEGORY_META[category];
     const status = STATUS_META[booking.status] || STATUS_META.CONFIRMED;
     const isLive = !!booking.cameraStreamUrl;
 
+    const navigate = useNavigate();
     const queryClient = useQueryClient();
     const [showLogs, setShowLogs] = useState(false);
     const [showDetails, setShowDetails] = useState(false);
@@ -474,13 +476,21 @@ function BookingItem({ booking, onCancel, cancelling, onReview, onUpdateBank }: 
                     </div>
 
                     <div className="flex items-center gap-2">
-                        {(booking.status === 'CONFIRMED' || booking.status === 'WAITING_SHOP_APPROVAL') && (
-                            <button
-                                onClick={() => onCancel(booking)} disabled={cancelling}
-                                className="px-5 py-2.5 border border-rose-100 dark:border-rose-900/30 text-rose-500 rounded-2xl text-[10px] font-black uppercase tracking-widest hover:bg-rose-50 dark:hover:bg-rose-900/20 transition-all flex items-center gap-2"
-                            >
-                                {cancelling ? <Loader2 size={14} className="animate-spin" /> : <XCircle size={14} />} Hủy lịch
-                            </button>
+                        {booking.status === 'WAITING_SHOP_APPROVAL' && (
+                            <>
+                                <button
+                                    onClick={() => onEdit(booking)}
+                                    className="px-5 py-2.5 border border-indigo-100 dark:border-indigo-900/30 text-indigo-500 rounded-2xl text-[10px] font-black uppercase tracking-widest hover:bg-indigo-50 dark:hover:bg-indigo-900/20 transition-all flex items-center gap-2"
+                                >
+                                    <Settings size={14} /> Chỉnh sửa
+                                </button>
+                                <button
+                                    onClick={() => onCancel(booking)} disabled={cancelling}
+                                    className="px-5 py-2.5 border border-rose-100 dark:border-rose-900/30 text-rose-500 rounded-2xl text-[10px] font-black uppercase tracking-widest hover:bg-rose-50 dark:hover:bg-rose-900/20 transition-all flex items-center gap-2"
+                                >
+                                    {cancelling ? <Loader2 size={14} className="animate-spin" /> : <XCircle size={14} />} Hủy lịch
+                                </button>
+                            </>
                         )}
                         {booking.status === 'CANCEL_REQUESTED' && (
                             <div className="px-5 py-2.5 rounded-2xl bg-orange-50 dark:bg-orange-950/20 text-orange-700 dark:text-orange-300 text-[10px] font-black uppercase tracking-widest flex items-center gap-2 border border-orange-100 dark:border-orange-900/40">
@@ -529,7 +539,9 @@ export default function BookingHistory() {
     // Review state
     const [showReviewModal, setShowReviewModal] = useState(false);
     const [showCancelModal, setShowCancelModal] = useState(false);
-    const [selectedBooking, setSelectedBooking] = useState<BookingResponse | null>(null);
+    const [selectedBookingForReview, setSelectedBookingForReview] = useState<BookingResponse | null>(null);
+    const [selectedBookingForBank, setSelectedBookingForBank] = useState<BookingResponse | null>(null);
+    const [editingBooking, setEditingBooking] = useState<BookingResponse | null>(null);
     const [cancelReasonOption, setCancelReasonOption] = useState<string>('');
     const [cancelReasonOther, setCancelReasonOther] = useState('');
     const [cancelBankOption, setCancelBankOption] = useState('Vietcombank');
@@ -569,7 +581,7 @@ export default function BookingHistory() {
 
     const directCancelMutation = useMutation({
         mutationFn: (id: number) => bookingService.cancel(id),
-        onMutate: () => setCancellingId(selectedBooking?.id || null),
+        onMutate: () => setCancellingId(selectedBookingForBank?.id || null),
         onSuccess: () => {
             toast.success('Hủy lịch thành công');
             qc.invalidateQueries({ queryKey: ['my-bookings'] });
@@ -589,14 +601,14 @@ export default function BookingHistory() {
     });
 
     const handleOpenReview = (booking: BookingResponse) => {
-        setSelectedBooking(booking);
+        setSelectedBookingForReview(booking);
         setRating(5);
         setComment('');
         setShowReviewModal(true);
     };
 
     const handleOpenCancel = (booking: BookingResponse) => {
-        setSelectedBooking(booking);
+        setSelectedBookingForBank(booking);
         setCancelReasonOption('');
         setCancelReasonOther('');
         setCancelBankOption('Vietcombank');
@@ -607,7 +619,7 @@ export default function BookingHistory() {
     };
 
     const handleOpenUpdateBank = (booking: BookingResponse) => {
-        setSelectedBooking(booking);
+        setSelectedBookingForBank(booking);
         const knownBanks = ['Vietcombank', 'Techcombank', 'MBBank', 'VietinBank', 'BIDV', 'Agribank', 'ACB', 'TPBank', 'VPBank', 'Sacombank'];
         const isKnown = booking.bankName && knownBanks.includes(booking.bankName);
         setCancelBankOption(booking.bankName ? (isKnown ? booking.bankName : 'OTHER') : 'Vietcombank');
@@ -618,14 +630,14 @@ export default function BookingHistory() {
     };
 
     const handleSubmitUpdateBank = async () => {
-        if (!selectedBooking) return;
+        if (!selectedBookingForBank) return;
         const finalBankName = cancelBankOption === 'OTHER' ? cancelBankName.trim() : cancelBankOption;
         if (!finalBankName || !cancelBankAccount.trim() || !cancelAccountHolder.trim()) {
             toast.error('Vui lòng cung cấp đầy đủ thông tin ngân hàng để nhận hoàn tiền');
             return;
         }
         await updateBankMutation.mutateAsync({
-            id: selectedBooking.id,
+            id: selectedBookingForBank.id,
             bankName: finalBankName,
             bankAccount: cancelBankAccount.trim(),
             accountHolder: cancelAccountHolder.trim(),
@@ -633,7 +645,7 @@ export default function BookingHistory() {
     };
 
     const handleSubmitCancelRequest = async () => {
-        if (!selectedBooking) return;
+        if (!selectedBookingForBank) return;
         const reason = cancelReasonOption === 'OTHER' ? cancelReasonOther.trim() : cancelReasonOption;
         
         if (!reason) {
@@ -641,9 +653,9 @@ export default function BookingHistory() {
             return;
         }
 
-        if (selectedBooking.paymentMethod === 'CASH_DEPOSIT') {
+        if (selectedBookingForBank.paymentMethod === 'CASH_DEPOSIT') {
             try {
-                await directCancelMutation.mutateAsync(selectedBooking.id);
+                await directCancelMutation.mutateAsync(selectedBookingForBank.id);
                 setShowCancelModal(false);
             } catch {
                 setShowCancelModal(false);
@@ -659,7 +671,7 @@ export default function BookingHistory() {
         }
         try {
             await cancelMutation.mutateAsync({
-                id: selectedBooking.id,
+                id: selectedBookingForBank.id,
                 reason,
                 bankName: finalBankName,
                 bankAccount: cancelBankAccount.trim(),
@@ -672,7 +684,7 @@ export default function BookingHistory() {
     };
 
     const handleSubmitReview = async () => {
-        if (!selectedBooking) return;
+        if (!selectedBookingForReview) return;
         if (!comment.trim()) {
             toast.error('Vui lòng nhập nhận xét');
             return;
@@ -681,8 +693,8 @@ export default function BookingHistory() {
         try {
             setSubmitting(true);
             await reviewService.createReview({
-                shopId: selectedBooking.shopId,
-                bookingId: selectedBooking.id,
+                shopId: selectedBookingForReview.shopId,
+                bookingId: selectedBookingForReview.id,
                 rating,
                 comment
             });
@@ -924,6 +936,8 @@ export default function BookingHistory() {
                                             onCancel={handleOpenCancel}
                                             cancelling={cancellingId === b.id}
                                             onReview={handleOpenReview}
+                                            onUpdateBank={handleOpenUpdateBank}
+                                            onEdit={setEditingBooking}
                                         />
                                     ))}
                                 </div>
@@ -973,15 +987,15 @@ export default function BookingHistory() {
 
             {/* Cancel Request Modal */}
             <AnimatePresence>
-                {showCancelModal && selectedBooking && (() => {
-                    const paymentMethod = selectedBooking.paymentMethod || 'CASH';
+                {showCancelModal && selectedBookingForBank && (() => {
+                    const paymentMethod = selectedBookingForBank.paymentMethod || 'CASH';
                     const isPayOS = paymentMethod === 'PAYOS';
                     const isDepositOnly = !isPayOS;
 
-                    const depositAmount = selectedBooking.servicePrice * 0.1;
-                    const paidAmount = isPayOS ? selectedBooking.servicePrice : depositAmount;
+                    const depositAmount = selectedBookingForBank.servicePrice * 0.1;
+                    const paidAmount = isPayOS ? selectedBookingForBank.servicePrice : depositAmount;
 
-                    const appointmentTime = selectedBooking.appointmentDatetime ? parseISO(selectedBooking.appointmentDatetime) : new Date();
+                    const appointmentTime = selectedBookingForBank.appointmentDatetime ? parseISO(selectedBookingForBank.appointmentDatetime) : new Date();
                     const hoursToAppointment = (appointmentTime.getTime() - new Date().getTime()) / (1000 * 60 * 60);
 
                     const isBefore5Hours = hoursToAppointment >= 5;
@@ -995,7 +1009,7 @@ export default function BookingHistory() {
                             refundAmount = paidAmount - depositAmount;
                         }
                     } else {
-                        penaltyAmount = selectedBooking.servicePrice * 0.5;
+                        penaltyAmount = selectedBookingForBank.servicePrice * 0.5;
                         if (isPayOS) {
                             refundAmount = paidAmount - depositAmount - penaltyAmount;
                             if (refundAmount < 0) refundAmount = 0;
@@ -1033,17 +1047,17 @@ export default function BookingHistory() {
                                 <div className="grid gap-4 sm:grid-cols-[1fr_auto] items-center rounded-[2rem] border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900 p-5">
                                     <div>
                                         <p className="text-xs font-black uppercase tracking-[0.25em] text-slate-400">Đơn hàng</p>
-                                        <p className="mt-2 text-base font-black text-slate-900 dark:text-white">{selectedBooking.services && selectedBooking.services.length > 0 ? selectedBooking.services.map((s: any) => s.serviceName).join(', ') : selectedBooking.serviceName}</p>
-                                        <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">{selectedBooking.shopName} • Bé: {selectedBooking.petName}</p>
+                                        <p className="mt-2 text-base font-black text-slate-900 dark:text-white">{selectedBookingForBank.services && selectedBookingForBank.services.length > 0 ? selectedBookingForBank.services.map((s: any) => s.serviceName).join(', ') : selectedBookingForBank.serviceName}</p>
+                                        <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">{selectedBookingForBank.shopName} • Bé: {selectedBookingForBank.petName}</p>
                                         <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">
-                                            {getCategory(selectedBooking) === 'boarding' && selectedBooking.checkIn && selectedBooking.checkOut
-                                                ? `Lưu trú: ${format(parseISO(selectedBooking.checkIn), 'dd/MM/yyyy')} → ${format(parseISO(selectedBooking.checkOut), 'dd/MM/yyyy')}`
-                                                : format(parseISO(selectedBooking.appointmentDatetime), 'dd/MM/yyyy • HH:mm', { locale: vi })}
+                                            {getCategory(selectedBookingForBank) === 'boarding' && selectedBookingForBank.checkIn && selectedBookingForBank.checkOut
+                                                ? `Lưu trú: ${format(parseISO(selectedBookingForBank.checkIn), 'dd/MM/yyyy')} → ${format(parseISO(selectedBookingForBank.checkOut), 'dd/MM/yyyy')}`
+                                                : format(parseISO(selectedBookingForBank.appointmentDatetime), 'dd/MM/yyyy • HH:mm', { locale: vi })}
                                         </p>
                                     </div>
                                     <div className="rounded-3xl bg-white dark:bg-slate-950 shadow-sm border border-slate-200 dark:border-slate-800 px-4 py-3 text-right">
                                         <p className="text-[10px] uppercase tracking-[0.25em] text-slate-400">Tổng tiền</p>
-                                        <p className="mt-1 text-xl font-black text-slate-900 dark:text-white">{formatVND(selectedBooking.servicePrice)}</p>
+                                        <p className="mt-1 text-xl font-black text-slate-900 dark:text-white">{formatVND(selectedBookingForBank.servicePrice)}</p>
                                     </div>
                                 </div>
 
@@ -1058,7 +1072,7 @@ export default function BookingHistory() {
                                         <div className="space-y-2 text-sm text-slate-600 dark:text-slate-400">
                                             <div className="flex justify-between items-center">
                                                 <span className="font-medium">Tổng tiền dịch vụ:</span>
-                                                <span className="font-bold text-slate-800 dark:text-slate-200">{formatVND(selectedBooking.servicePrice)}</span>
+                                                <span className="font-bold text-slate-800 dark:text-slate-200">{formatVND(selectedBookingForBank.servicePrice)}</span>
                                             </div>
                                             <div className="flex justify-between items-center">
                                                 <span className="font-medium">Đã thanh toán:</span>
@@ -1155,7 +1169,7 @@ export default function BookingHistory() {
                                     </div>
                                 )}
 
-                                {selectedBooking.paymentMethod === 'CASH_DEPOSIT' ? (
+                                {selectedBookingForBank.paymentMethod === 'CASH_DEPOSIT' ? (
                                     <div className="rounded-[2rem] bg-orange-50 dark:bg-orange-900/20 border border-orange-200 dark:border-orange-800 p-5 text-sm text-orange-700 dark:text-orange-400">
                                         <p className="font-bold">Lưu ý về đơn đặt cọc:</p>
                                         <p className="mt-2 leading-6">Đây là đơn thanh toán một phần (đặt cọc). Theo chính sách, bạn sẽ không được hoàn lại phí cọc khi tự hủy lịch. Đơn sẽ được chuyển sang trạng thái ĐÃ HỦY ngay lập tức.</p>
@@ -1343,7 +1357,7 @@ export default function BookingHistory() {
 
             {/* Review Modal */}
             <AnimatePresence>
-                {showReviewModal && selectedBooking && (
+                {showReviewModal && selectedBookingForReview && (
                     <div className="fixed inset-0 z-[999] flex items-center justify-center p-4">
                         <motion.div
                             initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
@@ -1365,8 +1379,8 @@ export default function BookingHistory() {
                                         <Sparkles size={24} />
                                     </div>
                                     <div>
-                                        <p className="text-sm font-black text-slate-900 dark:text-white">{selectedBooking.services && selectedBooking.services.length > 0 ? selectedBooking.services.map((s: any) => s.serviceName).join(', ') : selectedBooking.serviceName}</p>
-                                        <p className="text-xs text-slate-400 font-bold uppercase tracking-widest">{selectedBooking.shopName}</p>
+                                        <p className="text-sm font-black text-slate-900 dark:text-white">{selectedBookingForReview.services && selectedBookingForReview.services.length > 0 ? selectedBookingForReview.services.map((s: any) => s.serviceName).join(', ') : selectedBookingForReview.serviceName}</p>
+                                        <p className="text-xs text-slate-400 font-bold uppercase tracking-widest">{selectedBookingForReview.shopName}</p>
                                     </div>
                                 </div>
 
@@ -1407,6 +1421,16 @@ export default function BookingHistory() {
                     </div>
                 )}
             </AnimatePresence>
+
+            {editingBooking && (
+                <EditBookingModal 
+                    booking={editingBooking} 
+                    onClose={() => setEditingBooking(null)} 
+                    onSuccess={() => {
+                        qc.invalidateQueries({ queryKey: ['customerBookings'] });
+                    }}
+                />
+            )}
         </main>
     );
 }

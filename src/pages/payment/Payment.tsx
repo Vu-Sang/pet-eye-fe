@@ -164,6 +164,34 @@ export default function Payment() {
     localStorage.setItem('pendingBookingSummary', JSON.stringify(summaryData));
 
     if (payMethod === 'cash') {
+      if ((booking as any).updateBookingId) {
+        try {
+          const result = await (bookingService as any).updateBooking((booking as any).updateBookingId, {
+            shopId: booking.shopId,
+            serviceId: booking.serviceId,
+            serviceIds: serviceIds,
+            petId: booking.petId,
+            staffId: booking.staffId,
+            appointmentDatetime: booking.appointmentDatetime,
+            checkIn: booking.checkIn,
+            checkOut: booking.checkOut,
+            note: combinedNote,
+            cageSize: booking.cageSize || '',
+            roomType: booking.roomType,
+            paymentMethod: "CASH"
+          });
+          if (result.checkoutUrl) {
+            localStorage.setItem('pendingCashDeposit', result.orderCode?.toString() || '');
+            window.location.href = result.checkoutUrl;
+          } else {
+            navigate('/payment-result?status=SUCCESS');
+          }
+        } catch (e: any) {
+          setError(e?.response?.data?.message || 'Cập nhật thất bại. Vui lòng thử lại.');
+          setLoading(false);
+        }
+        return;
+      }
       try {
         // Cash flow: tạo PayOS link cho 10% tiền cọc
         const result = await bookingService.initiateCashDeposit({
@@ -191,6 +219,35 @@ export default function Payment() {
         }
       } catch (e: any) {
         setError(e?.response?.data?.message || 'Đặt lịch thất bại. Vui lòng thử lại.');
+        setLoading(false);
+      }
+      return;
+    }
+
+    if ((booking as any).updateBookingId) {
+      try {
+        const result = await bookingService.updateBooking((booking as any).updateBookingId, {
+          shopId: booking.shopId,
+          serviceId: booking.serviceId,
+          serviceIds: serviceIds,
+          petId: booking.petId,
+          staffId: booking.staffId,
+          appointmentDatetime: booking.appointmentDatetime,
+          checkIn: booking.checkIn,
+          checkOut: booking.checkOut,
+          note: combinedNote,
+          cageSize: booking.cageSize,
+          roomType: booking.roomType,
+          userVoucherId: payMethod === 'payos' && selectedVoucherId ? selectedVoucherId : undefined,
+          paymentMethod: "PAYOS"
+        });
+        if (result.checkoutUrl) {
+          window.location.href = result.checkoutUrl;
+        } else {
+          navigate('/payment-result?status=SUCCESS');
+        }
+      } catch (e: any) {
+        setError(e?.response?.data?.message || 'Cập nhật thất bại. Vui lòng thử lại.');
         setLoading(false);
       }
       return;

@@ -239,4 +239,10 @@ export const bookingService = {
     );
     return response.data.result!;
   },
+
+  updateBooking: async (id: number, data: any): Promise<any> => {
+    const response = await apiClient.put<ApiResponse<any>>(`/bookings/${id}/update`, data);
+    return response.data.result;
+  },
+
 };
