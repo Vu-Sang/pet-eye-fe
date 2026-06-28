@@ -1250,7 +1250,7 @@ export default function ClinicDetail() {
 
               {/* Filter tags */}
               <div className="flex flex-wrap gap-2 mb-6">
-                {['Tất cả', 'Có hình ảnh', 'Mới nhất'].map((f) => (
+                {['Tất cả', '5 sao', '4 sao', '3 sao', '2 sao', '1 sao', 'Có hình ảnh'].map((f) => (
                   <button
                     key={f}
                     onClick={() => setReviewFilter(f)}
@@ -1329,7 +1329,7 @@ export default function ClinicDetail() {
                     </div>
                   ))
                 ) : (
-                  <p className="text-slate-400 text-sm italic">Chưa có đánh giá nào cho phòng khám này.</p>
+                  <p className="text-slate-400 text-sm italic">Chưa có đánh giá nào cho cơ sở này.</p>
                 )}
               </div>
 

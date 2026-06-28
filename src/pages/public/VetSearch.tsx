@@ -32,6 +32,17 @@ const SHOP_TYPE_TABS = [
   { value: 'HOTEL', label: 'Lưu trú', icon: <Home size={16} /> },
   { value: 'MIXED', label: 'Tổng hợp', icon: <Store size={16} /> },
 ];
+const getShopTypeLabel = (type: string | undefined) => {
+  if (!type) return '';
+  const upper = type.toUpperCase();
+  if (upper.includes('CLINIC') || upper.includes('KHÁM') || upper.includes('BỆNH VIỆN')) return 'Khám thú y';
+  if (upper.includes('SPA') || upper.includes('GROOMING')) return 'Spa & Grooming';
+  if (upper.includes('HOTEL') || upper.includes('BOARDING') || upper.includes('LƯU TRÚ')) return 'Lưu trú';
+  if (upper.includes('MIXED') || upper.includes('TỔNG HỢP')) return 'Tổng hợp';
+  
+  const found = SHOP_TYPE_TABS.find(t => t.value === type || t.value.toUpperCase() === upper);
+  return found ? found.label : type;
+};
 
 const SORT_OPTIONS = ['Đánh giá cao nhất', 'Gần nhất', 'Mới nhất'];
 
@@ -362,31 +373,31 @@ export default function VetSearch() {
           <motion.div
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
-            className="w-full glass dark:glass-dark p-2 md:p-2 rounded-[32px] md:rounded-full shadow-3xl max-w-4xl mx-auto group focus-within:ring-4 md:focus-within:ring-8 ring-primary/10 transition-all"
+            className="w-full bg-white dark:bg-slate-900/80 p-1 md:p-2 rounded-2xl md:rounded-full shadow-2xl shadow-slate-200/50 dark:shadow-slate-900/50 max-w-4xl mx-auto group focus-within:ring-4 md:focus-within:ring-8 ring-primary/10 transition-all border border-slate-100 dark:border-slate-800"
           >
-            <div className="flex flex-col md:grid md:grid-cols-12 gap-1.5 md:gap-2 w-full">
+            <div className="flex flex-col md:grid md:grid-cols-12 w-full divide-y md:divide-y-0 md:divide-x divide-slate-100 dark:divide-slate-800">
               <div className="md:col-span-5 relative">
-                <Search className="absolute left-4 md:left-5 top-1/2 -translate-y-1/2 text-primary dark:text-white w-4 h-4 md:w-5 md:h-5" />
+                <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-primary dark:text-white w-4 h-4 md:w-5 md:h-5" />
                 <input
                   type="text"
                   placeholder="Tên cơ sở, dịch vụ..."
-                  className="w-full pl-11 md:pl-14 pr-4 py-3.5 md:py-5 bg-white/50 dark:bg-slate-900/50 rounded-full border-none focus:ring-0 text-slate-900 dark:text-white font-bold placeholder:text-slate-400 text-sm md:text-base"
+                  className="w-full pl-11 pr-4 py-4 md:py-5 bg-transparent border-none focus:ring-0 text-slate-900 dark:text-white font-bold placeholder:text-slate-400 text-sm md:text-base rounded-t-xl md:rounded-l-full md:rounded-tr-none"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                 />
               </div>
-              <div className="md:col-span-4 relative md:border-l border-slate-100 dark:border-slate-800">
-                <MapPin className="absolute left-4 md:left-5 top-1/2 -translate-y-1/2 text-secondary dark:text-white w-4 h-4 md:w-5 md:h-5" />
+              <div className="md:col-span-4 relative">
+                <MapPin className="absolute left-4 top-1/2 -translate-y-1/2 text-secondary dark:text-white w-4 h-4 md:w-5 md:h-5" />
                 <input
                   type="text"
                   placeholder="Khu vực, thành phố..."
-                  className="w-full pl-11 md:pl-14 pr-4 py-3.5 md:py-5 bg-white/30 md:bg-transparent dark:bg-slate-900/30 md:dark:bg-transparent rounded-full border-none focus:ring-0 text-slate-900 dark:text-white font-bold placeholder:text-slate-400 text-sm md:text-base"
+                  className="w-full pl-11 pr-4 py-4 md:py-5 bg-transparent border-none focus:ring-0 text-slate-900 dark:text-white font-bold placeholder:text-slate-400 text-sm md:text-base"
                   value={cityQuery}
                   onChange={(e) => setCityQuery(e.target.value)}
                 />
               </div>
-              <div className="md:col-span-3">
-                <button className="w-full h-full bg-primary hover:bg-primary-dark text-white rounded-full font-black transition-all flex items-center justify-center gap-2 py-3.5 md:py-5 shadow-xl shadow-primary/20 text-sm md:text-base">
+              <div className="md:col-span-3 p-1">
+                <button className="w-full h-full bg-primary hover:bg-primary/95 text-white rounded-xl md:rounded-full font-black transition-all flex items-center justify-center gap-2 py-3.5 md:py-4 shadow-md shadow-primary/20 text-sm md:text-base">
                   <Search size={16} />
                   TÌM CƠ SỞ
                 </button>
@@ -403,23 +414,24 @@ export default function VetSearch() {
           animate={{ opacity: 1, y: 0 }}
           className="mb-6 md:mb-10"
         >
-          <div className="flex overflow-x-auto scrollbar-hide -mx-4 px-4 md:mx-0 md:px-0 pb-2 md:pb-0 snap-x snap-mandatory">
-            <div className="inline-flex bg-white dark:bg-slate-900/80 border border-slate-200/80 dark:border-slate-800 p-1 md:p-1.5 rounded-full shadow-md shadow-slate-200/50 dark:shadow-slate-900/50 backdrop-blur-sm">
+          <div className="flex overflow-x-auto scrollbar-hide -mx-4 px-4 md:mx-0 md:px-0 pb-2 md:pb-0 snap-x snap-mandatory [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
+            <div className="inline-flex gap-2 md:gap-2">
               {SHOP_TYPE_TABS.map((tab) => {
                 const isActive = activeService === tab.value;
                 return (
                   <button
                     key={tab.value}
                     onClick={() => setActiveService(tab.value)}
-                    className={`relative flex items-center gap-1.5 md:gap-2 px-4 md:px-6 py-2.5 md:py-3.5 rounded-full text-xs md:text-sm font-black whitespace-nowrap transition-all z-10 snap-start ${isActive
-                      ? 'text-white'
-                      : 'text-slate-500 hover:text-slate-900 dark:hover:text-white'
-                      }`}
+                    className={`relative flex items-center gap-1.5 md:gap-2 px-4 md:px-5 py-2 md:py-2.5 rounded-full text-[13px] md:text-sm font-bold whitespace-nowrap transition-all z-10 snap-start ${
+                      isActive
+                        ? 'text-white shadow-lg shadow-primary/30 border border-transparent'
+                        : 'bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 text-slate-500 hover:text-slate-900 dark:hover:text-white hover:bg-slate-50 dark:hover:bg-slate-800 shadow-[0_2px_15px_-3px_rgba(6,81,237,0.08)]'
+                    }`}
                   >
                     {isActive && (
                       <motion.div
                         layoutId="active-pill"
-                        className="absolute inset-0 bg-primary rounded-full shadow-lg shadow-primary/25"
+                        className="absolute inset-0 bg-gradient-to-r from-primary to-blue-500 rounded-full"
                         transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
                       />
                     )}
@@ -512,12 +524,12 @@ export default function VetSearch() {
               {isLoading ? (
                 <>
                   {[1, 2, 3, 4].map((i) => (
-                    <div key={i} className={`glass dark:glass-dark rounded-2xl md:rounded-[32px] overflow-hidden ${viewMode === 'list' ? 'flex flex-col sm:flex-row h-auto sm:h-56' : 'h-[360px] md:h-[400px]'}`}>
-                      <div className="bg-slate-100 dark:bg-slate-800 animate-pulse shrink-0 w-full h-44 sm:h-full" />
-                      <div className="flex-1 p-4 md:p-6 space-y-3">
-                        <div className="h-5 bg-slate-100 dark:bg-slate-800 rounded-lg animate-pulse w-3/4" />
-                        <div className="h-4 bg-slate-100 dark:bg-slate-800 rounded-lg animate-pulse w-1/2" />
-                        <div className="h-3 bg-slate-100 dark:bg-slate-800 rounded-lg animate-pulse w-full" />
+                    <div key={i} className={`glass dark:glass-dark rounded-2xl md:rounded-[32px] overflow-hidden ${viewMode === 'list' ? 'flex flex-row h-32 sm:h-56' : 'flex flex-col h-[360px] md:h-[400px]'}`}>
+                      <div className={`bg-slate-100 dark:bg-slate-800 animate-pulse shrink-0 ${viewMode === 'list' ? 'w-[110px] sm:w-72 h-full' : 'w-full h-44 md:h-52'}`} />
+                      <div className="flex-1 p-3 sm:p-4 md:p-6 space-y-3">
+                        <div className="h-4 sm:h-5 bg-slate-100 dark:bg-slate-800 rounded-lg animate-pulse w-3/4" />
+                        <div className="h-3 sm:h-4 bg-slate-100 dark:bg-slate-800 rounded-lg animate-pulse w-1/2" />
+                        <div className="h-2 sm:h-3 bg-slate-100 dark:bg-slate-800 rounded-lg animate-pulse w-full" />
                       </div>
                     </div>
                   ))}
@@ -527,10 +539,10 @@ export default function VetSearch() {
                   <div key={`${shop.id}-${index}`} className="animate-fade-in-up" style={{ animationDelay: `${index * 0.05}s` }}>
                     <Link
                       to={`/clinic/${shop.id}`}
-                      className={`group bg-white dark:bg-slate-900/60 rounded-2xl md:rounded-[32px] overflow-hidden hover:shadow-xl hover:shadow-slate-200/60 dark:hover:shadow-slate-900/50 hover:-translate-y-1 transition-all duration-500 border border-slate-200/85 dark:border-slate-800/80 hover:border-primary/20 dark:hover:border-blue-500/30 h-full ${viewMode === 'list' ? 'flex flex-col sm:flex-row sm:h-64' : 'flex flex-col'}`}
+                      className={`group bg-white dark:bg-slate-900/60 rounded-2xl md:rounded-[32px] overflow-hidden hover:shadow-xl hover:shadow-slate-200/60 dark:hover:shadow-slate-900/50 hover:-translate-y-1 transition-all duration-500 border border-slate-200/85 dark:border-slate-800/80 hover:border-primary/20 dark:hover:border-blue-500/30 h-full ${viewMode === 'list' ? 'flex flex-row sm:h-64' : 'flex flex-col'}`}
                     >
                       {/* Image */}
-                      <div className={`relative overflow-hidden shrink-0 bg-slate-100 dark:bg-slate-800 ${viewMode === 'list' ? 'sm:w-72 w-full h-44 sm:h-auto' : 'h-44 md:h-52'}`}>
+                      <div className={`relative overflow-hidden shrink-0 bg-slate-100 dark:bg-slate-800 ${viewMode === 'list' ? 'w-[110px] sm:w-72' : 'h-44 md:h-52 w-full'}`}>
                         <img
                           src={shop.logoUrl || shop.licenseImageUrl || 'https://images.unsplash.com/photo-1516734212186-a967f81ad0d7?q=80&w=800&auto=format&fit=crop'}
                           alt={shop.shopName}
@@ -540,29 +552,29 @@ export default function VetSearch() {
 
                         {/* Badges */}
                         <div className="absolute top-3 md:top-4 left-3 md:left-4 flex flex-col gap-2">
-                          <span className="bg-gradient-to-r from-emerald-500 to-teal-500 px-2.5 md:px-3 py-1 md:py-1.5 rounded-lg md:rounded-xl text-[9px] font-black text-white uppercase tracking-widest flex items-center gap-1.5 shadow-lg shadow-emerald-500/20">
-                            <CheckCircle2 size={10} className="text-white" />
-                            ĐỐI TÁC
+                          <span className="bg-gradient-to-r from-emerald-500 to-teal-500 px-2 sm:px-2.5 md:px-3 py-1 md:py-1.5 rounded-md sm:rounded-lg md:rounded-xl text-[8px] sm:text-[9px] font-black text-white uppercase tracking-widest flex items-center gap-1 sm:gap-1.5 shadow-lg shadow-emerald-500/20">
+                            <CheckCircle2 size={10} className="text-white shrink-0" />
+                            <span className="hidden sm:inline">ĐỐI TÁC</span>
                           </span>
                         </div>
 
                         {shop.shopType && (
-                          <span className="absolute bottom-3 md:bottom-4 left-3 md:left-4 bg-white/90 dark:bg-slate-900/90 backdrop-blur-md text-primary text-[9px] font-bold px-2.5 md:px-3 py-1 md:py-1.5 rounded-lg md:rounded-xl uppercase tracking-widest dark:text-white">
-                            {SHOP_TYPE_TABS.find(t => t.value === shop.shopType)?.label ?? shop.shopType}
+                          <span className="absolute bottom-2 sm:bottom-3 md:bottom-4 left-2 sm:left-3 md:left-4 bg-white/90 dark:bg-slate-900/90 backdrop-blur-md text-primary text-[8px] sm:text-[9px] font-bold px-1.5 sm:px-2.5 md:px-3 py-0.5 sm:py-1 md:py-1.5 rounded-md sm:rounded-lg md:rounded-xl uppercase tracking-widest dark:text-white truncate max-w-[90px] sm:max-w-none">
+                            {getShopTypeLabel(shop.shopType)}
                           </span>
                         )}
                       </div>
 
                       {/* Info Content */}
-                      <div className="flex-1 p-4 md:p-6 flex flex-col justify-between">
-                        <div className="space-y-2 md:space-y-3">
-                          <div className="flex items-start justify-between gap-3">
-                            <h3 className="font-black text-slate-900 dark:text-white text-base md:text-lg leading-tight group-hover:text-primary transition-colors line-clamp-2">
+                      <div className="flex-1 p-3 sm:p-4 md:p-6 flex flex-col justify-between min-w-0">
+                        <div className="space-y-1.5 sm:space-y-2 md:space-y-3">
+                          <div className="flex items-start justify-between gap-2 sm:gap-3">
+                            <h3 className="font-black text-slate-900 dark:text-white text-sm sm:text-base md:text-lg leading-tight group-hover:text-primary transition-colors line-clamp-2">
                               {shop.shopName}
                             </h3>
-                            <div className="flex items-center gap-1 shrink-0 bg-amber-50 dark:bg-amber-400/10 px-2 md:px-2.5 py-1 md:py-1.5 rounded-lg md:rounded-xl border border-amber-100 dark:border-amber-400/20">
-                              <Star size={12} className="text-amber-500 fill-amber-500" />
-                              <span className="font-black text-amber-700 dark:text-amber-400 text-[11px] md:text-xs">
+                            <div className="flex items-center gap-0.5 sm:gap-1 shrink-0 bg-amber-50 dark:bg-amber-400/10 px-1.5 sm:px-2 md:px-2.5 py-0.5 sm:py-1 md:py-1.5 rounded-md sm:rounded-lg md:rounded-xl border border-amber-100 dark:border-amber-400/20">
+                              <Star size={10} className="text-amber-500 fill-amber-500 sm:w-3 sm:h-3" />
+                              <span className="font-black text-amber-700 dark:text-amber-400 text-[10px] sm:text-[11px] md:text-xs">
                                 {shop.ratingAvg > 0 ? shop.ratingAvg.toFixed(1) : 'Mới'}
                               </span>
                             </div>
@@ -575,8 +587,8 @@ export default function VetSearch() {
                                 {(shop as any).distanceKm.toFixed(1)} km
                               </div>
                             )}
-                            <div className="flex items-center gap-1.5 text-slate-500 dark:text-slate-400 text-[11px] md:text-xs font-medium min-w-0">
-                              <MapPin size={12} className="text-slate-400 dark:text-white shrink-0" />
+                            <div className="flex items-center gap-1 sm:gap-1.5 text-slate-500 dark:text-slate-400 text-[10px] sm:text-[11px] md:text-xs font-medium min-w-0">
+                              <MapPin size={10} className="text-slate-400 dark:text-white shrink-0 sm:w-3 sm:h-3" />
                               <span className="truncate">{shop.address}{shop.city ? `, ${shop.city}` : ''}</span>
                             </div>
                           </div>
@@ -588,12 +600,12 @@ export default function VetSearch() {
                           )}
                         </div>
 
-                        <div className="flex items-center justify-between mt-4 md:mt-6 pt-3 md:pt-4 border-t border-slate-100 dark:border-slate-800">
-                          <div className="flex items-center gap-2">
+                        <div className="flex items-center justify-end sm:justify-between mt-2 sm:mt-4 md:mt-6 pt-2 sm:pt-3 md:pt-4 border-t border-slate-100 dark:border-slate-800">
+                          <div className="hidden sm:flex items-center gap-2">
                             <div className="w-7 h-7 md:w-8 md:h-8 rounded-lg bg-slate-50 dark:bg-slate-800 flex items-center justify-center text-slate-400 dark:text-white">
                               <Phone size={12} />
                             </div>
-                            <span className="text-[10px] font-black text-slate-400 uppercase tracking-wider hidden sm:inline">{shop.phone}</span>
+                            <span className="text-[10px] font-black text-slate-400 uppercase tracking-wider">{shop.phone}</span>
                           </div>
                           <div className="flex items-center gap-1.5 md:gap-2 text-primary font-black text-[10px] md:text-[10px] uppercase tracking-widest group-hover:gap-3 transition-all dark:text-white">
                             Xem chi tiết

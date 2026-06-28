@@ -793,70 +793,68 @@ export default function BookingHistory() {
             </div>
 
             {/* Filters & Search Control Panel */}
-            <div className="flex flex-col gap-6 bg-white dark:bg-slate-900 p-6 rounded-[2.5rem] border border-slate-100 dark:border-slate-800/80">
-                {/* Tabs & Search */}
-                <div className="flex flex-col lg:flex-row lg:items-center gap-4 w-full justify-between">
-                    {/* Navigation Tabs */}
-                    <div className="flex items-center gap-2 p-1 bg-slate-50 dark:bg-slate-900 rounded-[1.5rem] border border-slate-200 dark:border-slate-700 w-fit overflow-x-auto shrink-0 max-w-full">
-                        {TABS.map(tab => (
-                            <button
-                                key={tab.key} onClick={() => { setActiveTab(tab.key); setPage(0); }}
-                                className={`px-5 py-2.5 rounded-[1.2rem] text-[10px] font-black uppercase tracking-widest transition-all flex items-center gap-2 ${activeTab === tab.key ? 'bg-primary text-white shadow-md shadow-primary/20' : 'text-slate-400 hover:text-slate-600'}`}
-                            >
-                                {tab.label}
-                            </button>
-                        ))}
-                    </div>
+            <div className="flex flex-col gap-6 mb-8">
+                {/* 1. Status Navigation Tabs (Underline Style) */}
+                <div className="flex items-center gap-6 lg:gap-8 border-b border-slate-200 dark:border-slate-800 overflow-x-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none] w-full">
+                    {TABS.map(tab => (
+                        <button
+                            key={tab.key} 
+                            onClick={() => { setActiveTab(tab.key); setPage(0); }}
+                            className={`pb-4 text-[13px] font-black uppercase tracking-widest whitespace-nowrap transition-all border-b-[3px] ${activeTab === tab.key ? 'border-primary text-primary' : 'border-transparent text-slate-400 hover:text-slate-600 dark:hover:text-slate-300'}`}
+                        >
+                            {tab.label}
+                        </button>
+                    ))}
+                </div>
 
+                {/* 2. Search & Sub-filters Toolbar */}
+                <div className="flex flex-col xl:flex-row gap-4 w-full">
                     {/* Search Input */}
-                    <div className="relative w-full lg:w-80">
-                        <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={16} />
+                    <div className="relative w-full xl:w-96 shrink-0">
+                        <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
                         <input
                             type="text"
                             value={searchQuery}
                             onChange={(e) => { setSearchQuery(e.target.value); setPage(0); }}
                             placeholder="Tìm kiếm cửa hàng, dịch vụ..."
-                            className="w-full pl-11 pr-10 py-3 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-2xl outline-none font-bold text-xs text-slate-800 dark:text-white placeholder-slate-400 focus:border-primary/50 transition-all shadow-sm focus:ring-4 focus:ring-primary/10"
+                            className="w-full pl-12 pr-10 py-3.5 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-2xl outline-none font-bold text-sm text-slate-800 dark:text-white placeholder-slate-400 focus:border-primary transition-all shadow-sm focus:ring-4 focus:ring-primary/10"
                         />
                         {searchQuery && (
                             <button
                                 onClick={() => { setSearchQuery(''); setPage(0); }}
-                                className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
+                                className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 bg-slate-100 dark:bg-slate-800 p-1 rounded-full"
                             >
                                 <X size={14} />
                             </button>
                         )}
                     </div>
-                </div>
 
-                {/* Sub Filters: Pet & Category */}
-                <div className="flex flex-col sm:flex-row sm:items-center gap-6 pt-4 border-t border-slate-100 dark:border-slate-800/60 w-full">
-                    {/* Pet Filter */}
-                    <div className="flex items-center gap-2">
-                        <span className="text-[10px] font-black text-slate-400 uppercase tracking-wider shrink-0">Thú cưng:</span>
-                        <div className="flex flex-wrap items-center gap-1.5">
+                    {/* Filter Chips Wrapping Container */}
+                    <div className="flex flex-wrap items-center gap-3 pb-2 xl:pb-0 w-full">
+                        {/* Pet Filter */}
+                        <div className="flex items-center gap-1.5 overflow-x-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none] bg-white dark:bg-slate-900 p-1.5 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-sm max-w-full">
+                            <span className="text-[10px] font-black text-slate-400 uppercase tracking-wider px-2 flex items-center gap-1 shrink-0">
+                                <span className="material-symbols-outlined text-[14px]">pets</span>
+                            </span>
                             {petsList.map(petName => (
                                 <button
                                     key={petName}
                                     onClick={() => { setSelectedPet(petName); setPage(0); }}
-                                    className={`px-3 py-1.5 rounded-xl text-[10px] font-bold transition-all border ${selectedPet === petName
-                                        ? 'bg-slate-900 dark:bg-white text-white dark:text-slate-900 border-transparent shadow-sm'
-                                        : 'bg-white dark:bg-slate-900 text-slate-500 hover:text-slate-800 border-slate-200 dark:border-slate-700 hover:border-slate-300 hover:shadow-sm'
+                                    className={`px-3 py-1.5 rounded-xl text-xs font-bold whitespace-nowrap transition-all ${selectedPet === petName
+                                        ? 'bg-slate-900 dark:bg-white text-white dark:text-slate-900 shadow-sm'
+                                        : 'text-slate-500 hover:text-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800'
                                         }`}
                                 >
                                     {petName === 'all' ? 'Tất cả' : petName}
                                 </button>
                             ))}
                         </div>
-                    </div>
 
-                    {/* Divider */}
-                    <div className="hidden sm:block w-px h-6 bg-slate-200 dark:bg-slate-850" />
-
-                    {/* Category Filter */}
-                    <div className="flex items-center gap-2">
-                        <span className="text-[10px] font-black text-slate-400 uppercase tracking-wider shrink-0">Dịch vụ:</span>
-                        <div className="flex items-center gap-1.5">
+                        {/* Category Filter */}
+                        <div className="flex items-center gap-1.5 overflow-x-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none] bg-white dark:bg-slate-900 p-1.5 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-sm max-w-full">
+                            <span className="text-[10px] font-black text-slate-400 uppercase tracking-wider px-2 flex items-center gap-1 shrink-0">
+                                <span className="material-symbols-outlined text-[14px]">category</span>
+                            </span>
                             {[
                                 { key: 'all', label: 'Tất cả' },
                                 { key: 'boarding', label: 'Lưu trú' },
@@ -866,38 +864,35 @@ export default function BookingHistory() {
                                 <button
                                     key={cat.key}
                                     onClick={() => { setSelectedCategory(cat.key); }}
-                                    className={`px-3 py-1.5 rounded-xl text-[10px] font-bold transition-all border ${selectedCategory === cat.key
-                                        ? 'bg-slate-900 dark:bg-white text-white dark:text-slate-900 border-transparent shadow-sm'
-                                        : 'bg-white dark:bg-slate-900 text-slate-500 hover:text-slate-800 border-slate-200 dark:border-slate-700 hover:border-slate-300 hover:shadow-sm'
+                                    className={`px-3 py-1.5 rounded-xl text-xs font-bold whitespace-nowrap transition-all ${selectedCategory === cat.key
+                                        ? 'bg-slate-900 dark:bg-white text-white dark:text-slate-900 shadow-sm'
+                                        : 'text-slate-500 hover:text-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800'
                                         }`}
                                 >
                                     {cat.label}
                                 </button>
                             ))}
                         </div>
-                    </div>
 
-                    {/* Divider */}
-                    <div className="hidden sm:block w-px h-6 bg-slate-200 dark:bg-slate-850" />
-
-                    {/* Sort Order */}
-                    <div className="flex items-center gap-2">
-                        <span className="text-[10px] font-black text-slate-400 uppercase tracking-wider shrink-0">Ngày tạo:</span>
-                        <div className="flex items-center gap-1.5 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl p-1">
+                        {/* Sort Order */}
+                        <div className="flex items-center gap-1.5 overflow-x-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none] bg-white dark:bg-slate-900 p-1.5 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-sm max-w-full">
+                            <span className="text-[10px] font-black text-slate-400 uppercase tracking-wider px-2 flex items-center gap-1 shrink-0">
+                                <span className="material-symbols-outlined text-[14px]">sort</span>
+                            </span>
                             <button
                                 onClick={() => setSortOrder('desc')}
-                                className={`px-3 py-1 rounded-lg text-[10px] font-bold transition-all ${sortOrder === 'desc'
+                                className={`px-3 py-1.5 rounded-xl text-xs font-bold whitespace-nowrap transition-all ${sortOrder === 'desc'
                                     ? 'bg-slate-100 dark:bg-slate-800 text-slate-900 dark:text-white'
-                                    : 'text-slate-500 hover:text-slate-700'
+                                    : 'text-slate-500 hover:text-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800'
                                     }`}
                             >
                                 Mới nhất
                             </button>
                             <button
                                 onClick={() => setSortOrder('asc')}
-                                className={`px-3 py-1 rounded-lg text-[10px] font-bold transition-all ${sortOrder === 'asc'
+                                className={`px-3 py-1.5 rounded-xl text-xs font-bold whitespace-nowrap transition-all ${sortOrder === 'asc'
                                     ? 'bg-slate-100 dark:bg-slate-800 text-slate-900 dark:text-white'
-                                    : 'text-slate-500 hover:text-slate-700'
+                                    : 'text-slate-500 hover:text-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800'
                                     }`}
                             >
                                 Cũ nhất
