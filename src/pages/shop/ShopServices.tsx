@@ -47,6 +47,7 @@ interface ServiceForm {
   cameraDescription: string;
   cageSize: string;
   roomType: string;
+  roomTypePricesStr: string;
 }
 
 const EMPTY_FORM: ServiceForm = {
@@ -66,6 +67,7 @@ const EMPTY_FORM: ServiceForm = {
   cameraDescription: '',
   cageSize: '',
   roomType: '',
+  roomTypePricesStr: '',
 };
 
 // ─── Component ────────────────────────────────────────────────────────────────
@@ -168,6 +170,7 @@ export default function ShopServices() {
       cameraDescription: service.cameraDescription ?? '',
       cageSize: service.cageSize?.join(', ') ?? '',
       roomType: service.roomType?.join(', ') ?? '',
+      roomTypePricesStr: service.roomType?.map(rt => service.roomTypePrices?.[rt] || 0).join(', ') ?? '',
     });
     setImagePreview(service.imageUrl ?? '');
     setShowModal(true);
@@ -236,6 +239,13 @@ export default function ShopServices() {
             cameraDescription: form.cameraEnabled ? form.cameraDescription : undefined,
             cageSize: form.cageSize ? form.cageSize.split(',').map(s=>s.trim()).filter(Boolean) : undefined,
             roomType: form.roomType ? form.roomType.split(',').map(s=>s.trim()).filter(Boolean) : undefined,
+            roomTypePrices: (() => {
+              const rts = form.roomType ? form.roomType.split(',').map(s=>s.trim()).filter(Boolean) : [];
+              const prices = form.roomTypePricesStr ? form.roomTypePricesStr.split(',').map(s=>Number(s.trim())).filter(n=>!isNaN(n)) : [];
+              const map: Record<string, number> = {};
+              rts.forEach((rt, i) => map[rt] = prices[i] || 0);
+              return map;
+            })(),
             prices: form.pricesStr ? form.pricesStr.split(',').map(s=>Number(s.trim())).filter(n=>!isNaN(n)) : undefined,
           }),
         };
@@ -260,6 +270,13 @@ export default function ShopServices() {
             cameraDescription: form.cameraEnabled ? form.cameraDescription : undefined,
             cageSize: form.cageSize ? form.cageSize.split(',').map(s=>s.trim()).filter(Boolean) : undefined,
             roomType: form.roomType ? form.roomType.split(',').map(s=>s.trim()).filter(Boolean) : undefined,
+            roomTypePrices: (() => {
+              const rts = form.roomType ? form.roomType.split(',').map(s=>s.trim()).filter(Boolean) : [];
+              const prices = form.roomTypePricesStr ? form.roomTypePricesStr.split(',').map(s=>Number(s.trim())).filter(n=>!isNaN(n)) : [];
+              const map: Record<string, number> = {};
+              rts.forEach((rt, i) => map[rt] = prices[i] || 0);
+              return map;
+            })(),
             prices: form.pricesStr ? form.pricesStr.split(',').map(s=>Number(s.trim())).filter(n=>!isNaN(n)) : undefined,
           }),
         };
@@ -814,6 +831,18 @@ export default function ShopServices() {
                       onChange={(e) => setForm((prev) => ({ ...prev, roomType: e.target.value }))}
                       className={`w-full px-4 py-2 border rounded-lg focus:ring-2 outline-none transition-all ${isDark ? 'bg-[#0b1121] border-white/10 text-white focus:ring-indigo-500/50 focus:border-indigo-500 placeholder-slate-500' : 'bg-white border-slate-200 text-slate-900 focus:ring-indigo-500/20 focus:border-indigo-500 placeholder-slate-400'}`}
                       placeholder="VD: Tiêu chuẩn, VIP"
+                    />
+                  </div>
+                  <div className="md:col-span-2">
+                    <label className={`block text-sm font-bold mb-2 ${isDark ? 'text-slate-300' : 'text-slate-700'}`}>
+                      Giá cộng thêm cho Loại phòng (đ/ngày) <span className="font-normal text-xs text-slate-500">(nhập tương ứng với thứ tự loại phòng ở trên, ngăn cách bởi dấu phẩy)</span>
+                    </label>
+                    <input
+                      type="text"
+                      value={form.roomTypePricesStr}
+                      onChange={(e) => setForm((prev) => ({ ...prev, roomTypePricesStr: e.target.value }))}
+                      className={`w-full px-4 py-2 border rounded-lg focus:ring-2 outline-none transition-all ${isDark ? 'bg-[#0b1121] border-white/10 text-white focus:ring-indigo-500/50 focus:border-indigo-500 placeholder-slate-500' : 'bg-white border-slate-200 text-slate-900 focus:ring-indigo-500/20 focus:border-indigo-500 placeholder-slate-400'}`}
+                      placeholder="VD: 0, 100000"
                     />
                   </div>
                 </div>
