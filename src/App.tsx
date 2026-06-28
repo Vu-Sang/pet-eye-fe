@@ -115,18 +115,18 @@ function AppLayout() {
         )}
 
         <Routes>
-          <Route path="/" element={<Home />} />
+          <Route path="/" element={user && user.role !== 'USER' ? <Navigate to={getRedirectPath()} replace /> : <Home />} />
           <Route path="/user/dashboard" element={user ? <HomePage /> : <Navigate to="/" replace />} />
           <Route path="/about" element={<About />} />
           <Route path="/terms" element={<Legal />} />
           <Route path="/privacy" element={<Legal />} />
-          <Route path="/login" element={<Login />} />
+          <Route path="/login" element={user ? <Navigate to={getRedirectPath()} replace /> : <Login />} />
           <Route path="/login/zalo/callback" element={<ZaloCallback />} />
-          <Route path="/register" element={<Register />} />
+          <Route path="/register" element={user ? <Navigate to={getRedirectPath()} replace /> : <Register />} />
           <Route path="/complete-profile" element={<CompleteProfile />} />
           <Route path="/verify-email" element={<VerifyEmail />} />
           <Route path="/forgot-password" element={<ForgotPassword />} />
-          <Route path="/shop/login" element={<Login />} />
+          <Route path="/shop/login" element={user ? <Navigate to={getRedirectPath()} replace /> : <Login />} />
           <Route path="/shop/register" element={<ShopRegister />} />
           <Route path="/shop/register/success" element={<ShopRegisterSuccess />} />
           
