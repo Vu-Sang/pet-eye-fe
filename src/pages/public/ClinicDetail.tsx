@@ -257,6 +257,17 @@ export default function ClinicDetail() {
     return boardingService.price ?? 0;
   }, [boardingService, selectedCageSize]);
 
+  const roomTypeExtraPrice = useMemo(() => {
+    if (!boardingService || !selectedRoomType || !boardingService.roomTypePrices) return 0;
+    return boardingService.roomTypePrices[selectedRoomType] || 0;
+  }, [boardingService, selectedRoomType]);
+
+  const cageSizeExtraPrice = useMemo(() => {
+    if (!boardingService) return 0;
+    const base = boardingService.price ?? 0;
+    return boardingBasePrice > base ? boardingBasePrice - base : 0;
+  }, [boardingService, boardingBasePrice]);
+
   // ── Staff selection ─────────────────────────────────────────────────────────
   const [selectedStaff, setSelectedStaff] = useState<StaffResponse | null>(null);
   const [selectedStaffId, setSelectedStaffId] = useState<number | null>(editBooking?.staffId || null);
@@ -476,7 +487,7 @@ export default function ClinicDetail() {
     const svc = apiServices.find((s: ServiceResponse) => s.id === id);
     return sum + (svc ? svc.price : 0);
   }, 0) + (isHotelSelected
-    ? (boardingBasePrice + cameraTierExtraPrice) * boardingDays
+    ? (boardingBasePrice + cameraTierExtraPrice + roomTypeExtraPrice) * boardingDays
     : 0);
 
   // ── Can book ────────────────────────────────────────────────────────────────
@@ -622,10 +633,11 @@ export default function ClinicDetail() {
     });
 
     if (isHotelSelected && boardingService) {
-      const boardingPrice = (boardingBasePrice + cameraTierExtraPrice) * boardingDays;
+      const boardingPrice = (boardingBasePrice + cameraTierExtraPrice + roomTypeExtraPrice) * boardingDays;
+      const roomTypeLabel = selectedRoomType ? ` · ${selectedRoomType}` : '';
       selectedServices.unshift({
         id: boardingService.id,
-        name: `${boardingService.serviceName} · Camera ${tierLabel(selectedCameraTier, boardingService.cameraTierLabels)} · ${boardingDays} ngày`,
+        name: `${boardingService.serviceName} · Camera ${tierLabel(selectedCameraTier, boardingService.cameraTierLabels)}${roomTypeLabel} · ${boardingDays} ngày`,
         price: boardingPrice,
         durationMinutes: undefined,
         category: boardingService.category,
@@ -923,8 +935,26 @@ export default function ClinicDetail() {
                     </div>
                   </div>
                   <div className="flex items-center gap-2">
-                    <span className="text-sm font-bold text-slate-900 dark:text-white">{boardingBasePrice.toLocaleString('vi-VN')}đ</span>
-                    <span className="text-xs text-slate-400">/ngày</span>
+                    <div className="flex flex-col items-end">
+                      <div className="flex items-center gap-1">
+                        <span className="text-sm font-bold text-slate-900 dark:text-white">{(boardingBasePrice + roomTypeExtraPrice).toLocaleString('vi-VN')}đ</span>
+                        <span className="text-xs text-slate-400">/ngày</span>
+                      </div>
+                      {(cageSizeExtraPrice > 0 || roomTypeExtraPrice > 0) && (
+                        <div className="flex flex-col items-end mt-0.5 gap-0.5">
+                          {cageSizeExtraPrice > 0 && (
+                            <span className="text-[10px] text-indigo-500 font-medium bg-indigo-50 dark:bg-indigo-500/10 px-1.5 py-0.5 rounded">
+                              + {cageSizeExtraPrice.toLocaleString('vi-VN')}đ (chuồng {selectedCageSize})
+                            </span>
+                          )}
+                          {roomTypeExtraPrice > 0 && (
+                            <span className="text-[10px] text-indigo-500 font-medium bg-indigo-50 dark:bg-indigo-500/10 px-1.5 py-0.5 rounded">
+                              + {roomTypeExtraPrice.toLocaleString('vi-VN')}đ (phòng {selectedRoomType})
+                            </span>
+                          )}
+                        </div>
+                      )}
+                    </div>
                     <div
                       onClick={() => setIsHotelSelected(!isHotelSelected)}
                       className={`relative w-12 h-6 rounded-full cursor-pointer transition-all duration-300 ml-2 ${isHotelSelected ? 'bg-indigo-600 shadow-inner' : 'bg-slate-200 dark:bg-slate-700'}`}
@@ -978,12 +1008,18 @@ export default function ClinicDetail() {
                                     onChange={(e) => setSelectedRoomType(e.target.value)}
                                     className="px-3 py-1.5 border border-slate-200 dark:border-slate-700 rounded-lg text-sm font-semibold text-slate-800 dark:text-slate-200 bg-white dark:bg-slate-800 focus:ring-2 focus:ring-[#1a2b4c] outline-none"
                                   >
-                                    {boardingService.roomType.map((r: string) => (
-                                      <option key={r} value={r}>{r}</option>
-                                    ))}
+                                    {boardingService.roomType.map((r: string) => {
+                                      return (
+                                        <option key={r} value={r}>
+                                          {r}
+                                        </option>
+                                      );
+                                    })}
                                   </select>
                                 ) : (
-                                  <span className="text-sm font-semibold text-slate-800 dark:text-slate-200">{boardingService.roomType[0]}</span>
+                                  <span className="text-sm font-semibold text-slate-800 dark:text-slate-200">
+                                    {boardingService.roomType[0]}
+                                  </span>
                                 )}
                               </div>
                             )}

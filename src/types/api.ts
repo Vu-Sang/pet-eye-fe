@@ -81,6 +81,7 @@ export interface ServiceResponse {
   cameraDescription?: string;
   cageSize?: string[];
   roomType?: string[];
+  roomTypePrices?: Record<string, number>;
   prices?: number[];
 }
 
@@ -99,6 +100,7 @@ export interface ServiceCreationRequest {
   cameraDescription?: string;
   cageSize?: string[];
   roomType?: string[];
+  roomTypePrices?: Record<string, number>;
   prices?: number[];
 }
 
@@ -118,6 +120,7 @@ export interface ServiceUpdateRequest {
   cameraDescription?: string;
   cageSize?: string[];
   roomType?: string[];
+  roomTypePrices?: Record<string, number>;
   prices?: number[];
 }
 
