@@ -32,6 +32,7 @@ function categoryLabel(cat: string): string {
 interface ServiceForm {
   serviceName: string;
   price: number;
+  pricesStr: string;
   durationMinutes: number;   // for BOARDING: stored as days in UI, converted to minutes on save
   durationDays: number;      // UI-only field for BOARDING
   description: string;
@@ -51,6 +52,7 @@ interface ServiceForm {
 const EMPTY_FORM: ServiceForm = {
   serviceName: '',
   price: 0,
+  pricesStr: '',
   durationMinutes: 1440,  // 1 day default for BOARDING
   durationDays: 1,
   description: '',
@@ -152,6 +154,7 @@ export default function ShopServices() {
     setForm({
       serviceName: service.serviceName,
       price: service.price,
+      pricesStr: service.prices?.join(', ') ?? (service.category === 'BOARDING' && service.price > 0 ? String(service.price) : ''),
       durationMinutes: service.durationMinutes,
       durationDays,
       description: service.description ?? '',
@@ -221,7 +224,7 @@ export default function ShopServices() {
         const payload: ServiceCreationRequest = {
           serviceName: form.serviceName,
           category: form.category,
-          price: form.price,
+          price: form.category === 'BOARDING' && form.pricesStr ? (Number(form.pricesStr.split(',')[0].trim()) || 0) : form.price,
           durationMinutes,
           description: form.description,
           imageUrl: form.imageUrl || undefined,
@@ -233,6 +236,7 @@ export default function ShopServices() {
             cameraDescription: form.cameraEnabled ? form.cameraDescription : undefined,
             cageSize: form.cageSize ? form.cageSize.split(',').map(s=>s.trim()).filter(Boolean) : undefined,
             roomType: form.roomType ? form.roomType.split(',').map(s=>s.trim()).filter(Boolean) : undefined,
+            prices: form.pricesStr ? form.pricesStr.split(',').map(s=>Number(s.trim())).filter(n=>!isNaN(n)) : undefined,
           }),
         };
         const created = await serviceService.createService(payload);
@@ -243,7 +247,7 @@ export default function ShopServices() {
         const payload: ServiceUpdateRequest = {
           serviceName: form.serviceName,
           category: form.category,
-          price: form.price,
+          price: form.category === 'BOARDING' && form.pricesStr ? (Number(form.pricesStr.split(',')[0].trim()) || 0) : form.price,
           durationMinutes,
           description: form.description,
           imageUrl: form.imageUrl || undefined,
@@ -256,6 +260,7 @@ export default function ShopServices() {
             cameraDescription: form.cameraEnabled ? form.cameraDescription : undefined,
             cageSize: form.cageSize ? form.cageSize.split(',').map(s=>s.trim()).filter(Boolean) : undefined,
             roomType: form.roomType ? form.roomType.split(',').map(s=>s.trim()).filter(Boolean) : undefined,
+            prices: form.pricesStr ? form.pricesStr.split(',').map(s=>Number(s.trim())).filter(n=>!isNaN(n)) : undefined,
           }),
         };
         const updated = await serviceService.updateService(editingId, payload);
@@ -704,20 +709,33 @@ export default function ShopServices() {
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <label className={`block text-sm font-bold mb-2 ${isDark ? 'text-slate-300' : 'text-slate-700'}`}>
-                    Giá (đ) * <span className="font-normal text-slate-500">{form.category === 'BOARDING' ? '/ngày' : '/lần'}</span>
+                    Giá (đ) * <span className="font-normal text-slate-500">{form.category === 'BOARDING' ? '/ngày (phân cách bởi dấu phẩy nếu nhiều giá)' : '/lần'}</span>
                   </label>
-                  <input
-                    type="number"
-                    min={0}
-                    step={1000}
-                    value={form.price === 0 ? '' : form.price}
-                    onChange={(e) => setForm((prev) => ({ ...prev, price: Number(e.target.value) }))}
-                    onInvalid={(e) => (e.target as HTMLInputElement).setCustomValidity('Vui lòng điền giá dịch vụ.')}
-                    onInput={(e) => (e.target as HTMLInputElement).setCustomValidity('')}
-                    className={`w-full px-4 py-2 border rounded-lg focus:ring-2 outline-none transition-all ${isDark ? 'bg-[#0b1121] border-white/10 text-white focus:ring-indigo-500/50 focus:border-indigo-500 placeholder-slate-500' : 'bg-white border-slate-200 text-slate-900 focus:ring-indigo-500/20 focus:border-indigo-500 placeholder-slate-400'}`}
-                    placeholder="150000"
-                    required
-                  />
+                  {form.category === 'BOARDING' ? (
+                    <input
+                      type="text"
+                      value={form.pricesStr}
+                      onChange={(e) => setForm((prev) => ({ ...prev, pricesStr: e.target.value }))}
+                      onInvalid={(e) => (e.target as HTMLInputElement).setCustomValidity('Vui lòng điền giá dịch vụ.')}
+                      onInput={(e) => (e.target as HTMLInputElement).setCustomValidity('')}
+                      className={`w-full px-4 py-2 border rounded-lg focus:ring-2 outline-none transition-all ${isDark ? 'bg-[#0b1121] border-white/10 text-white focus:ring-indigo-500/50 focus:border-indigo-500 placeholder-slate-500' : 'bg-white border-slate-200 text-slate-900 focus:ring-indigo-500/20 focus:border-indigo-500 placeholder-slate-400'}`}
+                      placeholder="VD: 150000, 200000"
+                      required
+                    />
+                  ) : (
+                    <input
+                      type="number"
+                      min={0}
+                      step={1000}
+                      value={form.price === 0 ? '' : form.price}
+                      onChange={(e) => setForm((prev) => ({ ...prev, price: Number(e.target.value) }))}
+                      onInvalid={(e) => (e.target as HTMLInputElement).setCustomValidity('Vui lòng điền giá dịch vụ.')}
+                      onInput={(e) => (e.target as HTMLInputElement).setCustomValidity('')}
+                      className={`w-full px-4 py-2 border rounded-lg focus:ring-2 outline-none transition-all ${isDark ? 'bg-[#0b1121] border-white/10 text-white focus:ring-indigo-500/50 focus:border-indigo-500 placeholder-slate-500' : 'bg-white border-slate-200 text-slate-900 focus:ring-indigo-500/20 focus:border-indigo-500 placeholder-slate-400'}`}
+                      placeholder="150000"
+                      required
+                    />
+                  )}
                 </div>
                 <div>
                   {form.category === 'BOARDING' ? (

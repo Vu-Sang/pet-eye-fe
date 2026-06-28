@@ -243,6 +243,17 @@ export default function ClinicDetail() {
     ? Math.max(1, Math.round((new Date(checkOutDate).getTime() - new Date(checkInDate).getTime()) / 86400000))
     : 0;
 
+  const boardingBasePrice = useMemo(() => {
+    if (!boardingService) return 0;
+    if (boardingService.cageSize?.length && boardingService.prices?.length) {
+      const idx = boardingService.cageSize.indexOf(selectedCageSize);
+      if (idx !== -1 && typeof boardingService.prices[idx] === 'number') {
+        return boardingService.prices[idx];
+      }
+    }
+    return boardingService.price ?? 0;
+  }, [boardingService, selectedCageSize]);
+
   // ── Staff selection ─────────────────────────────────────────────────────────
   const [selectedStaff, setSelectedStaff] = useState<StaffResponse | null>(null);
   const [selectedStaffId, setSelectedStaffId] = useState<number | null>(null);
@@ -462,7 +473,7 @@ export default function ClinicDetail() {
     const svc = apiServices.find((s: ServiceResponse) => s.id === id);
     return sum + (svc ? svc.price : 0);
   }, 0) + (isHotelSelected
-    ? ((boardingService?.price ?? 0) + cameraTierExtraPrice) * boardingDays
+    ? (boardingBasePrice + cameraTierExtraPrice) * boardingDays
     : 0);
 
   // ── Can book ────────────────────────────────────────────────────────────────
@@ -608,7 +619,7 @@ export default function ClinicDetail() {
     });
 
     if (isHotelSelected && boardingService) {
-      const boardingPrice = ((boardingService.price ?? 0) + cameraTierExtraPrice) * boardingDays;
+      const boardingPrice = (boardingBasePrice + cameraTierExtraPrice) * boardingDays;
       selectedServices.unshift({
         id: boardingService.id,
         name: `${boardingService.serviceName} · Camera ${tierLabel(selectedCameraTier, boardingService.cameraTierLabels)} · ${boardingDays} ngày`,
@@ -908,7 +919,7 @@ export default function ClinicDetail() {
                     </div>
                   </div>
                   <div className="flex items-center gap-2">
-                    <span className="text-sm font-bold text-slate-900 dark:text-white">{boardingService.price.toLocaleString('vi-VN')}đ</span>
+                    <span className="text-sm font-bold text-slate-900 dark:text-white">{boardingBasePrice.toLocaleString('vi-VN')}đ</span>
                     <span className="text-xs text-slate-400">/ngày</span>
                     <div
                       onClick={() => setIsHotelSelected(!isHotelSelected)}
