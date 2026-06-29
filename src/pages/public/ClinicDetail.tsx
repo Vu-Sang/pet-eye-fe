@@ -762,6 +762,36 @@ export default function ClinicDetail() {
               <h1 className="text-slate-900 dark:text-slate-100 text-xl sm:text-2xl md:text-4xl font-black leading-tight tracking-tight">
               {shop?.shopName ?? 'Đang tải...'}
             </h1>
+            {shop?.shopType && (
+              <div className="flex flex-wrap gap-2">
+                {shop.shopType === 'MIXED' ? (
+                  <>
+                    <span className="px-2.5 py-1 bg-purple-50 dark:bg-purple-500/10 text-purple-600 dark:text-purple-400 rounded-md text-[11px] sm:text-[12px] font-medium border border-purple-100 dark:border-purple-500/20">
+                      Spa & Grooming
+                    </span>
+                    <span className="px-2.5 py-1 bg-blue-50 dark:bg-blue-500/10 text-blue-600 dark:text-blue-400 rounded-md text-[11px] sm:text-[12px] font-medium border border-blue-100 dark:border-blue-500/20">
+                      Thú y
+                    </span>
+                    <span className="px-2.5 py-1 bg-orange-50 dark:bg-orange-500/10 text-orange-600 dark:text-orange-400 rounded-md text-[11px] sm:text-[12px] font-medium border border-orange-100 dark:border-orange-500/20">
+                      Khách sạn
+                    </span>
+                  </>
+                ) : (
+                  <span className={`px-2.5 py-1 rounded-md text-[11px] sm:text-[12px] font-medium border ${
+                    shop.shopType === 'GROOMING' ? 'bg-purple-50 dark:bg-purple-500/10 text-purple-600 dark:text-purple-400 border-purple-100 dark:border-purple-500/20' : 
+                    shop.shopType === 'CLINIC' ? 'bg-blue-50 dark:bg-blue-500/10 text-blue-600 dark:text-blue-400 border-blue-100 dark:border-blue-500/20' : 
+                    shop.shopType === 'HOTEL' ? 'bg-orange-50 dark:bg-orange-500/10 text-orange-600 dark:text-orange-400 border-orange-100 dark:border-orange-500/20' : 
+                    'bg-slate-50 dark:bg-slate-800 text-slate-600 dark:text-slate-300 border-slate-200 dark:border-slate-700'
+                  }`}>
+                    {shop.shopType === 'GROOMING' ? 'Spa & Grooming' : 
+                     shop.shopType === 'CLINIC' ? 'Phòng khám thú y' : 
+                     shop.shopType === 'HOTEL' ? 'Khách sạn thú cưng' : 
+                     shop.shopType}
+                  </span>
+                )}
+              </div>
+            )}
+
             <div className="flex flex-wrap items-center gap-2 text-slate-500 dark:text-slate-400 text-sm font-medium">
               {shop?.ratingAvg ? (
                 <>
@@ -945,13 +975,6 @@ export default function ClinicDetail() {
               <p className="text-slate-600 dark:text-slate-300 leading-relaxed text-base">
                 {shop?.description ?? 'Đang tải thông tin...'}
               </p>
-              {shop?.shopType && (
-                <div className="flex flex-wrap gap-2 mt-4">
-                  <span className="px-3 py-1 bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 rounded-full text-xs font-semibold">
-                    {shop.shopType}
-                  </span>
-                </div>
-              )}
             </section>
 
             {/* Pet Hotel & Camera Options — chỉ hiển thị nếu shop có dịch vụ BOARDING */}
@@ -2026,9 +2049,13 @@ export default function ClinicDetail() {
         {/* Mobile bottom bar */}
         <div className="lg:hidden fixed bottom-0 left-0 right-0 p-4 bg-white dark:bg-slate-900 border-t border-slate-200 dark:border-slate-800 flex items-center justify-between gap-4 z-50 shadow-[0_-10px_20px_rgba(0,0,0,0.05)] pb-safe">
           <div className="flex flex-col">
-            <span className="text-xs text-slate-500 font-bold uppercase tracking-wider mb-0.5">Giá khám từ</span>
+            <span className="text-xs text-slate-500 font-bold uppercase tracking-wider mb-0.5">
+              {totalPrice > 0 ? 'Tổng cộng' : 'Giá khám từ'}
+            </span>
             <span className="font-black text-xl text-[#1a2b4c] dark:text-teal-400">
-              {apiServices.length > 0 ? `${Math.min(...apiServices.map(s => s.price)).toLocaleString('vi-VN')}đ` : '---'}
+              {totalPrice > 0 
+                ? `${totalPrice.toLocaleString('vi-VN')}đ` 
+                : (apiServices.length > 0 ? `${Math.min(...apiServices.map(s => s.price)).toLocaleString('vi-VN')}đ` : '---')}
             </span>
           </div>
           <div className="flex flex-1">

@@ -126,9 +126,10 @@ export default function ShopProfile() {
       }));
       
       toast.success('Đã cập nhật thông tin cửa hàng!');
-    } catch (err) {
-      console.error('Failed to update shop profile:', err);
-      toast.error('Cập nhật thông tin thất bại.');
+    } catch (err: any) {
+      console.error('Failed to update shop profile:', err.response?.data || err);
+      const errorMsg = err.response?.data?.message || err.response?.data?.error || 'Cập nhật thông tin thất bại.';
+      toast.error(`Lỗi: ${errorMsg}`);
     } finally {
       setSaving(false);
     }
