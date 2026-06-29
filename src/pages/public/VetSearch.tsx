@@ -494,18 +494,18 @@ export default function VetSearch() {
                   )}
                 </button>
 
-                <div className="relative glass dark:glass-dark rounded-xl md:rounded-2xl p-1 hidden sm:flex">
+                <div className="relative glass dark:glass-dark rounded-xl md:rounded-2xl p-1 flex">
                   <button
                     onClick={() => setViewMode('list')}
-                    className={`p-2 md:p-2.5 rounded-lg md:rounded-xl transition-all ${viewMode === 'list' ? 'bg-primary text-white shadow-lg' : 'text-slate-400 dark:text-white hover:text-slate-600 dark:hover:text-slate-300'}`}
+                    className={`p-1.5 md:p-2.5 rounded-lg md:rounded-xl transition-all ${viewMode === 'list' ? 'bg-primary text-white shadow-lg' : 'text-slate-400 dark:text-white hover:text-slate-600 dark:hover:text-slate-300'}`}
                   >
-                    <ListIcon size={16} />
+                    <ListIcon size={14} className="md:w-4 md:h-4" />
                   </button>
                   <button
                     onClick={() => setViewMode('grid')}
-                    className={`p-2 md:p-2.5 rounded-lg md:rounded-xl transition-all ${viewMode === 'grid' ? 'bg-primary text-white shadow-lg' : 'text-slate-400 dark:text-white hover:text-slate-600 dark:hover:text-slate-300'}`}
+                    className={`p-1.5 md:p-2.5 rounded-lg md:rounded-xl transition-all ${viewMode === 'grid' ? 'bg-primary text-white shadow-lg' : 'text-slate-400 dark:text-white hover:text-slate-600 dark:hover:text-slate-300'}`}
                   >
-                    <Grid size={16} />
+                    <Grid size={14} className="md:w-4 md:h-4" />
                   </button>
                 </div>
                 <select
@@ -518,16 +518,16 @@ export default function VetSearch() {
               </div>
             </div>
 
-            {/* Cards Grid/List — on mobile always vertical cards */}
+            {/* Cards Grid/List */}
             <div
-              className={viewMode === 'grid' ? 'grid grid-cols-1 sm:grid-cols-2 gap-4 md:gap-6' : 'flex flex-col gap-4 md:gap-6'}
+              className={viewMode === 'grid' ? 'grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 gap-3 md:gap-6' : 'flex flex-col gap-4 md:gap-6'}
             >
               {isLoading ? (
                 <>
                   {[1, 2, 3, 4].map((i) => (
-                    <div key={i} className={`glass dark:glass-dark rounded-2xl md:rounded-[32px] overflow-hidden ${viewMode === 'list' ? 'flex flex-row h-32 sm:h-56' : 'flex flex-col h-[360px] md:h-[400px]'}`}>
-                      <div className={`bg-slate-100 dark:bg-slate-800 animate-pulse shrink-0 ${viewMode === 'list' ? 'w-[110px] sm:w-72 h-full' : 'w-full h-44 md:h-52'}`} />
-                      <div className="flex-1 p-3 sm:p-4 md:p-6 space-y-3">
+                    <div key={i} className={`glass dark:glass-dark rounded-2xl md:rounded-[32px] overflow-hidden ${viewMode === 'list' ? 'flex flex-row h-32 sm:h-56' : 'flex flex-col h-[280px] md:h-[400px]'}`}>
+                      <div className={`bg-slate-100 dark:bg-slate-800 animate-pulse shrink-0 ${viewMode === 'list' ? 'w-[110px] sm:w-72 h-full' : 'w-full h-28 md:h-52'}`} />
+                      <div className={`flex-1 space-y-3 ${viewMode === 'list' ? 'p-3 sm:p-4 md:p-6' : 'p-2 sm:p-4 md:p-6'}`}>
                         <div className="h-4 sm:h-5 bg-slate-100 dark:bg-slate-800 rounded-lg animate-pulse w-3/4" />
                         <div className="h-3 sm:h-4 bg-slate-100 dark:bg-slate-800 rounded-lg animate-pulse w-1/2" />
                         <div className="h-2 sm:h-3 bg-slate-100 dark:bg-slate-800 rounded-lg animate-pulse w-full" />
@@ -543,7 +543,7 @@ export default function VetSearch() {
                       className={`group bg-white dark:bg-slate-900/60 rounded-2xl md:rounded-[32px] overflow-hidden hover:shadow-xl hover:shadow-slate-200/60 dark:hover:shadow-slate-900/50 hover:-translate-y-1 transition-all duration-500 border border-slate-200/85 dark:border-slate-800/80 hover:border-primary/20 dark:hover:border-blue-500/30 h-full ${viewMode === 'list' ? 'flex flex-row sm:h-64' : 'flex flex-col'}`}
                     >
                       {/* Image */}
-                      <div className={`relative overflow-hidden shrink-0 bg-slate-100 dark:bg-slate-800 ${viewMode === 'list' ? 'w-[125px] sm:w-72' : 'h-44 md:h-52 w-full'}`}>
+                      <div className={`relative overflow-hidden shrink-0 bg-slate-100 dark:bg-slate-800 ${viewMode === 'list' ? 'w-[125px] sm:w-72' : 'h-28 sm:h-44 md:h-52 w-full'}`}>
                         <img
                           src={shop.logoUrl || shop.licenseImageUrl || 'https://images.unsplash.com/photo-1516734212186-a967f81ad0d7?q=80&w=800&auto=format&fit=crop'}
                           alt={shop.shopName}
@@ -567,10 +567,10 @@ export default function VetSearch() {
                       </div>
 
                       {/* Info Content */}
-                      <div className="flex-1 p-3 sm:p-4 md:p-6 flex flex-col justify-between min-w-0">
+                      <div className={`flex-1 flex flex-col justify-between min-w-0 ${viewMode === 'grid' ? 'p-2 sm:p-4 md:p-6' : 'p-3 sm:p-4 md:p-6'}`}>
                         <div className="space-y-1.5 sm:space-y-2 md:space-y-3">
-                          <div className="flex items-start justify-between gap-2 sm:gap-3">
-                            <h3 className="font-black text-slate-900 dark:text-white text-sm sm:text-base md:text-lg leading-tight group-hover:text-primary transition-colors line-clamp-2">
+                          <div className={`flex items-start justify-between gap-1.5 sm:gap-3 ${viewMode === 'grid' ? 'flex-col sm:flex-row' : ''}`}>
+                            <h3 className={`font-black text-slate-900 dark:text-white leading-tight group-hover:text-primary transition-colors line-clamp-2 ${viewMode === 'grid' ? 'text-[13px] sm:text-base md:text-lg' : 'text-sm sm:text-base md:text-lg'}`}>
                               {shop.shopName}
                             </h3>
                             <div className="flex items-center gap-0.5 sm:gap-1 shrink-0 bg-amber-50 dark:bg-amber-400/10 px-1.5 sm:px-2 md:px-2.5 py-0.5 sm:py-1 md:py-1.5 rounded-md sm:rounded-lg md:rounded-xl border border-amber-100 dark:border-amber-400/20">
@@ -581,15 +581,15 @@ export default function VetSearch() {
                             </div>
                           </div>
 
-                          <div className="flex flex-wrap items-center gap-2">
+                          <div className="flex flex-wrap items-center gap-1.5 sm:gap-2">
                             {(shop as any).distanceKm !== undefined && (
-                              <div className="flex items-center gap-1 text-teal-600 dark:text-teal-400 text-[11px] md:text-xs font-black bg-teal-50 dark:bg-teal-400/10 w-fit px-2 py-0.5 md:py-1 rounded-md md:rounded-lg">
-                                <MapPin size={11} />
+                              <div className="flex items-center gap-1 text-teal-600 dark:text-teal-400 text-[10px] sm:text-[11px] md:text-xs font-black bg-teal-50 dark:bg-teal-400/10 w-fit px-1.5 sm:px-2 py-0.5 md:py-1 rounded-md md:rounded-lg">
+                                <MapPin size={10} className="sm:w-[11px] sm:h-[11px]" />
                                 {(shop as any).distanceKm.toFixed(1)} km
                               </div>
                             )}
-                            <div className="flex items-center gap-1 sm:gap-1.5 text-slate-500 dark:text-slate-400 text-[10px] sm:text-[11px] md:text-xs font-medium min-w-0">
-                              <MapPin size={10} className="text-slate-400 dark:text-white shrink-0 sm:w-3 sm:h-3" />
+                            <div className="flex items-center gap-1 sm:gap-1.5 text-slate-500 dark:text-slate-400 text-[9px] sm:text-[11px] md:text-xs font-medium min-w-0">
+                              <MapPin size={10} className="text-slate-400 dark:text-white shrink-0 sm:w-3 sm:h-3 hidden sm:block" />
                               <span className="truncate">{shop.address}{shop.city ? `, ${shop.city}` : ''}</span>
                             </div>
                           </div>
@@ -601,16 +601,16 @@ export default function VetSearch() {
                           )}
                         </div>
 
-                        <div className="flex items-center justify-end sm:justify-between mt-2 sm:mt-4 md:mt-6 pt-0 sm:pt-3 md:pt-4 sm:border-t sm:border-slate-100 sm:dark:border-slate-800">
+                        <div className={`flex items-center mt-2 sm:mt-4 md:mt-6 pt-0 sm:pt-3 md:pt-4 sm:border-t sm:border-slate-100 sm:dark:border-slate-800 ${viewMode === 'grid' ? 'justify-end sm:justify-between' : 'justify-end sm:justify-between'}`}>
                           <div className="hidden sm:flex items-center gap-2">
                             <div className="w-7 h-7 md:w-8 md:h-8 rounded-lg bg-slate-50 dark:bg-slate-800 flex items-center justify-center text-slate-400 dark:text-white">
                               <Phone size={12} />
                             </div>
                             <span className="text-[10px] font-black text-slate-400 uppercase tracking-wider">{shop.phone}</span>
                           </div>
-                          <div className="flex items-center gap-1.5 md:gap-2 text-primary font-black text-[10px] md:text-[10px] uppercase tracking-widest group-hover:gap-3 transition-all dark:text-white">
+                          <div className={`flex items-center gap-1 sm:gap-1.5 md:gap-2 text-primary font-black uppercase tracking-widest group-hover:gap-2 sm:group-hover:gap-3 transition-all dark:text-white ${viewMode === 'grid' ? 'text-[9px] sm:text-[10px]' : 'text-[10px]'}`}>
                             Xem chi tiết
-                            <ChevronRight size={14} />
+                            <ChevronRight size={12} className="sm:w-3.5 sm:h-3.5" />
                           </div>
                         </div>
                       </div>
