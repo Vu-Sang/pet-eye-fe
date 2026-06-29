@@ -595,9 +595,11 @@ export default function VetSearch() {
                           </div>
 
                           {shop.description && (
-                            <p className="text-[11px] md:text-xs text-slate-500 dark:text-slate-400 line-clamp-2 leading-relaxed font-medium hidden sm:block">
-                              {shop.description}
-                            </p>
+                            <div className="hidden sm:block">
+                              <p className="text-[11px] md:text-xs text-slate-500 dark:text-slate-400 line-clamp-2 leading-relaxed font-medium">
+                                {shop.description}
+                              </p>
+                            </div>
                           )}
                         </div>
 
