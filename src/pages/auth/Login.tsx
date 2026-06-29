@@ -11,7 +11,7 @@ import { trackAuth } from '../../lib/analytics';
 export default function Login() {
   const navigate = useNavigate();
   const location = useLocation();
-  const { login, setUserSession } = useAuth();
+  const { login, setUserSession, user } = useAuth();
 
   // Define floating icons configuration for background (increased density to 25 elements)
   const floatingIcons = [
@@ -71,6 +71,17 @@ export default function Login() {
   const [unverifiedEmail, setUnverifiedEmail] = React.useState<string | null>(null);
 
   const isDesktop = typeof window !== 'undefined' && window.innerWidth >= 768;
+
+  React.useEffect(() => {
+    if (user && !isSuccess) {
+      const redirectTo = location.state?.from || (
+        user.role === 'ADMIN' ? '/admin/dashboard' : 
+        user.role === 'SHOP_OWNER' ? '/shop/dashboard' : 
+        user.role === 'STAFF' ? '/staff/dashboard' : '/'
+      );
+      navigate(redirectTo, { replace: true });
+    }
+  }, [user, navigate, location.state, isSuccess]);
 
   const navigateToTarget = (url: string) => {
     setTargetUrl(url);
@@ -542,7 +553,7 @@ export default function Login() {
             {activeRole === 'customer' ? (
               <>
                 Chưa có tài khoản?{' '}
-                <Link to="/register" className="text-primary dark:text-secondary font-black hover:underline ml-1">
+                <Link to="/register" state={{ from: location.state?.from }} className="text-primary dark:text-secondary font-black hover:underline ml-1">
                   Đăng ký miễn phí →
                 </Link>
               </>

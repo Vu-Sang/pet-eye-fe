@@ -14,6 +14,12 @@ import toast from 'react-hot-toast';
 import { motion, AnimatePresence } from 'motion/react';
 
 const SPECIALTIES = ['Grooming', 'Vet / Clinic', 'Boarding', 'General'];
+const SPECIALTY_MAP: Record<string, string> = {
+    'Grooming': 'Làm đẹp & Spa',
+    'Vet / Clinic': 'Thú y & Phòng khám',
+    'Boarding': 'Khách sạn & Lưu trú',
+    'General': 'Lĩnh vực chung / Khác'
+};
 const ROLES = [
     { label: 'Kỹ thuật viên Grooming', value: 'Groomer', spec: 'Grooming' },
     { label: 'Bác sĩ thú y', value: 'Vet', spec: 'Vet / Clinic' },
@@ -35,6 +41,7 @@ export default function ShopStaff() {
     const [savingMode, setSavingMode] = useState(false);
     const [viewingCerts, setViewingCerts] = useState<StaffResponse | null>(null);
     const [uploadingAvatar, setUploadingAvatar] = useState(false);
+    const [isSpecOpen, setIsSpecOpen] = useState(false);
     const avatarInputRef = React.useRef<HTMLInputElement>(null);
     
     const [form, setForm] = useState<StaffCreationRequest>({
@@ -380,15 +387,67 @@ export default function ShopStaff() {
                                                                 })}
                                                             </div>
                                                         </div>
-                                                        <div className="space-y-1.5">
+                                                        <div className="space-y-1.5 relative">
                                                             <label className="text-[9px] font-black text-slate-400 uppercase tracking-widest ml-1">Lĩnh vực chuyên môn chính</label>
                                                             <div className="relative">
-                                                                <select value={form.specialization} onChange={e => setForm(p => ({ ...p, specialization: e.target.value }))}
-                                                                    className={`w-full px-5 py-3 border-none rounded-xl focus:ring-2 outline-none font-bold text-sm transition-all appearance-none cursor-pointer ${isDark ? 'bg-slate-800 text-white focus:ring-indigo-500/50' : 'bg-white text-slate-700 focus:ring-primary'}`}>
-                                                                    <option value="">Chọn lĩnh vực...</option>
-                                                                    {SPECIALTIES.map(s => <option key={s} value={s}>{s}</option>)}
-                                                                </select>
-                                                                <ChevronDown className="absolute right-5 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" size={14} />
+                                                                <button
+                                                                    type="button"
+                                                                    onClick={() => setIsSpecOpen(!isSpecOpen)}
+                                                                    className={`w-full px-5 py-3 rounded-xl border border-slate-200 dark:border-slate-700 flex items-center justify-between font-bold text-sm transition-all text-left ${
+                                                                        isDark ? 'bg-slate-800 text-white' : 'bg-white text-slate-700'
+                                                                    }`}
+                                                                >
+                                                                    <span>{form.specialization ? SPECIALTY_MAP[form.specialization] : 'Chọn lĩnh vực...'}</span>
+                                                                    <ChevronDown className={`text-slate-400 transition-transform ${isSpecOpen ? 'rotate-180' : ''}`} size={16} />
+                                                                </button>
+
+                                                                <AnimatePresence>
+                                                                    {isSpecOpen && (
+                                                                        <>
+                                                                            <div className="fixed inset-0 z-10" onClick={() => setIsSpecOpen(false)} />
+                                                                            <motion.div
+                                                                                initial={{ opacity: 0, y: -10 }}
+                                                                                animate={{ opacity: 1, y: 0 }}
+                                                                                exit={{ opacity: 0, y: -10 }}
+                                                                                className={`absolute left-0 right-0 mt-2 rounded-xl border shadow-xl z-20 overflow-hidden max-h-60 overflow-y-auto ${
+                                                                                    isDark ? 'bg-slate-800 border-slate-700 text-white' : 'bg-white border-slate-200 text-slate-700'
+                                                                                }`}
+                                                                            >
+                                                                                <button
+                                                                                    type="button"
+                                                                                    onClick={() => {
+                                                                                        setForm(p => ({ ...p, specialization: '' }));
+                                                                                        setIsSpecOpen(false);
+                                                                                    }}
+                                                                                    className={`w-full px-5 py-3 text-left text-sm font-bold border-b border-slate-100 dark:border-slate-750 hover:bg-slate-50 dark:hover:bg-slate-700/50 transition-colors ${
+                                                                                        !form.specialization ? 'text-primary dark:text-indigo-400 bg-slate-50/50 dark:bg-slate-700/20' : 'text-slate-400'
+                                                                                    }`}
+                                                                                >
+                                                                                    Chọn lĩnh vực...
+                                                                                </button>
+                                                                                {SPECIALTIES.map(s => {
+                                                                                    const isSelected = form.specialization === s;
+                                                                                    return (
+                                                                                        <button
+                                                                                            key={s}
+                                                                                            type="button"
+                                                                                            onClick={() => {
+                                                                                                setForm(p => ({ ...p, specialization: s }));
+                                                                                                setIsSpecOpen(false);
+                                                                                            }}
+                                                                                            className={`w-full px-5 py-3 text-left text-sm font-bold hover:bg-slate-50 dark:hover:bg-slate-700/50 transition-colors flex items-center justify-between ${
+                                                                                                isSelected ? 'text-primary dark:text-indigo-400 bg-slate-50/50 dark:bg-slate-700/20' : ''
+                                                                                            }`}
+                                                                                        >
+                                                                                            <span>{SPECIALTY_MAP[s]}</span>
+                                                                                            {isSelected && <span className={`w-1.5 h-1.5 rounded-full ${isDark ? 'bg-indigo-400' : 'bg-primary'}`} />}
+                                                                                        </button>
+                                                                                    );
+                                                                                })}
+                                                                            </motion.div>
+                                                                        </>
+                                                                    )}
+                                                                </AnimatePresence>
                                                             </div>
                                                         </div>
                                                     </div>
@@ -580,7 +639,7 @@ export default function ShopStaff() {
                                                                     </span>
                                                                 </div>
                                                                 <span className={`inline-block px-3 py-1 text-[9px] font-black uppercase tracking-wider rounded-lg border whitespace-nowrap ${isDark ? 'bg-indigo-500/10 text-indigo-400 border-indigo-500/20' : 'bg-primary/5 text-primary border-primary/5'}`}>
-                                                                    {s.specialization || 'Đa năng'}
+                                                                    {SPECIALTY_MAP[s.specialization] || s.specialization || 'Đa năng'}
                                                                 </span>
                                                             </div>
                                                         </td>
