@@ -196,10 +196,10 @@ function BookingItem({ booking, onCancel, cancelling, onReview, onUpdateBank, on
         <motion.div
             layout
             initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }}
-            className="group bg-white dark:bg-slate-900 rounded-[3rem] border-2 border-white dark:border-slate-800 p-6 flex flex-col md:flex-row gap-8 hover:border-blue-200 dark:hover:border-blue-500/30 hover:shadow-[0_32px_64px_-12px_rgba(0,0,0,0.08)] transition-all duration-300 relative overflow-hidden"
+            className="group bg-white dark:bg-slate-900 rounded-[2rem] sm:rounded-[3rem] border-2 border-white dark:border-slate-800 p-4 sm:p-6 flex flex-col md:flex-row gap-4 sm:gap-8 hover:border-blue-200 dark:hover:border-blue-500/30 hover:shadow-[0_32px_64px_-12px_rgba(0,0,0,0.08)] transition-all duration-300 relative overflow-hidden"
         >
             {/* Left: Visual & Category */}
-            <div className="w-full md:w-56 h-48 rounded-[2.5rem] bg-slate-100 dark:bg-slate-800 overflow-hidden relative shrink-0">
+            <div className="w-full md:w-56 h-36 sm:h-48 rounded-[1.5rem] sm:rounded-[2.5rem] bg-slate-100 dark:bg-slate-800 overflow-hidden relative shrink-0">
                 <img
                     src={`https://images.unsplash.com/photo-${booking.id % 2 === 0 ? '1548199973-03cce0bbc87b' : '1516734212186-a967f81ad0d7'}?auto=format&fit=crop&q=80&w=400`}
                     alt="shop" className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
@@ -241,7 +241,7 @@ function BookingItem({ booking, onCancel, cancelling, onReview, onUpdateBank, on
                     </div>
                 </div>
 
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 bg-white dark:bg-slate-800/50 p-4 rounded-3xl border border-slate-100 dark:border-slate-800 shadow-sm hover:shadow-md transition-shadow">
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 bg-white dark:bg-slate-800/50 p-3 sm:p-4 rounded-3xl border border-slate-100 dark:border-slate-800 shadow-sm hover:shadow-md transition-shadow">
                     <div className="flex items-center gap-3">
                         <div className="w-10 h-10 rounded-xl bg-white dark:bg-slate-900 flex items-center justify-center text-primary shadow-sm">
                             <cat.icon size={20} />
@@ -438,57 +438,57 @@ function BookingItem({ booking, onCancel, cancelling, onReview, onUpdateBank, on
                 </AnimatePresence>
 
                 {/* Footer Actions */}
-                <div className="flex items-center justify-between pt-2">
-                    <div className="flex items-center gap-3">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pt-2">
+                    <div className="flex flex-wrap items-center gap-2 sm:gap-3">
                         {isLive && (
-                            <Link to={`/camera?bookingId=${booking.id}`} className="px-5 py-2.5 bg-emerald-500 text-white rounded-2xl text-[10px] font-black uppercase tracking-widest flex items-center gap-2 shadow-lg shadow-emerald-500/20 hover:scale-105 transition-all">
+                            <Link to={`/camera?bookingId=${booking.id}`} className="px-4 py-2 sm:px-5 sm:py-2.5 bg-emerald-500 text-white rounded-xl sm:rounded-2xl text-[10px] font-black uppercase tracking-widest flex items-center gap-1.5 sm:gap-2 shadow-lg shadow-emerald-500/20 hover:scale-105 transition-all">
                                 <Video size={14} /> Xem Camera
                             </Link>
                         )}
                         {booking.status === 'COMPLETED' && (
-                            <button onClick={() => onReview(booking)} className="px-5 py-2.5 bg-amber-400 text-slate-900 rounded-2xl text-[10px] font-black uppercase tracking-widest flex items-center gap-2 shadow-lg shadow-amber-400/20 hover:scale-105 transition-all">
+                            <button onClick={() => onReview(booking)} className="px-4 py-2 sm:px-5 sm:py-2.5 bg-amber-400 text-slate-900 rounded-xl sm:rounded-2xl text-[10px] font-black uppercase tracking-widest flex items-center gap-1.5 sm:gap-2 shadow-lg shadow-amber-400/20 hover:scale-105 transition-all">
                                 <Star size={14} className="fill-current" /> Đánh giá
                             </button>
                         )}
                         {careLogs.length > 0 && (
                             <button
                                 onClick={() => setShowLogs(!showLogs)}
-                                className={`px-5 py-2.5 rounded-2xl text-[10px] font-black uppercase tracking-widest flex items-center gap-2 transition-all ${showLogs
+                                className={`px-4 py-2 sm:px-5 sm:py-2.5 rounded-xl sm:rounded-2xl text-[10px] font-black uppercase tracking-widest flex items-center gap-1.5 sm:gap-2 transition-all ${showLogs
                                     ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-600/20'
                                     : 'bg-indigo-50 dark:bg-indigo-950/40 text-indigo-600 dark:text-indigo-400 hover:bg-indigo-100 dark:hover:bg-indigo-950/60'
                                     }`}
                             >
-                                <BookOpen size={14} /> Nhật ký chăm sóc ({careLogs.length})
+                                <BookOpen size={14} /> <span className="hidden sm:inline">Nhật ký</span> ({careLogs.length})
                             </button>
                         )}
                         <button
                             onClick={() => { setShowDetails(!showDetails); setShowLogs(false); }}
-                            className={`px-5 py-2.5 rounded-2xl text-[10px] font-black uppercase tracking-widest flex items-center gap-2 transition-all ${showDetails
+                            className={`px-4 py-2 sm:px-5 sm:py-2.5 rounded-xl sm:rounded-2xl text-[10px] font-black uppercase tracking-widest flex items-center gap-1.5 sm:gap-2 transition-all ${showDetails
                                 ? 'bg-emerald-600 text-white shadow-lg shadow-emerald-600/20'
                                 : 'bg-emerald-50 dark:bg-emerald-950/40 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-100 dark:hover:bg-emerald-950/60'
                                 }`}
                         >
                             <Info size={14} /> Chi tiết
                         </button>
-                        <button onClick={() => window.dispatchEvent(new Event('open-messaging'))} className="px-5 py-2.5 bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 rounded-2xl text-[10px] font-black uppercase tracking-widest hover:bg-primary hover:text-white transition-all">
+                        <button onClick={() => window.dispatchEvent(new Event('open-messaging'))} className="px-4 py-2 sm:px-5 sm:py-2.5 bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 rounded-xl sm:rounded-2xl text-[10px] font-black uppercase tracking-widest hover:bg-primary hover:text-white transition-all">
                             <MessageCircle size={14} /> Nhắn tin
                         </button>
                     </div>
 
-                    <div className="flex items-center gap-2">
+                    <div className="flex flex-wrap items-center gap-2 sm:gap-2">
                         {booking.status === 'WAITING_SHOP_APPROVAL' && (
                             <>
                                 <button
                                     onClick={() => onEdit(booking)}
-                                    className="px-5 py-2.5 border border-indigo-100 dark:border-indigo-900/30 text-indigo-500 rounded-2xl text-[10px] font-black uppercase tracking-widest hover:bg-indigo-50 dark:hover:bg-indigo-900/20 transition-all flex items-center gap-2"
+                                    className="px-4 py-2 sm:px-5 sm:py-2.5 border border-indigo-100 dark:border-indigo-900/30 text-indigo-500 rounded-xl sm:rounded-2xl text-[10px] font-black uppercase tracking-widest hover:bg-indigo-50 dark:hover:bg-indigo-900/20 transition-all flex items-center gap-1.5 sm:gap-2"
                                 >
-                                    <Settings size={14} /> Chỉnh sửa
+                                    <Settings size={14} /> Sửa
                                 </button>
                                 <button
                                     onClick={() => onCancel(booking)} disabled={cancelling}
-                                    className="px-5 py-2.5 border border-rose-100 dark:border-rose-900/30 text-rose-500 rounded-2xl text-[10px] font-black uppercase tracking-widest hover:bg-rose-50 dark:hover:bg-rose-900/20 transition-all flex items-center gap-2"
+                                    className="px-4 py-2 sm:px-5 sm:py-2.5 border border-rose-100 dark:border-rose-900/30 text-rose-500 rounded-xl sm:rounded-2xl text-[10px] font-black uppercase tracking-widest hover:bg-rose-50 dark:hover:bg-rose-900/20 transition-all flex items-center gap-1.5 sm:gap-2"
                                 >
-                                    {cancelling ? <Loader2 size={14} className="animate-spin" /> : <XCircle size={14} />} Hủy lịch
+                                    {cancelling ? <Loader2 size={14} className="animate-spin" /> : <XCircle size={14} />} Hủy
                                 </button>
                             </>
                         )}
@@ -529,6 +529,7 @@ function BookingItem({ booking, onCancel, cancelling, onReview, onUpdateBank, on
 export default function BookingHistory() {
     const qc = useQueryClient();
     const [activeTab, setActiveTab] = useState<TabKey>('all');
+    const [isStatusDropdownOpen, setIsStatusDropdownOpen] = useState(false);
     const [page, setPage] = useState(0);
     const [cancellingId, setCancellingId] = useState<number | null>(null);
     const [searchQuery, setSearchQuery] = useState('');
@@ -794,8 +795,8 @@ export default function BookingHistory() {
 
             {/* Filters & Search Control Panel */}
             <div className="flex flex-col gap-6 mb-8">
-                {/* 1. Status Navigation Tabs (Underline Style) */}
-                <div className="flex items-center gap-6 lg:gap-8 border-b border-slate-200 dark:border-slate-800 overflow-x-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none] w-full">
+                {/* 1. Status Navigation Tabs (Desktop: Tabs, Mobile: Dropdown) */}
+                <div className="hidden md:flex items-center gap-6 lg:gap-8 border-b border-slate-200 dark:border-slate-800 w-full">
                     {TABS.map(tab => (
                         <button
                             key={tab.key} 
@@ -805,6 +806,43 @@ export default function BookingHistory() {
                             {tab.label}
                         </button>
                     ))}
+                </div>
+                
+                <div className="md:hidden relative w-full z-20 mb-2">
+                    <button
+                        onClick={() => setIsStatusDropdownOpen(!isStatusDropdownOpen)}
+                        className="w-full flex items-center justify-between bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300 text-sm font-bold rounded-xl px-4 py-3 shadow-sm hover:border-slate-300 dark:hover:border-slate-700 transition-all"
+                    >
+                        <span>{TABS.find(t => t.key === activeTab)?.label}</span>
+                        <span className="material-symbols-outlined text-slate-400 text-[20px] transition-transform duration-300" style={{ transform: isStatusDropdownOpen ? 'rotate(180deg)' : 'none' }}>
+                            expand_more
+                        </span>
+                    </button>
+                    
+                    {isStatusDropdownOpen && (
+                        <>
+                            <div className="fixed inset-0 z-40" onClick={() => setIsStatusDropdownOpen(false)} />
+                            <div className="absolute top-full left-0 right-0 mt-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl shadow-xl z-50 overflow-hidden animate-in fade-in slide-in-from-top-2 duration-200">
+                                {TABS.map(tab => (
+                                    <button
+                                        key={tab.key}
+                                        onClick={() => {
+                                            setActiveTab(tab.key);
+                                            setPage(0);
+                                            setIsStatusDropdownOpen(false);
+                                        }}
+                                        className={`w-full text-left px-4 py-3 text-sm font-bold uppercase tracking-widest transition-colors ${
+                                            activeTab === tab.key 
+                                                ? 'bg-primary text-white' 
+                                                : 'text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800'
+                                        }`}
+                                    >
+                                        {tab.label}
+                                    </button>
+                                ))}
+                            </div>
+                        </>
+                    )}
                 </div>
 
                 {/* 2. Search & Sub-filters Toolbar */}
@@ -1024,13 +1062,16 @@ export default function BookingHistory() {
                             initial={{ opacity: 0, scale: 0.94, y: 28 }}
                             animate={{ opacity: 1, scale: 1, y: 0 }}
                             exit={{ opacity: 0, scale: 0.94, y: 28 }}
-                            className="relative w-full max-w-2xl max-h-[90vh] flex flex-col bg-white dark:bg-slate-950 rounded-[2rem] shadow-[0_40px_120px_-30px_rgba(15,23,42,0.45)] overflow-hidden border border-slate-200/70 dark:border-slate-800"
+                            className="relative w-full max-w-2xl max-h-[90vh] flex flex-col bg-white dark:bg-slate-950 rounded-[1.5rem] sm:rounded-[2rem] shadow-[0_40px_120px_-30px_rgba(15,23,42,0.45)] overflow-hidden border border-slate-200/70 dark:border-slate-800"
                         >
-                            <div className="bg-gradient-to-r from-[#1a2b4c] to-blue-900 p-8 text-white shrink-0">
+                            <div className="bg-gradient-to-r from-[#1a2b4c] to-blue-900 p-6 sm:p-8 text-white shrink-0">
                                 <div className="flex items-start gap-4">
-                                    <div className="w-14 h-14 rounded-3xl bg-white/15 flex items-center justify-center shadow-lg shadow-[#1a2b4c]/30">
+                                    <button 
+                                        onClick={() => setShowCancelModal(false)}
+                                        className="w-14 h-14 rounded-3xl bg-white/15 hover:bg-white/25 flex items-center justify-center shadow-lg shadow-[#1a2b4c]/30 transition-all active:scale-95 cursor-pointer"
+                                    >
                                         <XCircle size={32} className="text-white" />
-                                    </div>
+                                    </button>
                                     <div className="space-y-2">
                                         <h2 className="text-3xl font-black tracking-tight">Gửi yêu cầu hủy lịch</h2>
                                         <p className="text-sm opacity-90 leading-relaxed">Chúng tôi sẽ chuyển yêu cầu này đến shop và cập nhật khi có phản hồi.</p>
@@ -1038,47 +1079,47 @@ export default function BookingHistory() {
                                 </div>
                             </div>
 
-                            <div className="p-8 space-y-6 overflow-y-auto">
-                                <div className="grid gap-4 sm:grid-cols-[1fr_auto] items-center rounded-[2rem] border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900 p-5">
+                            <div className="p-5 sm:p-8 space-y-5 sm:space-y-6 overflow-y-auto">
+                                <div className="flex flex-col sm:flex-row sm:items-center gap-4 justify-between rounded-[1.5rem] sm:rounded-[2rem] border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900 p-4 sm:p-5">
                                     <div>
                                         <p className="text-xs font-black uppercase tracking-[0.25em] text-slate-400">Đơn hàng</p>
-                                        <p className="mt-2 text-base font-black text-slate-900 dark:text-white">{selectedBookingForBank.services && selectedBookingForBank.services.length > 0 ? selectedBookingForBank.services.map((s: any) => s.serviceName).join(', ') : selectedBookingForBank.serviceName}</p>
-                                        <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">{selectedBookingForBank.shopName} • Bé: {selectedBookingForBank.petName}</p>
-                                        <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">
+                                        <p className="mt-1 sm:mt-2 text-base font-black text-slate-900 dark:text-white">{selectedBookingForBank.services && selectedBookingForBank.services.length > 0 ? selectedBookingForBank.services.map((s: any) => s.serviceName).join(', ') : selectedBookingForBank.serviceName}</p>
+                                        <p className="text-[13px] sm:text-sm text-slate-500 dark:text-slate-400 mt-1">{selectedBookingForBank.shopName} • Bé: {selectedBookingForBank.petName}</p>
+                                        <p className="text-[13px] sm:text-sm text-slate-500 dark:text-slate-400 mt-0.5 sm:mt-1">
                                             {getCategory(selectedBookingForBank) === 'boarding' && selectedBookingForBank.checkIn && selectedBookingForBank.checkOut
                                                 ? `Lưu trú: ${format(parseISO(selectedBookingForBank.checkIn), 'dd/MM/yyyy')} → ${format(parseISO(selectedBookingForBank.checkOut), 'dd/MM/yyyy')}`
                                                 : format(parseISO(selectedBookingForBank.appointmentDatetime), 'dd/MM/yyyy • HH:mm', { locale: vi })}
                                         </p>
                                     </div>
-                                    <div className="rounded-3xl bg-white dark:bg-slate-950 shadow-sm border border-slate-200 dark:border-slate-800 px-4 py-3 text-right">
+                                    <div className="rounded-2xl sm:rounded-3xl bg-white dark:bg-slate-950 shadow-sm border border-slate-200 dark:border-slate-800 px-4 py-3 flex items-center justify-between sm:block sm:text-right shrink-0">
                                         <p className="text-[10px] uppercase tracking-[0.25em] text-slate-400">Tổng tiền</p>
-                                        <p className="mt-1 text-xl font-black text-slate-900 dark:text-white">{formatVND(selectedBookingForBank.servicePrice)}</p>
+                                        <p className="sm:mt-1 text-lg sm:text-xl font-black text-slate-900 dark:text-white">{formatVND(selectedBookingForBank.servicePrice)}</p>
                                     </div>
                                 </div>
 
                                 {/* Chi tiết tính toán hoàn tiền */}
                                 {true && (
-                                    <div className="rounded-[2rem] border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900 p-6 space-y-4">
+                                    <div className="rounded-[1.5rem] sm:rounded-[2rem] border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900 p-4 sm:p-6 space-y-4">
                                         <div className="flex items-center gap-2 mb-2 text-slate-800 dark:text-slate-200">
-                                            <Wallet size={18} />
-                                            <h4 className="font-black tracking-tight text-base">Thông tin thanh toán & hoàn tiền</h4>
+                                            <Wallet size={16} className="sm:w-[18px] sm:h-[18px]" />
+                                            <h4 className="font-black tracking-tight text-[15px] sm:text-base">Thông tin thanh toán & hoàn tiền</h4>
                                         </div>
                                         
-                                        <div className="space-y-2 text-sm text-slate-600 dark:text-slate-400">
-                                            <div className="flex justify-between items-center">
-                                                <span className="font-medium">Tổng tiền dịch vụ:</span>
+                                        <div className="space-y-2 text-[13px] sm:text-sm text-slate-600 dark:text-slate-400">
+                                            <div className="flex justify-between items-center gap-2">
+                                                <span className="font-medium">Tổng dịch vụ:</span>
                                                 <span className="font-bold text-slate-800 dark:text-slate-200">{formatVND(selectedBookingForBank.servicePrice)}</span>
                                             </div>
-                                            <div className="flex justify-between items-center">
+                                            <div className="flex justify-between items-center gap-2">
                                                 <span className="font-medium">Đã thanh toán:</span>
                                                 <span className="font-bold text-slate-900 dark:text-white flex items-center">
                                                     {formatVND(paidAmount)}
-                                                    <span className="text-[9px] uppercase ml-2 px-2 py-0.5 rounded-md bg-slate-200 dark:bg-slate-800 text-slate-500 font-bold tracking-widest">
+                                                    <span className="text-[9px] uppercase ml-1.5 sm:ml-2 px-1.5 sm:px-2 py-0.5 rounded-md bg-slate-200 dark:bg-slate-800 text-slate-500 font-bold tracking-widest shrink-0">
                                                         {isPayOS ? 'Toàn bộ' : 'Cọc 10%'}
                                                     </span>
                                                 </span>
                                             </div>
-                                            <div className="flex justify-between items-center">
+                                            <div className="flex justify-between items-center gap-2 mt-1 sm:mt-0">
                                                 <span className="font-medium">Thời gian đến giờ hẹn:</span>
                                                 <span className={`font-bold px-2.5 py-1 rounded-lg text-[10px] uppercase tracking-widest flex items-center gap-1 ${isBefore5Hours ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-500/10 dark:text-emerald-400' : 'bg-rose-100 text-rose-700 dark:bg-rose-500/10 dark:text-rose-400'}`}>
                                                     <Clock size={12} />
@@ -1088,23 +1129,23 @@ export default function BookingHistory() {
                                             
                                             <div className="border-t border-slate-200 dark:border-slate-800 my-3 pt-3" />
                                             
-                                            <div className="flex justify-between items-center">
+                                            <div className="flex justify-between items-center mt-1 sm:mt-0">
                                                 <span className="font-medium text-slate-500">Phí giữ chỗ (Mất cọc):</span>
-                                                <span className="font-bold text-rose-500">-{formatVND(depositAmount)}</span>
+                                                <span className="font-bold text-rose-500 shrink-0">-{formatVND(depositAmount)}</span>
                                             </div>
                                             {!isBefore5Hours && (
-                                                <div className="flex justify-between items-center mt-1">
-                                                    <span className="font-medium flex items-center gap-1.5 text-slate-500"><AlertCircle size={14} className="text-rose-500" /> Phạt hủy muộn (50%):</span>
-                                                    <span className="font-bold text-rose-500">-{formatVND(penaltyAmount)}</span>
+                                                <div className="flex justify-between items-center mt-1.5 sm:mt-1">
+                                                    <span className="font-medium flex items-center gap-1.5 text-slate-500"><AlertCircle size={14} className="text-rose-500 shrink-0" /> Phạt hủy muộn (50%):</span>
+                                                    <span className="font-bold text-rose-500 shrink-0">-{formatVND(penaltyAmount)}</span>
                                                 </div>
                                             )}
                                             
                                             <div className="border-t border-slate-200 dark:border-slate-800 my-3 pt-3" />
                                             
-                                            <div className="flex flex-col gap-2 bg-white dark:bg-slate-950 p-4 rounded-2xl border border-slate-100 dark:border-slate-800/80 shadow-sm">
-                                                <div className="flex justify-between items-center text-lg">
-                                                    <span className="font-black text-slate-900 dark:text-white text-base">Tổng tiền hoàn lại:</span>
-                                                    <span className="font-black text-emerald-500 text-xl">{formatVND(refundAmount)}</span>
+                                            <div className="flex flex-col gap-2 bg-white dark:bg-slate-950 p-4 rounded-[1.25rem] sm:rounded-2xl border border-slate-100 dark:border-slate-800/80 shadow-sm">
+                                                <div className="flex justify-between items-center">
+                                                    <span className="font-black text-slate-900 dark:text-white text-[15px] sm:text-base">Tổng tiền hoàn lại:</span>
+                                                    <span className="font-black text-emerald-500 text-lg sm:text-xl">{formatVND(refundAmount)}</span>
                                                 </div>
                                                 {oweAmount > 0 && (
                                                     <div className="flex justify-between items-center pt-3 mt-1 border-t border-dashed border-slate-200 dark:border-slate-800">

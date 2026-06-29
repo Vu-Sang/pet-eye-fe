@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
-import { Plus, X, Dog, Cat, Calendar, Weight, ClipboardList, Info, AlertCircle, CheckCircle2, Camera, Loader2, ChevronRight, Utensils, Heart, Trash2, Activity, ShieldCheck, Sparkles, User, ArrowRight, HeartPulse } from 'lucide-react';
+import { Plus, X, Dog, Cat, Calendar, Weight, ClipboardList, Info, AlertCircle, CheckCircle2, Camera, Loader2, ChevronRight, ChevronDown, Utensils, Heart, Trash2, Activity, ShieldCheck, Sparkles, User, ArrowRight, HeartPulse } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { petService } from '../../services/pet.service';
 import { useAuth } from '../../contexts/AuthContext';
@@ -41,6 +41,8 @@ export default function ProfilePets() {
     vaccinations: [] as any[],
     reminders: [] as any[]
   });
+  const [isSpeciesDropdownOpen, setIsSpeciesDropdownOpen] = useState(false);
+  const [isGenderDropdownOpen, setIsGenderDropdownOpen] = useState(false);
   const [step, setStep] = useState(1);
   const [submitting, setSubmitting] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
@@ -179,7 +181,14 @@ export default function ProfilePets() {
       {/* Header Section */}
       <div className="flex items-center justify-between gap-4 md:gap-6 mb-2 md:mb-0">
         <div>
-          <h1 className="text-2xl md:text-3xl text-slate-900 dark:text-slate-100 tracking-tight font-bold">Thú cưng của tôi</h1>
+          <h1 className="text-2xl md:text-3xl text-slate-900 dark:text-slate-100 tracking-tight font-bold flex items-center gap-3">
+            Thú cưng của tôi
+            {!loading && pets.length > 0 && (
+              <span className="text-[13px] md:text-sm font-black bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 px-3 py-1 rounded-xl border border-blue-100 dark:border-blue-800/50">
+                {pets.length} bé
+              </span>
+            )}
+          </h1>
           <p className="hidden md:block text-slate-500 dark:text-slate-400 mt-1">Nơi lưu giữ những khoảnh khắc và chăm sóc sức khỏe toàn diện cho các bé yêu.</p>
         </div>
         <motion.button
@@ -388,13 +397,34 @@ export default function ProfilePets() {
               </button>
 
               {/* Modal Sidebar */}
-              <div className="md:w-[280px] bg-slate-50 dark:bg-slate-800/40 p-10 flex flex-col border-r border-slate-100 dark:border-slate-800">
-                <div className="size-16 bg-gradient-to-br from-[#1a2b4c] to-blue-600 rounded-[1.5rem] flex items-center justify-center mb-8 shadow-xl shadow-blue-900/20">
-                  <Dog size={32} className="text-white" />
-                </div>
-                <h2 className="text-2xl font-bold text-slate-900 dark:text-white mb-8 leading-tight tracking-tight">Thêm thành viên mới</h2>
+              <div className="md:w-[280px] shrink-0 bg-slate-50 dark:bg-slate-800/40 p-6 md:p-10 flex flex-col border-b md:border-b-0 md:border-r border-slate-100 dark:border-slate-800 z-10">
                 
-                <div className="space-y-8 relative flex-1">
+                {/* Mobile Header (Horizontal & Compact) */}
+                <div className="flex md:hidden items-center gap-4">
+                  <div className="size-12 bg-gradient-to-br from-[#1a2b4c] to-blue-600 rounded-2xl flex items-center justify-center shadow-lg shadow-blue-900/20 shrink-0">
+                    <Dog size={24} className="text-white" />
+                  </div>
+                  <div className="flex-1">
+                    <h2 className="text-lg font-bold text-slate-900 dark:text-white leading-tight">Thêm thành viên mới</h2>
+                    <div className="flex items-center gap-2 mt-1.5">
+                      <div className="text-[10px] font-black uppercase text-blue-600 shrink-0">BƯỚC {step}/4</div>
+                      <div className="h-1.5 w-full bg-blue-100 dark:bg-slate-700 rounded-full overflow-hidden">
+                        <div className="h-full bg-blue-600 transition-all duration-300" style={{ width: `${(step / 4) * 100}%` }} />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Desktop Header (Vertical) */}
+                <div className="hidden md:flex flex-col">
+                  <div className="size-16 bg-gradient-to-br from-[#1a2b4c] to-blue-600 rounded-[1.5rem] flex items-center justify-center mb-8 shadow-xl shadow-blue-900/20 shrink-0">
+                    <Dog size={32} className="text-white" />
+                  </div>
+                  <h2 className="text-2xl font-bold text-slate-900 dark:text-white mb-8 leading-tight tracking-tight">Thêm thành viên mới</h2>
+                </div>
+                
+                {/* Desktop Stepper */}
+                <div className="hidden md:block space-y-8 relative flex-1">
                   <div className="absolute top-5 left-5 w-0.5 h-[calc(100%-40px)] bg-slate-200 dark:bg-slate-700 z-0" />
                   <motion.div 
                     className="absolute top-5 left-5 w-0.5 bg-blue-600 z-0" 
@@ -434,8 +464,8 @@ export default function ProfilePets() {
               </div>
 
               {/* Modal Content */}
-              <div className="flex-1 flex flex-col">
-                <div className="flex-1 p-8 md:p-12 overflow-y-auto custom-scrollbar">
+              <div className="flex-1 flex flex-col relative">
+                <div className="flex-1 p-6 pb-28 md:p-12 overflow-y-auto custom-scrollbar">
                   <AnimatePresence mode="wait">
                     <motion.div
                       key={step}
@@ -482,18 +512,46 @@ export default function ProfilePets() {
                               />
                             </div>
 
-                            <div>
+                            <div className="relative">
                               <label className="text-sm font-bold text-slate-400 mb-2 block">Loài</label>
-                              <select
-                                className="w-full px-6 py-4 bg-slate-50 dark:bg-slate-800 border-2 border-transparent focus:border-blue-600/30 rounded-2xl text-slate-900 dark:text-white outline-none transition-all font-bold appearance-none cursor-pointer"
-                                value={formData.species}
-                                onChange={e => setFormData({...formData, species: e.target.value})}
+                              <div 
+                                className="w-full px-6 py-4 bg-slate-50 dark:bg-slate-800 border-2 border-transparent focus-within:border-blue-600/30 rounded-2xl text-slate-900 dark:text-white transition-all font-bold cursor-pointer flex items-center justify-between"
+                                onClick={() => setIsSpeciesDropdownOpen(!isSpeciesDropdownOpen)}
                               >
-                                <option value="Chó">🐶 Chó</option>
-                                <option value="Mèo">🐱 Mèo</option>
-                                <option value="Thỏ">🐰 Thỏ</option>
-                                <option value="Khác">✨ Khác</option>
-                              </select>
+                                <span>{formData.species === 'Chó' ? '🐶 ' : formData.species === 'Mèo' ? '🐱 ' : formData.species === 'Thỏ' ? '🐰 ' : '✨ '}{formData.species}</span>
+                                <ChevronDown size={20} className="text-slate-400" />
+                              </div>
+                              
+                              <AnimatePresence>
+                                {isSpeciesDropdownOpen && (
+                                  <>
+                                    <div className="fixed inset-0 z-40" onClick={() => setIsSpeciesDropdownOpen(false)} />
+                                    <motion.div 
+                                      initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }}
+                                      className="absolute z-50 mt-2 w-full bg-white dark:bg-slate-800 border border-slate-100 dark:border-slate-700 rounded-2xl shadow-xl overflow-hidden p-2"
+                                    >
+                                      {[
+                                        { val: 'Chó', icon: '🐶' },
+                                        { val: 'Mèo', icon: '🐱' },
+                                        { val: 'Thỏ', icon: '🐰' },
+                                        { val: 'Khác', icon: '✨' },
+                                      ].map(opt => (
+                                        <button
+                                          key={opt.val}
+                                          type="button"
+                                          onClick={() => {
+                                            setFormData({...formData, species: opt.val});
+                                            setIsSpeciesDropdownOpen(false);
+                                          }}
+                                          className={`w-full text-left px-4 py-3 rounded-xl font-bold transition-colors flex items-center ${formData.species === opt.val ? 'bg-blue-50 dark:bg-blue-900/30 text-blue-600' : 'text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700/50'}`}
+                                        >
+                                          <span className="mr-2 text-lg">{opt.icon}</span> {opt.val}
+                                        </button>
+                                      ))}
+                                    </motion.div>
+                                  </>
+                                )}
+                              </AnimatePresence>
                             </div>
 
                             <div>
@@ -528,17 +586,41 @@ export default function ProfilePets() {
                               />
                             </div>
 
-                            <div>
+                            <div className="relative">
                               <label className="text-sm font-bold text-slate-400 mb-2 block">Giới tính</label>
-                              <select
-                                className="w-full px-6 py-4 bg-slate-50 dark:bg-slate-800 border-2 border-transparent focus:border-blue-600/30 rounded-2xl text-slate-900 dark:text-white outline-none transition-all font-bold appearance-none cursor-pointer"
-                                value={formData.gender}
-                                onChange={e => setFormData({...formData, gender: e.target.value})}
+                              <div 
+                                className="w-full px-6 py-4 bg-slate-50 dark:bg-slate-800 border-2 border-transparent focus-within:border-blue-600/30 rounded-2xl text-slate-900 dark:text-white transition-all font-bold cursor-pointer flex items-center justify-between"
+                                onClick={() => setIsGenderDropdownOpen(!isGenderDropdownOpen)}
                               >
-                                <option value="Đực">Đực</option>
-                                <option value="Cái">Cái</option>
-                                <option value="Chưa rõ">Chưa rõ</option>
-                              </select>
+                                <span>{formData.gender}</span>
+                                <ChevronDown size={20} className="text-slate-400" />
+                              </div>
+                              
+                              <AnimatePresence>
+                                {isGenderDropdownOpen && (
+                                  <>
+                                    <div className="fixed inset-0 z-40" onClick={() => setIsGenderDropdownOpen(false)} />
+                                    <motion.div 
+                                      initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }}
+                                      className="absolute z-50 mt-2 w-full bg-white dark:bg-slate-800 border border-slate-100 dark:border-slate-700 rounded-2xl shadow-xl overflow-hidden p-2"
+                                    >
+                                      {['Đực', 'Cái', 'Chưa rõ'].map(opt => (
+                                        <button
+                                          key={opt}
+                                          type="button"
+                                          onClick={() => {
+                                            setFormData({...formData, gender: opt});
+                                            setIsGenderDropdownOpen(false);
+                                          }}
+                                          className={`w-full text-left px-4 py-3 rounded-xl font-bold transition-colors ${formData.gender === opt ? 'bg-blue-50 dark:bg-blue-900/30 text-blue-600' : 'text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700/50'}`}
+                                        >
+                                          {opt}
+                                        </button>
+                                      ))}
+                                    </motion.div>
+                                  </>
+                                )}
+                              </AnimatePresence>
                             </div>
 
                             <div>
