@@ -125,16 +125,25 @@ export default function ProfileSecurity() {
                         </div>
                     </div>
 
-                    <div className="bg-blue-50 dark:bg-blue-900/20 rounded-xl p-4 text-xs text-blue-700 dark:text-blue-300">
-                        <p className="font-bold mb-2 flex items-center gap-1">
+                    <div className="bg-blue-50 dark:bg-blue-900/20 rounded-xl p-4 text-xs">
+                        <p className="font-bold text-blue-700 dark:text-blue-300 mb-2 flex items-center gap-1">
                             <span className="material-symbols-outlined text-sm">info</span>
                             Yêu cầu mật khẩu:
                         </p>
-                        <ul className="space-y-1">
-                            {['Ít nhất 8 ký tự', 'Có chữ hoa và chữ thường', 'Có ít nhất 1 số', 'Có ký tự đặc biệt (!@#$...)'].map(r => (
-                                <li key={r} className="flex items-center gap-1">
-                                    <span className="material-symbols-outlined text-xs text-blue-400">circle</span>
-                                    {r}
+                        <ul className="space-y-1.5 mt-2">
+                            {[
+                                { label: 'Ít nhất 8 ký tự', valid: newPassword.length >= 8 },
+                                { label: 'Có chữ hoa và chữ thường', valid: /[a-z]/.test(newPassword) && /[A-Z]/.test(newPassword) },
+                                { label: 'Có ít nhất 1 số', valid: /[0-9]/.test(newPassword) },
+                                { label: 'Có ký tự đặc biệt (!@#$...)', valid: /[^A-Za-z0-9]/.test(newPassword) && newPassword.length > 0 }
+                            ].map(r => (
+                                <li key={r.label} className={`flex items-center gap-1.5 transition-colors duration-300 ${r.valid ? 'text-emerald-600 dark:text-emerald-400' : 'text-slate-500 dark:text-slate-400'}`}>
+                                    <span className="material-symbols-outlined text-[14px]">
+                                        {r.valid ? 'check_circle' : 'circle'}
+                                    </span>
+                                    <span className={`font-semibold ${r.valid ? 'text-emerald-600 dark:text-emerald-400' : 'text-slate-600 dark:text-slate-400'}`}>
+                                        {r.label}
+                                    </span>
                                 </li>
                             ))}
                         </ul>

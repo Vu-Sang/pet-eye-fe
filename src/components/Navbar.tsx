@@ -106,11 +106,11 @@ function GuestNavbar() {
           <div className="w-px h-6 bg-slate-200 dark:bg-slate-700 mx-1 hidden sm:block" />
 
           <ThemeToggle />
-          <Link to="/login"
+          <Link to="/login" state={{ from: location.pathname }}
             className="h-8 px-4 rounded-full flex items-center justify-center text-[14px] font-bold border border-primary/20 hover:border-primary/50 text-slate-700 hover:bg-slate-50 dark:border-blue-500/20 dark:hover:border-blue-500/50 dark:text-slate-300 dark:hover:bg-slate-800 transition-all hover:-translate-y-0.5 active:scale-95">
             Đăng nhập
           </Link>
-          <Link to="/register"
+          <Link to="/register" state={{ from: location.pathname }}
             className="h-8 px-4 rounded-full flex items-center justify-center text-[14px] font-bold bg-gradient-to-r from-primary to-blue-500 dark:from-blue-400 dark:to-secondary text-white border border-primary/30 dark:border-blue-500/30 shadow-md shadow-primary/10 hover:shadow-lg hover:shadow-primary/20 transition-all hover:-translate-y-0.5 active:scale-95">
             Đăng ký
           </Link>
@@ -140,11 +140,11 @@ function GuestNavbar() {
               </Link>
 
               <div className="flex flex-col gap-3 pt-4">
-                <Link to="/login" onClick={() => setMobileOpen(false)}
+                <Link to="/login" state={{ from: location.pathname }} onClick={() => setMobileOpen(false)}
                   className="w-full text-center py-4 rounded-2xl border border-slate-200 text-slate-700 dark:border-slate-700 dark:text-slate-300 font-bold hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors">
                   Đăng nhập
                 </Link>
-                <Link to="/register" onClick={() => setMobileOpen(false)}
+                <Link to="/register" state={{ from: location.pathname }} onClick={() => setMobileOpen(false)}
                   className="w-full text-center py-4 bg-gradient-to-r from-primary to-blue-500 dark:from-blue-400 dark:to-secondary text-white rounded-2xl font-black shadow-md shadow-primary/10 hover:shadow-lg hover:shadow-primary/20 transition-all">
                   Tham gia ngay
                 </Link>

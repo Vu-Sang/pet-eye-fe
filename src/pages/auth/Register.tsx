@@ -5,10 +5,12 @@ import { motion } from 'motion/react';
 import { userService } from '../../services/user.service';
 import Logo from '../../components/Logo';
 import { trackAuth } from '../../lib/analytics';
+import { useAuth } from '../../contexts/AuthContext';
 
 export default function Register() {
   const navigate = useNavigate();
   const location = useLocation();
+  const { user } = useAuth();
   const [fullName, setFullName] = React.useState('');
   const [email, setEmail] = React.useState('');
   const [phone, setPhone] = React.useState('');
@@ -17,6 +19,17 @@ export default function Register() {
   const [confirmPassword, setConfirmPassword] = React.useState('');
   const [loading, setLoading] = React.useState(false);
   const [error, setError] = React.useState('');
+
+  React.useEffect(() => {
+    if (user) {
+      const redirectTo = location.state?.from || (
+        user.role === 'ADMIN' ? '/admin/dashboard' : 
+        user.role === 'SHOP_OWNER' ? '/shop/dashboard' : 
+        user.role === 'STAFF' ? '/staff/dashboard' : '/'
+      );
+      navigate(redirectTo, { replace: true });
+    }
+  }, [user, navigate, location.state]);
 
   const floatingIcons = [
     { Icon: PawPrint, size: 24, left: '4%', delay: 0, duration: 25 },
@@ -321,7 +334,7 @@ export default function Register() {
             <div className="mt-4 text-center text-sm text-slate-500 dark:text-slate-400 font-bold space-y-1">
               <p>
                 Bạn đã có tài khoản?{' '}
-                <Link to="/login" className="text-primary font-black hover:underline ml-1">
+                <Link to="/login" state={{ from: location.state?.from }} className="text-primary font-black hover:underline ml-1">
                   Đăng nhập tại đây →
                 </Link>
               </p>

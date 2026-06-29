@@ -5,12 +5,12 @@ import { FaFacebookF, FaInstagram, FaTiktok } from 'react-icons/fa6';
 
 export default function Footer() {
     return (
-        <footer className="bg-[#0b1b36] text-white pt-16 pb-32 md:pb-6 mt-auto">
+        <footer className="bg-[#0b1b36] text-white pt-16 pb-8 md:pb-6 mt-auto">
             <div className="max-w-7xl mx-auto px-6 md:px-12 lg:px-20">
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 md:gap-10">
                     {/* Cột 1: Brand & Socials */}
-                    <div className="space-y-6">
-                        <Link to="/" onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })} className="inline-block mb-3"><Logo dark /></Link>
+                    <div className="space-y-5">
+                        <Link to="/" onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })} className="inline-block mb-2"><Logo dark /></Link>
                         <p className="text-sm text-slate-300 leading-relaxed pr-4">
                             Nền tảng kết nối chủ nuôi với các dịch vụ chăm sóc thú cưng đáng tin cậy
                         </p>
@@ -27,48 +27,51 @@ export default function Footer() {
                         </div>
                     </div>
 
-                    {/* Cột 2: Dịch vụ */}
-                    <div className="lg:pl-8">
-                        <h5 className="font-bold mb-6 text-base tracking-wide">Dịch vụ</h5>
-                        <ul className="space-y-3.5 text-sm text-slate-300">
-                            <li><Link className="hover:text-white transition-colors" to="/search?type=CLINIC">Khám chữa bệnh</Link></li>
-                            <li><Link className="hover:text-white transition-colors" to="/search?type=HOTEL">Dịch vụ lưu trú</Link></li>
-                            <li><Link className="hover:text-white transition-colors" to="/search?type=SPA">Spa &amp; Grooming</Link></li>
-                        </ul>
-                    </div>
+                    {/* Cột 2 & 3: Grouped for Mobile 2-columns */}
+                    <div className="grid grid-cols-2 gap-4 lg:gap-10 lg:col-span-2">
+                        {/* Cột 2: Dịch vụ */}
+                        <div className="lg:pl-8">
+                            <h5 className="font-bold mb-4 md:mb-6 text-base tracking-wide">Dịch vụ</h5>
+                            <ul className="space-y-3 md:space-y-3.5 text-[13px] md:text-sm text-slate-300">
+                                <li><Link className="hover:text-white transition-colors" to="/search?type=CLINIC">Khám chữa bệnh</Link></li>
+                                <li><Link className="hover:text-white transition-colors" to="/search?type=HOTEL">Dịch vụ lưu trú</Link></li>
+                                <li><Link className="hover:text-white transition-colors" to="/search?type=SPA">Spa &amp; Grooming</Link></li>
+                            </ul>
+                        </div>
 
-                    {/* Cột 3: Về PetEye */}
-                    <div>
-                        <h5 className="font-bold mb-6 text-base tracking-wide">Về PetEye</h5>
-                        <ul className="space-y-3.5 text-sm text-slate-300">
-                            <li><Link className="hover:text-white transition-colors" to="/about#story">Câu chuyện thương hiệu</Link></li>
-                            <li><Link className="hover:text-white transition-colors" to="/about#partner">Trở thành đối tác</Link></li>
-                            <li><Link className="hover:text-white transition-colors" to="/about#news">Tin tức &amp; Sự kiện</Link></li>
-                        </ul>
+                        {/* Cột 3: Về PetEye */}
+                        <div>
+                            <h5 className="font-bold mb-4 md:mb-6 text-base tracking-wide">Về PetEye</h5>
+                            <ul className="space-y-3 md:space-y-3.5 text-[13px] md:text-sm text-slate-300">
+                                <li><Link className="hover:text-white transition-colors" to="/about#story">Câu chuyện thương hiệu</Link></li>
+                                <li><Link className="hover:text-white transition-colors" to="/about#partner">Trở thành đối tác</Link></li>
+                                <li><Link className="hover:text-white transition-colors" to="/about#news">Tin tức &amp; Sự kiện</Link></li>
+                            </ul>
+                        </div>
                     </div>
 
                     {/* Cột 4: Liên hệ */}
-                    <div>
-                        <h5 className="font-bold mb-6 text-base tracking-wide">Liên hệ</h5>
-                        <ul className="space-y-4 text-sm text-slate-300">
+                    <div className="md:col-span-2 lg:col-span-1 pr-16 md:pr-0">
+                        <h5 className="font-bold mb-4 md:mb-6 text-base tracking-wide">Liên hệ</h5>
+                        <ul className="space-y-3 md:space-y-4 text-[13px] md:text-sm text-slate-300">
                             <li className="flex items-start gap-3">
-                                <span className="material-symbols-outlined text-[20px] shrink-0 mt-0.5">location_on</span>
+                                <span className="material-symbols-outlined text-[18px] md:text-[20px] shrink-0 mt-0.5">location_on</span>
                                 <span className="leading-snug">7 Đ. D1, Tăng Nhơn Phú, Hồ Chí Minh</span>
                             </li>
                             <li className="flex items-center gap-3">
-                                <span className="material-symbols-outlined text-[20px] shrink-0">call</span>
+                                <span className="material-symbols-outlined text-[18px] md:text-[20px] shrink-0">call</span>
                                 <span>070 718 5436 (8:00 - 22:00)</span>
                             </li>
-                            <li className="flex items-center gap-3">
-                                <span className="material-symbols-outlined text-[20px] shrink-0">mail</span>
-                                <span>peteye.contact26@gmail.com</span>
+                            <li className="flex items-center gap-3 overflow-hidden">
+                                <span className="material-symbols-outlined text-[18px] md:text-[20px] shrink-0">mail</span>
+                                <span className="truncate">peteye.contact26@gmail.com</span>
                             </li>
                         </ul>
                     </div>
                 </div>
 
                 {/* Bottom Bar */}
-                <div className="border-t border-slate-800/80 mt-16 pt-6 flex flex-col md:flex-row justify-between items-center gap-4 text-[13px] text-slate-400">
+                <div className="border-t border-slate-800/80 mt-10 md:mt-16 pt-6 flex flex-col md:flex-row justify-between items-center gap-4 text-[13px] text-slate-400">
                     <p>© 2026 PetEye Platform. All rights reserved.</p>
                     <div className="flex gap-6">
                         <Link className="hover:text-white transition-colors" to="/terms">Điều khoản sử dụng</Link>

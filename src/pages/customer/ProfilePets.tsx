@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
-import { Plus, X, Dog, Cat, Calendar, Weight, ClipboardList, Info, AlertCircle, CheckCircle2, Camera, Loader2, ChevronRight, Utensils, Heart, Trash2, Activity, ShieldCheck, Sparkles, User, ArrowRight, HeartPulse } from 'lucide-react';
+import { Plus, X, Dog, Cat, Calendar, Weight, ClipboardList, Info, AlertCircle, CheckCircle2, Camera, Loader2, ChevronRight, ChevronDown, Utensils, Heart, Trash2, Activity, ShieldCheck, Sparkles, User, ArrowRight, HeartPulse } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { petService } from '../../services/pet.service';
 import { useAuth } from '../../contexts/AuthContext';
@@ -41,6 +41,8 @@ export default function ProfilePets() {
     vaccinations: [] as any[],
     reminders: [] as any[]
   });
+  const [isSpeciesDropdownOpen, setIsSpeciesDropdownOpen] = useState(false);
+  const [isGenderDropdownOpen, setIsGenderDropdownOpen] = useState(false);
   const [step, setStep] = useState(1);
   const [submitting, setSubmitting] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
@@ -177,19 +179,27 @@ export default function ProfilePets() {
   return (
     <main className="flex-1 flex flex-col gap-8 p-4 md:p-0">
       {/* Header Section */}
-      <div className="flex flex-col md:flex-row md:items-start justify-between gap-6">
+      <div className="flex items-center justify-between gap-4 md:gap-6 mb-2 md:mb-0">
         <div>
-          <h1 className="text-3xl text-slate-900 dark:text-slate-100 tracking-tight font-bold">Thú cưng của tôi</h1>
-          <p className="text-slate-500 dark:text-slate-400 mt-1">Nơi lưu giữ những khoảnh khắc và chăm sóc sức khỏe toàn diện cho các bé yêu.</p>
+          <h1 className="text-2xl md:text-3xl text-slate-900 dark:text-slate-100 tracking-tight font-bold flex items-center gap-3">
+            Thú cưng của tôi
+            {!loading && pets.length > 0 && (
+              <span className="text-[13px] md:text-sm font-black bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 px-3 py-1 rounded-xl border border-blue-100 dark:border-blue-800/50">
+                {pets.length} bé
+              </span>
+            )}
+          </h1>
+          <p className="hidden md:block text-slate-500 dark:text-slate-400 mt-1">Nơi lưu giữ những khoảnh khắc và chăm sóc sức khỏe toàn diện cho các bé yêu.</p>
         </div>
         <motion.button
-          whileHover={{ scale: 1.02 }}
-          whileTap={{ scale: 0.98 }}
+          whileHover={{ scale: 1.05 }}
+          whileTap={{ scale: 0.95 }}
           onClick={() => { resetForm(); setShowAddModal(true); }}
-          className="flex items-center justify-center gap-2 px-8 py-4 bg-gradient-to-r from-[#1a2b4c] to-[#2d4a82] text-white font-bold rounded-[2rem] transition-all shadow-xl shadow-blue-900/10 hover:shadow-2xl hover:shadow-blue-900/20 group"
+          className="flex items-center justify-center gap-2 size-12 md:w-auto md:h-auto md:px-8 md:py-4 bg-gradient-to-r from-[#1a2b4c] to-[#2d4a82] text-white font-bold rounded-full md:rounded-[2rem] transition-all shadow-xl shadow-blue-900/10 hover:shadow-2xl hover:shadow-blue-900/20 group shrink-0"
+          title="Thêm thành viên mới"
         >
-          <Plus size={22} className="group-hover:rotate-90 transition-transform duration-300" />
-          Thêm thành viên mới
+          <Plus size={24} className="md:w-[22px] md:h-[22px] group-hover:rotate-90 transition-transform duration-300" />
+          <span className="hidden md:inline">Thêm thành viên mới</span>
         </motion.button>
       </div>
 
@@ -227,34 +237,43 @@ export default function ProfilePets() {
               {/* Decorative background element */}
               <div className="absolute top-0 right-0 size-48 bg-gradient-to-bl from-blue-50/50 to-transparent dark:from-blue-900/5 pointer-events-none" />
               
-              <div className="p-5 sm:p-8">
-                <div className="flex flex-col sm:flex-row gap-4 sm:gap-6 items-center sm:items-start">
+              {/* Delete Button (Moved to top right for better mobile UI) */}
+              <button
+                onClick={() => { setSelectedPetForDelete(pet); setShowDeleteModal(true); }}
+                className="absolute top-4 right-4 z-10 size-10 bg-white/50 hover:bg-red-50 dark:bg-slate-800/50 dark:hover:bg-red-900/20 text-slate-400 hover:text-red-500 rounded-full flex items-center justify-center backdrop-blur-sm transition-all border border-slate-100 dark:border-slate-700"
+                title="Xóa thú cưng"
+              >
+                <Trash2 size={18} />
+              </button>
+              
+              <div className="p-4 sm:p-6 sm:p-8">
+                <div className="flex gap-4 sm:gap-6 items-center sm:items-start">
                   <div className="relative shrink-0">
-                    <div className="size-24 sm:size-32 mx-auto sm:mx-0 rounded-[2rem] overflow-hidden ring-8 ring-slate-50 dark:ring-slate-800/50 group-hover:ring-[#1a2b4c]/5 transition-all duration-500">
+                    <div className="size-20 sm:size-32 rounded-[1.25rem] sm:rounded-[2rem] overflow-hidden ring-4 sm:ring-8 ring-slate-50 dark:ring-slate-800/50 group-hover:ring-[#1a2b4c]/5 transition-all duration-500">
                       <img
                         src={pet.avatar || (pet.species === 'Mèo' ? 'https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?q=80&w=2043&auto=format&fit=crop' : 'https://images.unsplash.com/photo-1583511655857-d19b40a7a54e?q=80&w=2069&auto=format&fit=crop')}
                         alt={pet.name}
                         className="size-full object-cover group-hover:scale-110 transition-transform duration-700"
                       />
                     </div>
-                    <div className="absolute -bottom-2 -right-2 size-10 bg-white dark:bg-slate-800 rounded-2xl shadow-xl flex items-center justify-center border border-slate-50 dark:border-slate-700 text-xl">
+                    <div className="absolute -bottom-2 -right-2 size-8 sm:size-10 bg-white dark:bg-slate-800 rounded-xl sm:rounded-2xl shadow-xl flex items-center justify-center border border-slate-50 dark:border-slate-700 text-sm sm:text-xl">
                       {pet.species === 'Mèo' ? '🐱' : '🐶'}
                     </div>
                   </div>
                   
-                  <div className="flex-1 min-w-0 w-full pt-2">
-                    <div className="flex flex-col sm:flex-row items-center sm:items-start justify-between gap-3 sm:gap-4 text-center sm:text-left">
-                      <div>
-                        <h3 className="font-bold text-slate-900 dark:text-white text-2xl group-hover:text-slate-900 dark:group-hover:text-blue-400 transition-colors tracking-tight">
+                  <div className="flex-1 min-w-0 w-full py-1">
+                    <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 sm:gap-4">
+                      <div className="min-w-0 w-full pr-8 sm:pr-0">
+                        <h3 className="font-bold text-slate-900 dark:text-white text-xl sm:text-2xl group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors tracking-tight truncate">
                           {pet.name}
                         </h3>
-                        <div className="flex items-center justify-center sm:justify-start gap-2 mt-1">
-                          <span className="text-slate-400 font-bold text-xs uppercase tracking-wider">{pet.breed || 'Linh vật'}</span>
-                          <span className="size-1 bg-slate-200 rounded-full" />
-                          <span className="text-slate-400 font-bold text-xs uppercase tracking-wider">{pet.gender}</span>
+                        <div className="flex items-center gap-1.5 mt-0.5 sm:mt-1 truncate">
+                          <span className="text-slate-400 font-bold text-[10px] sm:text-xs uppercase tracking-wider truncate">{pet.breed || 'Linh vật'}</span>
+                          <span className="size-1 bg-slate-200 rounded-full shrink-0" />
+                          <span className="text-slate-400 font-bold text-[10px] sm:text-xs uppercase tracking-wider shrink-0">{pet.gender}</span>
                         </div>
                       </div>
-                      <div className={`px-4 py-1.5 rounded-full text-xs font-bold border whitespace-nowrap transition-all duration-300 ${
+                      <div className={`inline-flex px-3 py-1 sm:px-4 sm:py-1.5 rounded-full text-[10px] sm:text-xs font-bold border whitespace-nowrap transition-all duration-300 ${
                         pet.active 
                           ? 'bg-emerald-50 text-emerald-600 border-emerald-100 dark:bg-emerald-500/10 dark:border-emerald-500/20' 
                           : 'bg-slate-100 text-slate-500 border-slate-200'
@@ -263,23 +282,23 @@ export default function ProfilePets() {
                       </div>
                     </div>
                     
-                    <div className="grid grid-cols-2 gap-3 mt-6">
-                      <div className="flex items-center gap-2.5 p-2.5 bg-slate-50/80 dark:bg-slate-800/50 rounded-2xl border border-slate-100/50 dark:border-slate-700/50">
-                        <div className="size-8 bg-white dark:bg-slate-700 rounded-xl flex items-center justify-center text-blue-500 shadow-sm">
-                          <Weight size={14} />
+                    <div className="grid grid-cols-2 gap-2 sm:gap-3 mt-4 sm:mt-6">
+                      <div className="flex items-center gap-2 sm:gap-2.5 p-2 sm:p-2.5 bg-slate-50/80 dark:bg-slate-800/50 rounded-xl sm:rounded-2xl border border-slate-100/50 dark:border-slate-700/50">
+                        <div className="size-6 sm:size-8 bg-white dark:bg-slate-700 rounded-lg sm:rounded-xl flex items-center justify-center text-blue-500 shadow-sm shrink-0">
+                          <Weight size={12} className="sm:w-3.5 sm:h-3.5" />
                         </div>
-                        <div>
-                          <p className="text-xs font-bold text-slate-400 ">Cân nặng</p>
-                          <p className="text-sm font-bold text-slate-700 dark:text-slate-200">{pet.weight} kg</p>
+                        <div className="min-w-0">
+                          <p className="text-[9px] sm:text-xs font-bold text-slate-400 truncate">Cân nặng</p>
+                          <p className="text-xs sm:text-sm font-bold text-slate-700 dark:text-slate-200 truncate">{pet.weight} kg</p>
                         </div>
                       </div>
-                      <div className="flex items-center gap-2.5 p-2.5 bg-slate-50/80 dark:bg-slate-800/50 rounded-2xl border border-slate-100/50 dark:border-slate-700/50">
-                        <div className="size-8 bg-white dark:bg-slate-700 rounded-xl flex items-center justify-center text-amber-500 shadow-sm">
-                          <Calendar size={14} />
+                      <div className="flex items-center gap-2 sm:gap-2.5 p-2 sm:p-2.5 bg-slate-50/80 dark:bg-slate-800/50 rounded-xl sm:rounded-2xl border border-slate-100/50 dark:border-slate-700/50">
+                        <div className="size-6 sm:size-8 bg-white dark:bg-slate-700 rounded-lg sm:rounded-xl flex items-center justify-center text-amber-500 shadow-sm shrink-0">
+                          <Calendar size={12} className="sm:w-3.5 sm:h-3.5" />
                         </div>
-                        <div>
-                          <p className="text-xs font-bold text-slate-400 ">Tuổi đời</p>
-                          <p className="text-sm font-bold text-slate-700 dark:text-slate-200">{calculateAge(pet.dob)}</p>
+                        <div className="min-w-0">
+                          <p className="text-[9px] sm:text-xs font-bold text-slate-400 truncate">Tuổi đời</p>
+                          <p className="text-xs sm:text-sm font-bold text-slate-700 dark:text-slate-200 truncate">{calculateAge(pet.dob)}</p>
                         </div>
                       </div>
                     </div>
@@ -287,35 +306,28 @@ export default function ProfilePets() {
                 </div>
 
                 {pet.healthNote && (
-                  <div className="mt-6 p-4 bg-blue-50/30 dark:bg-blue-500/5 rounded-3xl text-xs text-blue-600 dark:text-blue-400 border border-blue-100/30 dark:border-blue-500/10 flex gap-3 italic font-medium">
-                    <HeartPulse size={16} className="shrink-0 text-blue-400" />
+                  <div className="mt-4 sm:mt-6 p-3 sm:p-4 bg-blue-50/30 dark:bg-blue-500/5 rounded-2xl sm:rounded-3xl text-[10px] sm:text-xs text-blue-600 dark:text-blue-400 border border-blue-100/30 dark:border-blue-500/10 flex gap-2 sm:gap-3 italic font-medium">
+                    <HeartPulse size={14} className="shrink-0 text-blue-400 sm:w-4 sm:h-4" />
                     <span className="line-clamp-2 leading-relaxed">"{pet.healthNote}"</span>
                   </div>
                 )}
               </div>
               
-              <div className="px-5 py-4 sm:px-8 sm:py-6 bg-slate-50/50 dark:bg-slate-800/20 flex flex-wrap sm:flex-nowrap gap-3 sm:gap-4 border-t border-slate-100/50 dark:border-slate-800/50">
+              <div className="px-4 py-4 sm:px-8 sm:py-6 bg-slate-50/50 dark:bg-slate-800/20 grid grid-cols-2 gap-3 sm:gap-4 border-t border-slate-100/50 dark:border-slate-800/50">
                 <Link
                   to={`/search`}
-                  className="flex-1 py-3.5 text-center bg-[#1a2b4c] hover:bg-[#2d4a82] text-white font-bold rounded-2xl text-xs shadow-lg shadow-blue-900/10 transition-all active:scale-95 flex items-center justify-center gap-2"
+                  className="py-3.5 text-center bg-[#1a2b4c] hover:bg-[#2d4a82] text-white font-bold rounded-2xl text-xs shadow-lg shadow-blue-900/10 transition-all active:scale-95 flex items-center justify-center gap-2"
                 >
                   <Calendar size={14} />
-                  Đặt lịch ngay
+                  Đặt lịch
                 </Link>
                 <Link
                   to={`/pet/${pet.id}`}
-                  className="flex-1 py-3.5 text-center bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 font-bold rounded-2xl text-xs hover:bg-slate-50 dark:hover:bg-slate-700 transition-all active:scale-95 flex items-center justify-center gap-2"
+                  className="py-3.5 text-center bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 font-bold rounded-2xl text-xs hover:bg-slate-50 dark:hover:bg-slate-700 transition-all active:scale-95 flex items-center justify-center gap-2"
                 >
                   <ClipboardList size={14} />
                   Hồ sơ y tế
                 </Link>
-                <button
-                  onClick={() => { setSelectedPetForDelete(pet); setShowDeleteModal(true); }}
-                  className="size-12 flex items-center justify-center text-red-400 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-2xl transition-all"
-                  title="Xóa thú cưng"
-                >
-                  <Trash2 size={20} />
-                </button>
               </div>
             </motion.div>
           ))
@@ -385,13 +397,34 @@ export default function ProfilePets() {
               </button>
 
               {/* Modal Sidebar */}
-              <div className="md:w-[280px] bg-slate-50 dark:bg-slate-800/40 p-10 flex flex-col border-r border-slate-100 dark:border-slate-800">
-                <div className="size-16 bg-gradient-to-br from-[#1a2b4c] to-blue-600 rounded-[1.5rem] flex items-center justify-center mb-8 shadow-xl shadow-blue-900/20">
-                  <Dog size={32} className="text-white" />
-                </div>
-                <h2 className="text-2xl font-bold text-slate-900 dark:text-white mb-8 leading-tight tracking-tight">Thêm thành viên mới</h2>
+              <div className="md:w-[280px] shrink-0 bg-slate-50 dark:bg-slate-800/40 p-6 md:p-10 flex flex-col border-b md:border-b-0 md:border-r border-slate-100 dark:border-slate-800 z-10">
                 
-                <div className="space-y-8 relative flex-1">
+                {/* Mobile Header (Horizontal & Compact) */}
+                <div className="flex md:hidden items-center gap-4">
+                  <div className="size-12 bg-gradient-to-br from-[#1a2b4c] to-blue-600 rounded-2xl flex items-center justify-center shadow-lg shadow-blue-900/20 shrink-0">
+                    <Dog size={24} className="text-white" />
+                  </div>
+                  <div className="flex-1">
+                    <h2 className="text-lg font-bold text-slate-900 dark:text-white leading-tight">Thêm thành viên mới</h2>
+                    <div className="flex items-center gap-2 mt-1.5">
+                      <div className="text-[10px] font-black uppercase text-blue-600 shrink-0">BƯỚC {step}/4</div>
+                      <div className="h-1.5 w-full bg-blue-100 dark:bg-slate-700 rounded-full overflow-hidden">
+                        <div className="h-full bg-blue-600 transition-all duration-300" style={{ width: `${(step / 4) * 100}%` }} />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Desktop Header (Vertical) */}
+                <div className="hidden md:flex flex-col">
+                  <div className="size-16 bg-gradient-to-br from-[#1a2b4c] to-blue-600 rounded-[1.5rem] flex items-center justify-center mb-8 shadow-xl shadow-blue-900/20 shrink-0">
+                    <Dog size={32} className="text-white" />
+                  </div>
+                  <h2 className="text-2xl font-bold text-slate-900 dark:text-white mb-8 leading-tight tracking-tight">Thêm thành viên mới</h2>
+                </div>
+                
+                {/* Desktop Stepper */}
+                <div className="hidden md:block space-y-8 relative flex-1">
                   <div className="absolute top-5 left-5 w-0.5 h-[calc(100%-40px)] bg-slate-200 dark:bg-slate-700 z-0" />
                   <motion.div 
                     className="absolute top-5 left-5 w-0.5 bg-blue-600 z-0" 
@@ -431,8 +464,8 @@ export default function ProfilePets() {
               </div>
 
               {/* Modal Content */}
-              <div className="flex-1 flex flex-col">
-                <div className="flex-1 p-8 md:p-12 overflow-y-auto custom-scrollbar">
+              <div className="flex-1 flex flex-col relative">
+                <div className="flex-1 p-6 pb-28 md:p-12 overflow-y-auto custom-scrollbar">
                   <AnimatePresence mode="wait">
                     <motion.div
                       key={step}
@@ -479,18 +512,46 @@ export default function ProfilePets() {
                               />
                             </div>
 
-                            <div>
+                            <div className="relative">
                               <label className="text-sm font-bold text-slate-400 mb-2 block">Loài</label>
-                              <select
-                                className="w-full px-6 py-4 bg-slate-50 dark:bg-slate-800 border-2 border-transparent focus:border-blue-600/30 rounded-2xl text-slate-900 dark:text-white outline-none transition-all font-bold appearance-none cursor-pointer"
-                                value={formData.species}
-                                onChange={e => setFormData({...formData, species: e.target.value})}
+                              <div 
+                                className="w-full px-6 py-4 bg-slate-50 dark:bg-slate-800 border-2 border-transparent focus-within:border-blue-600/30 rounded-2xl text-slate-900 dark:text-white transition-all font-bold cursor-pointer flex items-center justify-between"
+                                onClick={() => setIsSpeciesDropdownOpen(!isSpeciesDropdownOpen)}
                               >
-                                <option value="Chó">🐶 Chó</option>
-                                <option value="Mèo">🐱 Mèo</option>
-                                <option value="Thỏ">🐰 Thỏ</option>
-                                <option value="Khác">✨ Khác</option>
-                              </select>
+                                <span>{formData.species === 'Chó' ? '🐶 ' : formData.species === 'Mèo' ? '🐱 ' : formData.species === 'Thỏ' ? '🐰 ' : '✨ '}{formData.species}</span>
+                                <ChevronDown size={20} className="text-slate-400" />
+                              </div>
+                              
+                              <AnimatePresence>
+                                {isSpeciesDropdownOpen && (
+                                  <>
+                                    <div className="fixed inset-0 z-40" onClick={() => setIsSpeciesDropdownOpen(false)} />
+                                    <motion.div 
+                                      initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }}
+                                      className="absolute z-50 mt-2 w-full bg-white dark:bg-slate-800 border border-slate-100 dark:border-slate-700 rounded-2xl shadow-xl overflow-hidden p-2"
+                                    >
+                                      {[
+                                        { val: 'Chó', icon: '🐶' },
+                                        { val: 'Mèo', icon: '🐱' },
+                                        { val: 'Thỏ', icon: '🐰' },
+                                        { val: 'Khác', icon: '✨' },
+                                      ].map(opt => (
+                                        <button
+                                          key={opt.val}
+                                          type="button"
+                                          onClick={() => {
+                                            setFormData({...formData, species: opt.val});
+                                            setIsSpeciesDropdownOpen(false);
+                                          }}
+                                          className={`w-full text-left px-4 py-3 rounded-xl font-bold transition-colors flex items-center ${formData.species === opt.val ? 'bg-blue-50 dark:bg-blue-900/30 text-blue-600' : 'text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700/50'}`}
+                                        >
+                                          <span className="mr-2 text-lg">{opt.icon}</span> {opt.val}
+                                        </button>
+                                      ))}
+                                    </motion.div>
+                                  </>
+                                )}
+                              </AnimatePresence>
                             </div>
 
                             <div>
@@ -525,17 +586,41 @@ export default function ProfilePets() {
                               />
                             </div>
 
-                            <div>
+                            <div className="relative">
                               <label className="text-sm font-bold text-slate-400 mb-2 block">Giới tính</label>
-                              <select
-                                className="w-full px-6 py-4 bg-slate-50 dark:bg-slate-800 border-2 border-transparent focus:border-blue-600/30 rounded-2xl text-slate-900 dark:text-white outline-none transition-all font-bold appearance-none cursor-pointer"
-                                value={formData.gender}
-                                onChange={e => setFormData({...formData, gender: e.target.value})}
+                              <div 
+                                className="w-full px-6 py-4 bg-slate-50 dark:bg-slate-800 border-2 border-transparent focus-within:border-blue-600/30 rounded-2xl text-slate-900 dark:text-white transition-all font-bold cursor-pointer flex items-center justify-between"
+                                onClick={() => setIsGenderDropdownOpen(!isGenderDropdownOpen)}
                               >
-                                <option value="Đực">Đực</option>
-                                <option value="Cái">Cái</option>
-                                <option value="Chưa rõ">Chưa rõ</option>
-                              </select>
+                                <span>{formData.gender}</span>
+                                <ChevronDown size={20} className="text-slate-400" />
+                              </div>
+                              
+                              <AnimatePresence>
+                                {isGenderDropdownOpen && (
+                                  <>
+                                    <div className="fixed inset-0 z-40" onClick={() => setIsGenderDropdownOpen(false)} />
+                                    <motion.div 
+                                      initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }}
+                                      className="absolute z-50 mt-2 w-full bg-white dark:bg-slate-800 border border-slate-100 dark:border-slate-700 rounded-2xl shadow-xl overflow-hidden p-2"
+                                    >
+                                      {['Đực', 'Cái', 'Chưa rõ'].map(opt => (
+                                        <button
+                                          key={opt}
+                                          type="button"
+                                          onClick={() => {
+                                            setFormData({...formData, gender: opt});
+                                            setIsGenderDropdownOpen(false);
+                                          }}
+                                          className={`w-full text-left px-4 py-3 rounded-xl font-bold transition-colors ${formData.gender === opt ? 'bg-blue-50 dark:bg-blue-900/30 text-blue-600' : 'text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700/50'}`}
+                                        >
+                                          {opt}
+                                        </button>
+                                      ))}
+                                    </motion.div>
+                                  </>
+                                )}
+                              </AnimatePresence>
                             </div>
 
                             <div>
