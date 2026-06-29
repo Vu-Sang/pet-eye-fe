@@ -57,6 +57,7 @@ export default function ClinicDetail() {
   const editBooking = location.state?.editBooking;
   const { user } = useAuth();
   const queryClient = useQueryClient();
+  const [showFullDesc, setShowFullDesc] = useState(false);
 
   // ── Real data from API ──────────────────────────────────────────────────────
   const { data: shop, isLoading: shopLoading } = useQuery({
@@ -972,9 +973,26 @@ export default function ClinicDetail() {
             {/* Intro */}
             <section className="border-b border-slate-200 dark:border-slate-800 pb-8">
               <h2 className="text-lg sm:text-xl font-bold text-slate-900 dark:text-slate-100 mb-4">Giới thiệu</h2>
-              <p className="text-slate-600 dark:text-slate-300 leading-relaxed text-base">
-                {shop?.description ?? 'Đang tải thông tin...'}
-              </p>
+              <div className="relative">
+                <p className={`text-slate-600 dark:text-slate-300 leading-relaxed text-base transition-all duration-300 ${
+                  !showFullDesc ? 'line-clamp-3 lg:line-clamp-none' : ''
+                }`}>
+                  {shop?.description ?? 'Đang tải thông tin...'}
+                </p>
+                {shop?.description && shop.description.length > 200 && (
+                  <div className="lg:hidden mt-2">
+                    <button
+                      onClick={() => setShowFullDesc(!showFullDesc)}
+                      className="text-xs font-black text-[#1a2b4c] dark:text-teal-400 hover:underline flex items-center gap-1 uppercase tracking-wider"
+                    >
+                      <span>{showFullDesc ? 'Thu gọn' : 'Xem thêm'}</span>
+                      <span className="material-symbols-outlined text-sm font-bold">
+                        {showFullDesc ? 'expand_less' : 'expand_more'}
+                      </span>
+                    </button>
+                  </div>
+                )}
+              </div>
             </section>
 
             {/* Pet Hotel & Camera Options — chỉ hiển thị nếu shop có dịch vụ BOARDING */}
