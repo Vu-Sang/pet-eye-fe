@@ -148,7 +148,7 @@ export default function ShopRegister() {
       return formData.address && formData.city && formData.description;
     }
     if (step === 3) {
-      const licenseValid = formData.licenseNumber.length === 10 || formData.licenseNumber.length === 13;
+      const licenseValid = formData.licenseNumber.length === 10 || formData.licenseNumber.length === 12 || formData.licenseNumber.length === 13;
       return formData.password && formData.confirmPassword && licenseValid && formData.licenseImageUrl && formData.agreed;
     }
     return false;
@@ -415,12 +415,12 @@ export default function ShopRegister() {
                       const val = e.target.value.replace(/\D/g, '').slice(0, 13);
                       setFormData({ ...formData, licenseNumber: val });
                     }}
-                    placeholder="10 hoặc 13 chữ số"
+                    placeholder="10, 12 hoặc 13 chữ số"
                     maxLength={13}
                     className={`w-full pl-12 pr-16 py-3 rounded-xl border-2 outline-none transition-colors ${
-                      formData.licenseNumber.length > 0 && formData.licenseNumber.length !== 10 && formData.licenseNumber.length !== 13
+                      formData.licenseNumber.length > 0 && formData.licenseNumber.length !== 10 && formData.licenseNumber.length !== 12 && formData.licenseNumber.length !== 13
                         ? 'border-red-300 focus:border-red-400'
-                        : formData.licenseNumber.length === 10 || formData.licenseNumber.length === 13
+                        : formData.licenseNumber.length === 10 || formData.licenseNumber.length === 12 || formData.licenseNumber.length === 13
                         ? 'border-green-400 focus:border-green-500'
                         : 'border-slate-200 focus:border-[#1a2b4c]'
                     }`}
@@ -429,7 +429,7 @@ export default function ShopRegister() {
                     onInput={(e) => (e.target as HTMLInputElement).setCustomValidity('')}
                   />
                   <span className={`absolute right-4 top-1/2 -translate-y-1/2 text-xs font-semibold ${
-                    formData.licenseNumber.length === 10 || formData.licenseNumber.length === 13
+                    formData.licenseNumber.length === 10 || formData.licenseNumber.length === 12 || formData.licenseNumber.length === 13
                       ? 'text-green-500'
                       : 'text-slate-400'
                   }`}>
@@ -437,10 +437,10 @@ export default function ShopRegister() {
                   </span>
                 </div>
                 <p className="text-xs text-slate-400 mt-1.5">
-                  Mã số doanh nghiệp Việt Nam gồm <span className="font-semibold">10 chữ số</span> (doanh nghiệp) hoặc <span className="font-semibold">13 chữ số</span> (chi nhánh)
+                  Mã số doanh nghiệp Việt Nam gồm <span className="font-semibold">10, 12 hoặc 13 chữ số</span>
                 </p>
-                {formData.licenseNumber.length > 0 && formData.licenseNumber.length !== 10 && formData.licenseNumber.length !== 13 && (
-                  <p className="text-xs text-red-500 mt-1">Mã số phải có đúng 10 hoặc 13 chữ số</p>
+                {formData.licenseNumber.length > 0 && formData.licenseNumber.length !== 10 && formData.licenseNumber.length !== 12 && formData.licenseNumber.length !== 13 && (
+                  <p className="text-xs text-red-500 mt-1">Mã số phải có đúng 10, 12 hoặc 13 chữ số</p>
                 )}
               </div>
 
