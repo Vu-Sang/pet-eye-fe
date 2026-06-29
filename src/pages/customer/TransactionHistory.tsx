@@ -8,6 +8,7 @@ import { PawPrint } from 'lucide-react';
 export default function TransactionHistory() {
   const [selectedTx, setSelectedTx] = useState<TransactionResponse | null>(null);
   const [filter, setFilter] = useState('ALL');
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [downloading, setDownloading] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 5;
@@ -57,27 +58,48 @@ export default function TransactionHistory() {
 
   return (
     <main className="flex-1 flex flex-col gap-6">
-      <div className="mb-8">
-        <h1 className="text-3xl text-slate-900 dark:text-slate-100 tracking-tight font-bold">Lịch sử giao dịch</h1>
-        <p className="text-slate-500 dark:text-slate-400 mt-1">Theo dõi các khoản thanh toán và hoàn tiền của bạn.</p>
-      </div>
+      <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-6 md:mb-8">
+        <div>
+          <h1 className="text-2xl md:text-3xl text-slate-900 dark:text-slate-100 tracking-tight font-bold">Lịch sử giao dịch</h1>
+          <p className="text-slate-500 dark:text-slate-400 mt-1 text-sm md:text-base">Theo dõi các khoản thanh toán và hoàn tiền của bạn.</p>
+        </div>
 
-      <div className="flex gap-2 mb-6 overflow-x-auto pb-2">
-        {['ALL', 'SUCCESS', 'PENDING', 'FAILED'].map(f => (
+        <div className="relative shrink-0 w-full sm:w-56">
           <button
-            key={f}
-            onClick={() => {
-              setFilter(f);
-              setCurrentPage(1);
-            }}
-            className={`px-5 py-2.5 rounded-xl font-bold text-sm transition-all whitespace-nowrap ${filter === f
-              ? 'bg-[#1a2b4c] text-white shadow-lg'
-              : 'bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-600 hover:bg-slate-50'
-              }`}
+            onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+            className="w-full flex items-center justify-between bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300 text-sm font-bold rounded-xl px-4 py-3 shadow-sm hover:border-slate-300 dark:hover:border-slate-700 transition-all"
           >
-            {f === 'ALL' ? 'Tất cả' : getStatusLabel(f)}
+            <span>{filter === 'ALL' ? 'Tất cả trạng thái' : getStatusLabel(filter)}</span>
+            <span className="material-symbols-outlined text-slate-400 text-[20px] transition-transform duration-300" style={{ transform: isDropdownOpen ? 'rotate(180deg)' : 'none' }}>
+              expand_more
+            </span>
           </button>
-        ))}
+          
+          {isDropdownOpen && (
+            <>
+              <div className="fixed inset-0 z-40" onClick={() => setIsDropdownOpen(false)} />
+              <div className="absolute top-full left-0 right-0 mt-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl shadow-xl z-50 overflow-hidden animate-in fade-in slide-in-from-top-2 duration-200">
+                {['ALL', 'SUCCESS', 'PENDING', 'FAILED'].map(f => (
+                  <button
+                    key={f}
+                    onClick={() => {
+                      setFilter(f);
+                      setCurrentPage(1);
+                      setIsDropdownOpen(false);
+                    }}
+                    className={`w-full text-left px-4 py-3 text-sm font-bold transition-colors ${
+                      filter === f 
+                        ? 'bg-[#1a2b4c] text-white' 
+                        : 'text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800'
+                    }`}
+                  >
+                    {f === 'ALL' ? 'Tất cả trạng thái' : getStatusLabel(f)}
+                  </button>
+                ))}
+              </div>
+            </>
+          )}
+        </div>
       </div>
 
       {isLoading && !pageData ? (

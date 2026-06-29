@@ -217,7 +217,7 @@ export default function Legal() {
 
   return (
     <div className="min-h-screen bg-slate-50 pt-32 pb-24">
-      <div className="max-w-4xl mx-auto px-6">
+      <div className="max-w-4xl mx-auto px-4 sm:px-6">
 
         {/* Header */}
         <div className="mb-12 text-center">
@@ -228,7 +228,7 @@ export default function Legal() {
         </div>
 
         {/* Content Box */}
-        <div className="bg-white rounded-[40px] p-8 md:p-12 shadow-xl border border-slate-100">
+        <div className="bg-white rounded-3xl md:rounded-[40px] p-5 sm:p-8 md:p-12 shadow-xl border border-slate-100">
 
           {/* Tabs */}
           <div className="flex flex-col sm:flex-row gap-4 mb-12 border-b border-slate-100 pb-6">
@@ -259,26 +259,26 @@ export default function Legal() {
           </motion.div>
 
           {/* Contact Support */}
-          <div className="mt-16 pt-8 border-t border-slate-100">
-            <div className="bg-blue-50 rounded-3xl p-6 md:p-8 flex flex-col md:flex-row items-center justify-between gap-8">
-              <div className="flex-1">
-                <h4 className="text-2xl font-black text-slate-900 mb-4">Thông tin liên hệ</h4>
+          <div className="mt-12 md:mt-16 pt-8 border-t border-slate-100">
+            <div className="bg-blue-50 rounded-2xl md:rounded-3xl p-5 md:p-8 flex flex-col md:flex-row items-center justify-between gap-6 md:gap-8">
+              <div className="flex-1 w-full">
+                <h4 className="text-xl md:text-2xl font-black text-slate-900 mb-4 text-center md:text-left">Thông tin liên hệ</h4>
                 <div className="space-y-3 text-slate-600 font-medium">
-                  <p className="flex items-start gap-3">
-                    <span className="font-bold text-slate-900 min-w-[90px]">Địa chỉ:</span>
+                  <p className="flex flex-col sm:flex-row sm:items-start gap-1 sm:gap-3">
+                    <span className="font-bold text-slate-900 sm:min-w-[90px]">Địa chỉ:</span>
                     <span>7 Đ. D1, Tăng Nhơn Phú, Hồ Chí Minh 700000, Vietnam</span>
                   </p>
-                  <p className="flex items-start gap-3">
-                    <span className="font-bold text-slate-900 min-w-[90px]">Điện thoại:</span>
+                  <p className="flex flex-col sm:flex-row sm:items-start gap-1 sm:gap-3">
+                    <span className="font-bold text-slate-900 sm:min-w-[90px]">Điện thoại:</span>
                     <a href="tel:0707185436" className="text-blue-600 hover:text-blue-700 hover:underline">070 718 5436</a>
                   </p>
-                  <p className="flex items-start gap-3">
-                    <span className="font-bold text-slate-900 min-w-[90px]">Email:</span>
-                    <a href="mail to:peteye.contact26@gmail.com" className="text-blue-600 hover:text-blue-700 hover:underline break-all">peteye.contact26@gmail.com</a>
+                  <p className="flex flex-col sm:flex-row sm:items-start gap-1 sm:gap-3">
+                    <span className="font-bold text-slate-900 sm:min-w-[90px]">Email:</span>
+                    <a href="mailto:peteye.contact26@gmail.com" className="text-blue-600 hover:text-blue-700 hover:underline break-all">peteye.contact26@gmail.com</a>
                   </p>
                 </div>
               </div>
-              <div className="shrink-0 w-full md:w-auto mt-4 md:mt-0">
+              <div className="shrink-0 w-full md:w-auto mt-2 md:mt-0">
                 <a href="mailto:peteye.contact26@gmail.com" className="flex items-center justify-center px-8 py-4 bg-primary text-white font-bold rounded-full shadow-lg shadow-primary/30 hover:bg-primary-hover hover:shadow-xl hover:-translate-y-1 transition-all duration-300 w-full">
                   Gửi email ngay
                 </a>

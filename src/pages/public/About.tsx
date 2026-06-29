@@ -45,11 +45,11 @@ export default function About() {
             <div className="inline-flex items-center gap-2 px-4 py-2 bg-white/10 backdrop-blur-md text-white font-semibold rounded-full text-sm mb-8 border border-white/20 shadow-lg">
               <Heart size={16} className="text-rose-400" /> Câu chuyện thương hiệu
             </div>
-            <h2 className="text-5xl md:text-6xl lg:text-7xl font-black text-white mb-8 leading-tight drop-shadow-xl tracking-tight">
+            <h2 className="text-4xl md:text-5xl lg:text-7xl font-black text-white mb-6 md:mb-8 leading-tight drop-shadow-xl tracking-tight">
               Khởi nguồn từ tình yêu với <br className="hidden md:block"/>
               <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-teal-300">những người bạn nhỏ</span>
             </h2>
-            <div className="space-y-6 text-xl md:text-2xl text-slate-200 leading-relaxed font-medium max-w-4xl mx-auto">
+            <div className="space-y-4 md:space-y-6 text-lg md:text-2xl text-slate-200 leading-relaxed font-medium max-w-4xl mx-auto">
               <p>
                 Khởi nguồn từ một trăn trở đơn giản: Làm thế nào để tìm được cơ sở thú y, spa uy tín một cách nhanh chóng và có thể theo dõi thú cưng của mình mọi lúc mọi nơi?
               </p>
@@ -78,11 +78,11 @@ export default function About() {
               initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeIn}
               className="max-w-3xl relative"
             >
-              <div className="absolute -left-10 -top-10 text-[120px] text-blue-500/10 font-serif leading-none">"</div>
-              <h2 className="text-5xl md:text-6xl lg:text-7xl font-black text-slate-900 leading-tight mb-8 tracking-tighter relative z-10">
+              <div className="absolute -left-4 md:-left-10 -top-8 md:-top-10 text-[80px] md:text-[120px] text-blue-500/10 font-serif leading-none">"</div>
+              <h2 className="text-4xl md:text-5xl lg:text-7xl font-black text-slate-900 leading-tight mb-6 md:mb-8 tracking-tighter relative z-10">
                 Trở thành một trong những <span className="bg-clip-text text-transparent bg-gradient-to-r from-primary to-blue-500 pb-2">nền tảng công nghệ đáng tin cậy</span> hàng&nbsp;đầu.
               </h2>
-              <p className="text-2xl md:text-3xl text-slate-600 font-medium leading-relaxed relative z-10">
+              <p className="text-xl md:text-3xl text-slate-600 font-medium leading-relaxed relative z-10">
                 Kết nối chủ nuôi với hệ sinh thái dịch vụ thú cưng minh bạch và chất lượng.
               </p>
               <div className="mt-8 flex items-center gap-4">
@@ -96,12 +96,12 @@ export default function About() {
               initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeIn}
               className="max-w-3xl ml-auto relative md:text-right"
             >
-              <div className="absolute -left-10 md:left-auto md:-right-10 -top-10 text-[120px] text-blue-500/10 font-serif leading-none">"</div>
-              <h2 className="text-5xl md:text-6xl lg:text-7xl font-black text-slate-900 leading-tight mb-8 tracking-tighter relative z-10">
-                Mang đến <span className="bg-clip-text text-transparent bg-gradient-to-r from-primary to-blue-500 pb-2">sự an tâm</span> cho chủ nuôi.
+              <div className="absolute -left-4 md:left-auto md:-right-10 -top-8 md:-top-10 text-[80px] md:text-[120px] text-blue-500/10 font-serif leading-none">"</div>
+              <h2 className="text-4xl md:text-5xl lg:text-7xl font-black text-slate-900 leading-tight mb-6 md:mb-8 tracking-tighter relative z-10">
+                Gắn kết cộng đồng yêu thú cưng qua những <span className="bg-clip-text text-transparent bg-gradient-to-r from-primary to-blue-500 pb-2">giá trị đích thực.</span>
               </h2>
-              <p className="text-2xl md:text-3xl text-slate-600 font-medium leading-relaxed relative z-10">
-                Bằng cách kết nối họ với các dịch vụ chăm sóc thú cưng đáng tin cậy thông qua công nghệ.
+              <p className="text-xl md:text-3xl text-slate-600 font-medium leading-relaxed relative z-10">
+                Không chỉ là đặt dịch vụ, chúng tôi muốn xây dựng niềm tin và sự an tâm tuyệt đối cho bạn. cậy thông qua công nghệ.
               </p>
               <div className="mt-8 flex items-center gap-4 md:justify-end">
                 <div className="w-16 h-1 bg-gradient-to-r from-primary to-blue-500 rounded-full md:order-2"></div>
@@ -148,7 +148,7 @@ export default function About() {
 
         <div className="max-w-6xl mx-auto px-6 md:px-12 lg:px-20">
           <div className="text-center max-w-3xl mx-auto mb-16 md:mb-20">
-            <h2 className="text-5xl md:text-6xl lg:text-7xl font-black text-slate-900 leading-tight mb-6 tracking-tighter">
+            <h2 className="text-4xl md:text-5xl lg:text-7xl font-black text-slate-900 leading-tight mb-4 md:mb-6 tracking-tighter">
               Vì sao hàng nghìn chủ nuôi <br className="hidden md:block"/>
               <span className="bg-clip-text text-transparent bg-gradient-to-r from-primary to-blue-500 pb-2">lựa chọn PetEye?</span>
             </h2>
@@ -167,14 +167,14 @@ export default function About() {
                 className={`flex flex-col md:flex-row items-center gap-6 md:gap-12 ${feature.align === 'right' ? 'md:flex-row-reverse' : ''}`}
               >
                 <div className="md:w-5/12 flex justify-center">
-                   <div className={`w-32 h-32 md:w-48 md:h-48 rounded-full flex items-center justify-center ${feature.bg} ${feature.color} shadow-xl shadow-slate-200/50 relative group`}>
+                   <div className={`w-24 h-24 md:w-48 md:h-48 rounded-full flex items-center justify-center ${feature.bg} ${feature.color} shadow-xl shadow-slate-200/50 relative group`}>
                       <div className="absolute inset-0 bg-white/40 rounded-full blur-xl group-hover:blur-2xl transition-all duration-500"></div>
-                      <feature.icon size={64} className="relative z-10 group-hover:scale-110 transition-transform duration-500" />
+                      <feature.icon className="relative z-10 group-hover:scale-110 transition-transform duration-500 w-12 h-12 md:w-16 md:h-16" />
                    </div>
                 </div>
                 <div className={`md:w-7/12 text-center md:text-left ${feature.align === 'right' ? 'md:text-right' : ''}`}>
-                  <h4 className="text-2xl md:text-3xl font-black text-slate-900 mb-3">{feature.title}</h4>
-                  <p className="text-lg text-slate-600 leading-relaxed font-medium">{feature.desc}</p>
+                  <h4 className="text-xl md:text-3xl font-black text-slate-900 mb-2 md:mb-3">{feature.title}</h4>
+                  <p className="text-base md:text-lg text-slate-600 leading-relaxed font-medium">{feature.desc}</p>
                 </div>
               </motion.div>
             ))}
@@ -198,10 +198,10 @@ export default function About() {
           <div className="grid lg:grid-cols-12 gap-16 items-center">
             
             <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeIn} className="lg:col-span-5">
-              <h2 className="text-5xl md:text-6xl lg:text-7xl font-black text-white leading-tight mb-6 tracking-tighter">Cam kết <br/> của PetEye</h2>
-              <div className="w-20 h-2 bg-blue-500 mb-8 rounded-full"></div>
-              <p className="text-3xl text-blue-400 font-bold mb-6">Minh bạch trong mọi quyết định</p>
-              <p className="text-xl text-slate-400 font-medium leading-relaxed italic border-l-4 border-slate-700 pl-6">
+              <h2 className="text-4xl md:text-5xl lg:text-7xl font-black text-white leading-tight mb-4 md:mb-6 tracking-tighter">Cam kết <br/> của PetEye</h2>
+              <div className="w-16 md:w-20 h-2 bg-blue-500 mb-6 md:mb-8 rounded-full"></div>
+              <p className="text-2xl md:text-3xl text-blue-400 font-bold mb-4 md:mb-6">Minh bạch trong mọi quyết định</p>
+              <p className="text-lg md:text-xl text-slate-400 font-medium leading-relaxed italic border-l-4 border-slate-700 pl-4 md:pl-6">
                 "Chúng tôi tin rằng sự an tâm bắt đầu từ việc nhìn thấy và hiểu rõ nơi bạn gửi gắm thú&nbsp;cưng."
               </p>
             </motion.div>
@@ -227,24 +227,24 @@ export default function About() {
       </section>
 
       {/* 5. Partner CTA - Floating Staggered Box */}
-      <section className="py-32 bg-slate-50 relative">
-        <div className="max-w-7xl mx-auto px-6 md:px-12 lg:px-20">
-          <div className="relative bg-white rounded-[3rem] p-12 md:p-20 shadow-2xl shadow-blue-900/5 overflow-hidden">
-            <div className="absolute -top-24 -right-24 w-96 h-96 bg-orange-100 rounded-full blur-[80px]"></div>
-            <div className="absolute -bottom-24 -left-24 w-96 h-96 bg-blue-100 rounded-full blur-[80px]"></div>
+      <section className="py-20 md:py-32 bg-slate-50 relative">
+        <div className="max-w-7xl mx-auto px-4 md:px-12 lg:px-20">
+          <div className="relative bg-white rounded-3xl md:rounded-[3rem] p-6 sm:p-12 md:p-20 shadow-2xl shadow-blue-900/5 overflow-hidden">
+            <div className="absolute -top-24 -right-24 w-64 md:w-96 h-64 md:h-96 bg-orange-100 rounded-full blur-[60px] md:blur-[80px]"></div>
+            <div className="absolute -bottom-24 -left-24 w-64 md:w-96 h-64 md:h-96 bg-blue-100 rounded-full blur-[60px] md:blur-[80px]"></div>
 
-            <div className="grid lg:grid-cols-2 gap-16 relative z-10 items-center">
+            <div className="grid lg:grid-cols-2 gap-10 md:gap-16 relative z-10 items-center">
               <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeIn}>
-                <div className="inline-flex items-center gap-2 px-4 py-2 bg-orange-50 text-orange-600 font-bold rounded-full text-sm mb-8 uppercase tracking-wider">
+                <div className="inline-flex items-center gap-2 px-3 py-1.5 md:px-4 md:py-2 bg-orange-50 text-orange-600 font-bold rounded-full text-xs md:text-sm mb-6 md:mb-8 uppercase tracking-wider">
                   <Handshake size={16} /> Dành cho Doanh nghiệp
                 </div>
-                <h2 className="text-5xl md:text-6xl lg:text-7xl font-black text-slate-900 mb-8 leading-tight tracking-tighter">
+                <h2 className="text-4xl md:text-5xl lg:text-7xl font-black text-slate-900 mb-6 md:mb-8 leading-tight tracking-tighter">
                   Trở thành đối tác chiến lược cùng <span className="bg-clip-text text-transparent bg-gradient-to-r from-primary to-blue-500 pb-2">PetEye</span>
                 </h2>
-                <p className="text-xl text-slate-600 leading-relaxed font-medium mb-10">
+                <p className="text-base sm:text-lg md:text-xl text-slate-600 leading-relaxed font-medium mb-8 md:mb-10">
                   Bạn là chủ phòng khám thú y, spa hay dịch vụ lưu trú? Tham gia mạng lưới PetEye để tiếp cận hàng ngàn khách hàng tiềm năng, tối ưu quy trình quản lý và nâng tầm thương hiệu.
                 </p>
-                <Link to="/shop/register" className="inline-flex items-center gap-3 bg-slate-900 text-white px-10 py-5 rounded-full text-lg font-bold hover:bg-blue-600 transition-colors shadow-xl hover:-translate-y-1">
+                <Link to="/shop/register" className="inline-flex justify-center items-center gap-3 bg-slate-900 text-white px-8 md:px-10 py-4 md:py-5 rounded-full text-base md:text-lg font-bold hover:bg-blue-600 transition-colors shadow-xl hover:-translate-y-1 w-full sm:w-auto">
                   Đăng ký đối tác ngay
                   <ArrowRight size={20} />
                 </Link>
