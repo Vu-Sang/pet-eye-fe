@@ -39,6 +39,7 @@ export interface StaffCreationRequest {
   phone?: string;
   role?: string;
   specialization?: string;
+  avatar?: string;
   certificates?: StaffCertificateRequest[];
 }
 
