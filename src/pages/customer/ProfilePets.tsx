@@ -177,19 +177,20 @@ export default function ProfilePets() {
   return (
     <main className="flex-1 flex flex-col gap-8 p-4 md:p-0">
       {/* Header Section */}
-      <div className="flex flex-col md:flex-row md:items-start justify-between gap-6">
+      <div className="flex items-center justify-between gap-4 md:gap-6 mb-2 md:mb-0">
         <div>
-          <h1 className="text-3xl text-slate-900 dark:text-slate-100 tracking-tight font-bold">Thú cưng của tôi</h1>
-          <p className="text-slate-500 dark:text-slate-400 mt-1">Nơi lưu giữ những khoảnh khắc và chăm sóc sức khỏe toàn diện cho các bé yêu.</p>
+          <h1 className="text-2xl md:text-3xl text-slate-900 dark:text-slate-100 tracking-tight font-bold">Thú cưng của tôi</h1>
+          <p className="hidden md:block text-slate-500 dark:text-slate-400 mt-1">Nơi lưu giữ những khoảnh khắc và chăm sóc sức khỏe toàn diện cho các bé yêu.</p>
         </div>
         <motion.button
-          whileHover={{ scale: 1.02 }}
-          whileTap={{ scale: 0.98 }}
+          whileHover={{ scale: 1.05 }}
+          whileTap={{ scale: 0.95 }}
           onClick={() => { resetForm(); setShowAddModal(true); }}
-          className="flex items-center justify-center gap-2 px-8 py-4 bg-gradient-to-r from-[#1a2b4c] to-[#2d4a82] text-white font-bold rounded-[2rem] transition-all shadow-xl shadow-blue-900/10 hover:shadow-2xl hover:shadow-blue-900/20 group"
+          className="flex items-center justify-center gap-2 size-12 md:w-auto md:h-auto md:px-8 md:py-4 bg-gradient-to-r from-[#1a2b4c] to-[#2d4a82] text-white font-bold rounded-full md:rounded-[2rem] transition-all shadow-xl shadow-blue-900/10 hover:shadow-2xl hover:shadow-blue-900/20 group shrink-0"
+          title="Thêm thành viên mới"
         >
-          <Plus size={22} className="group-hover:rotate-90 transition-transform duration-300" />
-          Thêm thành viên mới
+          <Plus size={24} className="md:w-[22px] md:h-[22px] group-hover:rotate-90 transition-transform duration-300" />
+          <span className="hidden md:inline">Thêm thành viên mới</span>
         </motion.button>
       </div>
 
@@ -227,34 +228,43 @@ export default function ProfilePets() {
               {/* Decorative background element */}
               <div className="absolute top-0 right-0 size-48 bg-gradient-to-bl from-blue-50/50 to-transparent dark:from-blue-900/5 pointer-events-none" />
               
-              <div className="p-5 sm:p-8">
-                <div className="flex flex-col sm:flex-row gap-4 sm:gap-6 items-center sm:items-start">
+              {/* Delete Button (Moved to top right for better mobile UI) */}
+              <button
+                onClick={() => { setSelectedPetForDelete(pet); setShowDeleteModal(true); }}
+                className="absolute top-4 right-4 z-10 size-10 bg-white/50 hover:bg-red-50 dark:bg-slate-800/50 dark:hover:bg-red-900/20 text-slate-400 hover:text-red-500 rounded-full flex items-center justify-center backdrop-blur-sm transition-all border border-slate-100 dark:border-slate-700"
+                title="Xóa thú cưng"
+              >
+                <Trash2 size={18} />
+              </button>
+              
+              <div className="p-4 sm:p-6 sm:p-8">
+                <div className="flex gap-4 sm:gap-6 items-center sm:items-start">
                   <div className="relative shrink-0">
-                    <div className="size-24 sm:size-32 mx-auto sm:mx-0 rounded-[2rem] overflow-hidden ring-8 ring-slate-50 dark:ring-slate-800/50 group-hover:ring-[#1a2b4c]/5 transition-all duration-500">
+                    <div className="size-20 sm:size-32 rounded-[1.25rem] sm:rounded-[2rem] overflow-hidden ring-4 sm:ring-8 ring-slate-50 dark:ring-slate-800/50 group-hover:ring-[#1a2b4c]/5 transition-all duration-500">
                       <img
                         src={pet.avatar || (pet.species === 'Mèo' ? 'https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?q=80&w=2043&auto=format&fit=crop' : 'https://images.unsplash.com/photo-1583511655857-d19b40a7a54e?q=80&w=2069&auto=format&fit=crop')}
                         alt={pet.name}
                         className="size-full object-cover group-hover:scale-110 transition-transform duration-700"
                       />
                     </div>
-                    <div className="absolute -bottom-2 -right-2 size-10 bg-white dark:bg-slate-800 rounded-2xl shadow-xl flex items-center justify-center border border-slate-50 dark:border-slate-700 text-xl">
+                    <div className="absolute -bottom-2 -right-2 size-8 sm:size-10 bg-white dark:bg-slate-800 rounded-xl sm:rounded-2xl shadow-xl flex items-center justify-center border border-slate-50 dark:border-slate-700 text-sm sm:text-xl">
                       {pet.species === 'Mèo' ? '🐱' : '🐶'}
                     </div>
                   </div>
                   
-                  <div className="flex-1 min-w-0 w-full pt-2">
-                    <div className="flex flex-col sm:flex-row items-center sm:items-start justify-between gap-3 sm:gap-4 text-center sm:text-left">
-                      <div>
-                        <h3 className="font-bold text-slate-900 dark:text-white text-2xl group-hover:text-slate-900 dark:group-hover:text-blue-400 transition-colors tracking-tight">
+                  <div className="flex-1 min-w-0 w-full py-1">
+                    <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 sm:gap-4">
+                      <div className="min-w-0 w-full pr-8 sm:pr-0">
+                        <h3 className="font-bold text-slate-900 dark:text-white text-xl sm:text-2xl group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors tracking-tight truncate">
                           {pet.name}
                         </h3>
-                        <div className="flex items-center justify-center sm:justify-start gap-2 mt-1">
-                          <span className="text-slate-400 font-bold text-xs uppercase tracking-wider">{pet.breed || 'Linh vật'}</span>
-                          <span className="size-1 bg-slate-200 rounded-full" />
-                          <span className="text-slate-400 font-bold text-xs uppercase tracking-wider">{pet.gender}</span>
+                        <div className="flex items-center gap-1.5 mt-0.5 sm:mt-1 truncate">
+                          <span className="text-slate-400 font-bold text-[10px] sm:text-xs uppercase tracking-wider truncate">{pet.breed || 'Linh vật'}</span>
+                          <span className="size-1 bg-slate-200 rounded-full shrink-0" />
+                          <span className="text-slate-400 font-bold text-[10px] sm:text-xs uppercase tracking-wider shrink-0">{pet.gender}</span>
                         </div>
                       </div>
-                      <div className={`px-4 py-1.5 rounded-full text-xs font-bold border whitespace-nowrap transition-all duration-300 ${
+                      <div className={`inline-flex px-3 py-1 sm:px-4 sm:py-1.5 rounded-full text-[10px] sm:text-xs font-bold border whitespace-nowrap transition-all duration-300 ${
                         pet.active 
                           ? 'bg-emerald-50 text-emerald-600 border-emerald-100 dark:bg-emerald-500/10 dark:border-emerald-500/20' 
                           : 'bg-slate-100 text-slate-500 border-slate-200'
@@ -263,23 +273,23 @@ export default function ProfilePets() {
                       </div>
                     </div>
                     
-                    <div className="grid grid-cols-2 gap-3 mt-6">
-                      <div className="flex items-center gap-2.5 p-2.5 bg-slate-50/80 dark:bg-slate-800/50 rounded-2xl border border-slate-100/50 dark:border-slate-700/50">
-                        <div className="size-8 bg-white dark:bg-slate-700 rounded-xl flex items-center justify-center text-blue-500 shadow-sm">
-                          <Weight size={14} />
+                    <div className="grid grid-cols-2 gap-2 sm:gap-3 mt-4 sm:mt-6">
+                      <div className="flex items-center gap-2 sm:gap-2.5 p-2 sm:p-2.5 bg-slate-50/80 dark:bg-slate-800/50 rounded-xl sm:rounded-2xl border border-slate-100/50 dark:border-slate-700/50">
+                        <div className="size-6 sm:size-8 bg-white dark:bg-slate-700 rounded-lg sm:rounded-xl flex items-center justify-center text-blue-500 shadow-sm shrink-0">
+                          <Weight size={12} className="sm:w-3.5 sm:h-3.5" />
                         </div>
-                        <div>
-                          <p className="text-xs font-bold text-slate-400 ">Cân nặng</p>
-                          <p className="text-sm font-bold text-slate-700 dark:text-slate-200">{pet.weight} kg</p>
+                        <div className="min-w-0">
+                          <p className="text-[9px] sm:text-xs font-bold text-slate-400 truncate">Cân nặng</p>
+                          <p className="text-xs sm:text-sm font-bold text-slate-700 dark:text-slate-200 truncate">{pet.weight} kg</p>
                         </div>
                       </div>
-                      <div className="flex items-center gap-2.5 p-2.5 bg-slate-50/80 dark:bg-slate-800/50 rounded-2xl border border-slate-100/50 dark:border-slate-700/50">
-                        <div className="size-8 bg-white dark:bg-slate-700 rounded-xl flex items-center justify-center text-amber-500 shadow-sm">
-                          <Calendar size={14} />
+                      <div className="flex items-center gap-2 sm:gap-2.5 p-2 sm:p-2.5 bg-slate-50/80 dark:bg-slate-800/50 rounded-xl sm:rounded-2xl border border-slate-100/50 dark:border-slate-700/50">
+                        <div className="size-6 sm:size-8 bg-white dark:bg-slate-700 rounded-lg sm:rounded-xl flex items-center justify-center text-amber-500 shadow-sm shrink-0">
+                          <Calendar size={12} className="sm:w-3.5 sm:h-3.5" />
                         </div>
-                        <div>
-                          <p className="text-xs font-bold text-slate-400 ">Tuổi đời</p>
-                          <p className="text-sm font-bold text-slate-700 dark:text-slate-200">{calculateAge(pet.dob)}</p>
+                        <div className="min-w-0">
+                          <p className="text-[9px] sm:text-xs font-bold text-slate-400 truncate">Tuổi đời</p>
+                          <p className="text-xs sm:text-sm font-bold text-slate-700 dark:text-slate-200 truncate">{calculateAge(pet.dob)}</p>
                         </div>
                       </div>
                     </div>
@@ -287,35 +297,28 @@ export default function ProfilePets() {
                 </div>
 
                 {pet.healthNote && (
-                  <div className="mt-6 p-4 bg-blue-50/30 dark:bg-blue-500/5 rounded-3xl text-xs text-blue-600 dark:text-blue-400 border border-blue-100/30 dark:border-blue-500/10 flex gap-3 italic font-medium">
-                    <HeartPulse size={16} className="shrink-0 text-blue-400" />
+                  <div className="mt-4 sm:mt-6 p-3 sm:p-4 bg-blue-50/30 dark:bg-blue-500/5 rounded-2xl sm:rounded-3xl text-[10px] sm:text-xs text-blue-600 dark:text-blue-400 border border-blue-100/30 dark:border-blue-500/10 flex gap-2 sm:gap-3 italic font-medium">
+                    <HeartPulse size={14} className="shrink-0 text-blue-400 sm:w-4 sm:h-4" />
                     <span className="line-clamp-2 leading-relaxed">"{pet.healthNote}"</span>
                   </div>
                 )}
               </div>
               
-              <div className="px-5 py-4 sm:px-8 sm:py-6 bg-slate-50/50 dark:bg-slate-800/20 flex flex-wrap sm:flex-nowrap gap-3 sm:gap-4 border-t border-slate-100/50 dark:border-slate-800/50">
+              <div className="px-4 py-4 sm:px-8 sm:py-6 bg-slate-50/50 dark:bg-slate-800/20 grid grid-cols-2 gap-3 sm:gap-4 border-t border-slate-100/50 dark:border-slate-800/50">
                 <Link
                   to={`/search`}
-                  className="flex-1 py-3.5 text-center bg-[#1a2b4c] hover:bg-[#2d4a82] text-white font-bold rounded-2xl text-xs shadow-lg shadow-blue-900/10 transition-all active:scale-95 flex items-center justify-center gap-2"
+                  className="py-3.5 text-center bg-[#1a2b4c] hover:bg-[#2d4a82] text-white font-bold rounded-2xl text-xs shadow-lg shadow-blue-900/10 transition-all active:scale-95 flex items-center justify-center gap-2"
                 >
                   <Calendar size={14} />
-                  Đặt lịch ngay
+                  Đặt lịch
                 </Link>
                 <Link
                   to={`/pet/${pet.id}`}
-                  className="flex-1 py-3.5 text-center bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 font-bold rounded-2xl text-xs hover:bg-slate-50 dark:hover:bg-slate-700 transition-all active:scale-95 flex items-center justify-center gap-2"
+                  className="py-3.5 text-center bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 font-bold rounded-2xl text-xs hover:bg-slate-50 dark:hover:bg-slate-700 transition-all active:scale-95 flex items-center justify-center gap-2"
                 >
                   <ClipboardList size={14} />
                   Hồ sơ y tế
                 </Link>
-                <button
-                  onClick={() => { setSelectedPetForDelete(pet); setShowDeleteModal(true); }}
-                  className="size-12 flex items-center justify-center text-red-400 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-2xl transition-all"
-                  title="Xóa thú cưng"
-                >
-                  <Trash2 size={20} />
-                </button>
               </div>
             </motion.div>
           ))

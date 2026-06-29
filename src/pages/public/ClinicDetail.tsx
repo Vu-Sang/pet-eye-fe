@@ -752,23 +752,38 @@ export default function ClinicDetail() {
   };
 
   return (
-    <div className="flex-1 bg-slate-50 dark:bg-slate-900 pt-32 lg:pt-36">
+    <div className="flex-1 bg-slate-50 dark:bg-slate-900 pt-24 sm:pt-32 lg:pt-36">
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-6">
-        {/* Clinic Header */}
-        <div className="flex flex-wrap justify-between items-start gap-4 pb-5">
-          <div className="flex flex-col gap-2">
-            <h1 className="text-slate-900 dark:text-slate-100 text-2xl md:text-4xl font-black leading-tight tracking-tight">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-28 lg:pb-6 relative">
+        <div className="flex flex-col lg:block">
+          {/* Clinic Header */}
+          <div className="order-2 lg:order-none flex flex-wrap justify-between items-start gap-4 pb-5 mt-5 lg:mt-0">
+            <div className="flex flex-col gap-2">
+              <h1 className="text-slate-900 dark:text-slate-100 text-xl sm:text-2xl md:text-4xl font-black leading-tight tracking-tight">
               {shop?.shopName ?? 'Đang tải...'}
             </h1>
             <div className="flex flex-wrap items-center gap-2 text-slate-500 dark:text-slate-400 text-sm font-medium">
-              <span className="flex items-center text-amber-500 gap-1">
-                <span className="material-symbols-outlined text-lg" style={{ fontVariationSettings: "'FILL' 1" }}>
-                  star
-                </span>
-                {shop?.ratingAvg ? shop.ratingAvg.toFixed(1) : 'Mới'}
-              </span>
-              <span>•</span>
+              {shop?.ratingAvg ? (
+                <>
+                  <span className="flex items-center text-amber-500 gap-1">
+                    <span className="material-symbols-outlined text-lg" style={{ fontVariationSettings: "'FILL' 1" }}>
+                      star
+                    </span>
+                    {shop.ratingAvg.toFixed(1)}
+                  </span>
+                  <span>•</span>
+                </>
+              ) : (
+                <>
+                  <span className="hidden sm:flex items-center text-amber-500 gap-1">
+                    <span className="material-symbols-outlined text-lg" style={{ fontVariationSettings: "'FILL' 1" }}>
+                      star
+                    </span>
+                    Mới
+                  </span>
+                  <span className="hidden sm:inline">•</span>
+                </>
+              )}
               <span className="flex items-center gap-1">
                 <span className="material-symbols-outlined text-sm text-teal-500">location_on</span>
                 {shop ? `${shop.address}${shop.city ? `, ${shop.city}` : ''}` : '---'}
@@ -781,16 +796,33 @@ export default function ClinicDetail() {
               )}
             </div>
           </div>
-
         </div>
 
-        {/* Hero Image Grid */}
-        <div className={`w-full h-[280px] md:h-[380px] lg:h-[460px] gap-2 overflow-hidden rounded-2xl mb-8 ${galleryImages.length === 1 ? 'flex' :
-          galleryImages.length === 2 ? 'grid grid-cols-2' :
-            galleryImages.length === 3 ? 'grid grid-cols-3' :
-              galleryImages.length === 4 ? 'grid grid-cols-3 grid-rows-2' :
-                'grid grid-cols-4 grid-rows-2'
-          }`}>
+          {/* Mobile Hero Slider (Only on < lg) */}
+          <div className="order-1 lg:hidden w-full h-[240px] sm:h-[320px] flex overflow-x-auto snap-x snap-mandatory hide-scrollbar rounded-2xl shadow-sm mb-5">
+            {galleryImages.map((img, i) => (
+              <div
+                key={i}
+                className="w-full h-full flex-none snap-center bg-center bg-no-repeat bg-cover relative"
+                style={{ backgroundImage: `url(${img})` }}
+              >
+                <div className="absolute inset-0 bg-black/5" />
+                {galleryImages.length > 1 && (
+                  <div className="absolute bottom-3 right-3 bg-black/50 text-white px-2.5 py-1 rounded-full text-xs font-bold backdrop-blur-sm">
+                    {i + 1} / {galleryImages.length}
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
+
+          {/* Desktop Hero Image Grid (Only on >= lg) */}
+          <div className={`hidden lg:order-none w-full h-[460px] gap-2 overflow-hidden rounded-2xl mb-8 ${galleryImages.length === 1 ? 'lg:flex' :
+            galleryImages.length === 2 ? 'lg:grid lg:grid-cols-2' :
+              galleryImages.length === 3 ? 'lg:grid lg:grid-cols-3' :
+                galleryImages.length === 4 ? 'lg:grid lg:grid-cols-3 lg:grid-rows-2' :
+                  'lg:grid lg:grid-cols-4 lg:grid-rows-2'
+            }`}>
           {/* Layout for 1 image */}
           {galleryImages.length === 1 && (
             <div
@@ -897,6 +929,7 @@ export default function ClinicDetail() {
             </>
           )}
         </div>
+        </div>
 
         {/* Map & Directions Section - Đã chuyển xuống dạng Modal ở cuối file */}
 
@@ -908,7 +941,7 @@ export default function ClinicDetail() {
 
             {/* Intro */}
             <section className="border-b border-slate-200 dark:border-slate-800 pb-8">
-              <h2 className="text-xl font-bold text-slate-900 dark:text-slate-100 mb-4">Giới thiệu</h2>
+              <h2 className="text-lg sm:text-xl font-bold text-slate-900 dark:text-slate-100 mb-4">Giới thiệu</h2>
               <p className="text-slate-600 dark:text-slate-300 leading-relaxed text-base">
                 {shop?.description ?? 'Đang tải thông tin...'}
               </p>
@@ -930,7 +963,7 @@ export default function ClinicDetail() {
                       <span className="material-symbols-outlined text-2xl">hotel</span>
                     </div>
                     <div>
-                      <h2 className="text-xl font-bold text-slate-900 dark:text-slate-100">{boardingService.serviceName}</h2>
+                      <h2 className="text-lg sm:text-xl font-bold text-slate-900 dark:text-slate-100">{boardingService.serviceName}</h2>
                       <p className="text-xs text-slate-500 font-medium mt-0.5">{boardingService.description}</p>
                     </div>
                   </div>
@@ -1096,7 +1129,7 @@ export default function ClinicDetail() {
 
             {/* Featured Services */}
             <section className="border-b border-slate-200 dark:border-slate-800 pb-8">
-              <h2 className="text-xl font-bold text-slate-900 dark:text-slate-100 mb-5">Dịch vụ nổi bật</h2>
+              <h2 className="text-lg sm:text-xl font-bold text-slate-900 dark:text-slate-100 mb-5">Dịch vụ nổi bật</h2>
 
               {servicesLoading && (
                 <div className="flex flex-col gap-3">
@@ -1260,14 +1293,14 @@ export default function ClinicDetail() {
           {/* Reviews */}
           <div className="order-3 lg:col-start-1 lg:row-start-2 min-w-0 w-full">
             <section>
-              <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 mb-5">
-                <h2 className="text-xl font-bold text-slate-900 dark:text-slate-100 flex items-center gap-2">
+              <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 mb-4 sm:mb-5">
+                <h2 className="text-lg sm:text-xl font-bold text-slate-900 dark:text-slate-100 flex items-center gap-2">
                   Đánh giá từ cộng đồng
-                  <span className="text-slate-400 font-normal text-base">({reviewCount})</span>
+                  <span className="text-slate-400 font-normal text-sm sm:text-base">({reviewCount})</span>
                 </h2>
                 <div className="flex items-center gap-3">
                   <div className="text-center">
-                    <span className="text-3xl font-black text-slate-900 dark:text-slate-100">{shop?.ratingAvg ? shop.ratingAvg.toFixed(1) : '0.0'}</span>
+                    <span className="text-2xl sm:text-3xl font-black text-slate-900 dark:text-slate-100">{shop?.ratingAvg ? shop.ratingAvg.toFixed(1) : '0.0'}</span>
                     <div className="flex text-amber-400 justify-center mt-1">
                       {[1, 2, 3, 4, 5].map((s) => (
                         <span key={s} className="material-symbols-outlined text-sm" style={{ fontVariationSettings: s <= (shop?.ratingAvg || 0) ? "'FILL' 1" : "'FILL' 0" }}>
@@ -1285,12 +1318,12 @@ export default function ClinicDetail() {
               </div>
 
               {/* Filter tags */}
-              <div className="flex flex-wrap gap-2 mb-6">
+              <div className="flex flex-wrap gap-1.5 sm:gap-2 mb-4 sm:mb-6">
                 {['Tất cả', '5 sao', '4 sao', '3 sao', '2 sao', '1 sao', 'Có hình ảnh'].map((f) => (
                   <button
                     key={f}
                     onClick={() => setReviewFilter(f)}
-                    className={`px-4 py-2 rounded-full border text-sm font-medium transition-colors ${reviewFilter === f
+                    className={`px-3 py-1.5 sm:px-4 sm:py-2 rounded-full border text-[11px] sm:text-sm font-medium transition-colors ${reviewFilter === f
                       ? 'bg-[#1a2b4c] text-white border-[#1a2b4c] dark:bg-teal-500 dark:border-teal-500'
                       : 'border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-200 hover:border-[#1a2b4c] hover:text-[#1a2b4c] dark:hover:border-teal-400 dark:hover:text-teal-400'
                       }`}
@@ -1301,17 +1334,26 @@ export default function ClinicDetail() {
               </div>
 
               {/* Review list */}
-              <div className="flex flex-col gap-6">
-                {(apiReviews || []).length > 0 ? (
-                  apiReviews?.map((review: any) => (
+              <div className="flex flex-col gap-4 sm:gap-6">
+                {(() => {
+                  let filteredList = [...(apiReviews || [])];
+                  if (reviewFilter === '5 sao') filteredList = filteredList.filter(r => r.rating === 5);
+                  else if (reviewFilter === '4 sao') filteredList = filteredList.filter(r => r.rating === 4);
+                  else if (reviewFilter === '3 sao') filteredList = filteredList.filter(r => r.rating === 3);
+                  else if (reviewFilter === '2 sao') filteredList = filteredList.filter(r => r.rating === 2);
+                  else if (reviewFilter === '1 sao') filteredList = filteredList.filter(r => r.rating === 1);
+                  else if (reviewFilter === 'Có hình ảnh') filteredList = filteredList.filter(r => r.images?.length > 0);
+                  
+                  return filteredList.length > 0 ? (
+                    filteredList.map((review: any) => (
                     <div
                       key={review.id}
-                      className="flex gap-4 pb-6 border-b border-slate-100 dark:border-slate-800 last:border-0"
+                      className="flex gap-3 sm:gap-4 pb-4 sm:pb-6 border-b border-slate-100 dark:border-slate-800 last:border-0"
                     >
                       <img
                         src={review.userAvatar || 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?q=80&w=100&auto=format&fit=crop'}
                         alt={review.userName}
-                        className="size-10 rounded-full object-cover shrink-0"
+                        className="size-8 sm:size-10 rounded-full object-cover shrink-0"
                       />
                       <div className="flex flex-col gap-2 flex-1">
                         <div className="flex justify-between items-start">
@@ -1366,7 +1408,8 @@ export default function ClinicDetail() {
                   ))
                 ) : (
                   <p className="text-slate-400 text-sm italic">Chưa có đánh giá nào cho cơ sở này.</p>
-                )}
+                );
+                })()}
               </div>
 
               <div className="text-center mt-6">
@@ -1383,7 +1426,7 @@ export default function ClinicDetail() {
             <div className="lg:sticky lg:top-24 flex flex-col gap-6">
               {/* Booking Card */}
               <div className="flex flex-col rounded-2xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 shadow-xl shadow-slate-200/50 dark:shadow-none overflow-hidden">
-                <div className="p-6 flex flex-col gap-5">
+                <div className="p-4 sm:p-6 flex flex-col gap-4 sm:gap-5">
 
                   {/* ── Chọn Dịch vụ (Sidebar) ──────────────── */}
                   {nonBoardingServices.length > 0 && (
@@ -1858,7 +1901,7 @@ export default function ClinicDetail() {
                 </div>
 
                 {/* Fixed CTA Footer */}
-                <div className="p-6 pt-5 border-t border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-800/30 flex flex-col gap-4 shrink-0">
+                <div className="hidden lg:flex p-4 sm:p-6 pt-5 border-t border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-800/30 flex-col gap-4 shrink-0">
                   {/* CTA */}
                   <button
                     onClick={handleBookClick}
@@ -1981,20 +2024,38 @@ export default function ClinicDetail() {
           </div>
         </div>
         {/* Mobile bottom bar */}
-        <div className="lg:hidden fixed bottom-0 left-0 right-0 p-4 bg-white dark:bg-slate-900 border-t border-slate-200 dark:border-slate-800 flex items-center justify-between gap-4 z-50 shadow-2xl">
+        <div className="lg:hidden fixed bottom-0 left-0 right-0 p-4 bg-white dark:bg-slate-900 border-t border-slate-200 dark:border-slate-800 flex items-center justify-between gap-4 z-50 shadow-[0_-10px_20px_rgba(0,0,0,0.05)] pb-safe">
           <div className="flex flex-col">
-            <span className="text-xs text-slate-500">Giá khám từ</span>
-            <span className="font-black text-xl text-slate-900 dark:text-slate-100">150.000đ</span>
+            <span className="text-xs text-slate-500 font-bold uppercase tracking-wider mb-0.5">Giá khám từ</span>
+            <span className="font-black text-xl text-[#1a2b4c] dark:text-teal-400">
+              {apiServices.length > 0 ? `${Math.min(...apiServices.map(s => s.price)).toLocaleString('vi-VN')}đ` : '---'}
+            </span>
           </div>
           <div className="flex flex-1">
             <button
               onClick={() => {
-                document.getElementById('booking-section')?.scrollIntoView({ behavior: 'smooth' });
+                if (canBook) {
+                  handleBookClick();
+                } else {
+                  document.getElementById('booking-section')?.scrollIntoView({ behavior: 'smooth' });
+                  // import('react-hot-toast').then(({ toast }) => toast('Vui lòng chọn dịch vụ và thời gian.'));
+                }
               }}
-              className="flex-1 h-12 flex items-center justify-center gap-2 rounded-xl bg-[#1a2b4c] text-white font-bold text-sm shadow-lg shadow-[#1a2b4c]/25"
+              className={`flex-1 h-12 flex items-center justify-center gap-2 rounded-xl font-bold transition-all text-sm uppercase tracking-wider ${canBook
+                ? "bg-[#1a2b4c] dark:bg-teal-500 text-white shadow-lg shadow-[#1a2b4c]/25 dark:shadow-teal-900/50"
+                : "bg-slate-200 dark:bg-slate-800 text-slate-500 dark:text-slate-400"
+                }`}
             >
               <span className="material-symbols-outlined text-base">calendar_month</span>
-              {editBooking ? "Cập nhật lịch" : "Đặt lịch ngay"}
+              {canBook
+                ? (editBooking ? "Cập nhật lịch" : "Đặt lịch ngay")
+                : !isHotelSelected && !hasNormalServices
+                  ? "Chọn dịch vụ"
+                  : isHotelSelected && !boardingReady
+                    ? "Chọn ngày phòng"
+                    : hasNormalServices && !normalReady
+                      ? "Chọn ngày giờ"
+                      : "Đặt lịch ngay"}
             </button>
           </div>
         </div>
@@ -2007,7 +2068,7 @@ export default function ClinicDetail() {
           <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-end sm:items-center justify-center p-4">
             <div className="bg-white dark:bg-slate-800 rounded-2xl w-full max-w-md shadow-2xl">
               {/* Header */}
-              <div className="flex items-center justify-between p-5 border-b border-slate-100 dark:border-slate-700">
+              <div className="flex items-center justify-between p-4 sm:p-5 border-b border-slate-100 dark:border-slate-700">
                 <div>
                   <h2 className="text-lg font-bold text-slate-900 dark:text-white">Chọn thú cưng</h2>
                   <p className="text-xs text-slate-500 mt-0.5">Bé nào sẽ sử dụng dịch vụ hôm nay?</p>
@@ -2021,7 +2082,7 @@ export default function ClinicDetail() {
               </div>
 
               {/* Pet list */}
-              <div className="p-5 space-y-3 max-h-72 overflow-y-auto">
+              <div className="p-4 sm:p-5 space-y-3 max-h-72 overflow-y-auto">
                 {myPets.length === 0 || showQuickAddPet ? (
                   <div className="space-y-4">
                     {myPets.length === 0 && !showQuickAddPet && (
@@ -2270,7 +2331,7 @@ export default function ClinicDetail() {
               </div>
 
               {/* Footer */}
-              <div className="p-5 border-t border-slate-100 dark:border-slate-700 flex gap-3">
+              <div className="p-4 sm:p-5 border-t border-slate-100 dark:border-slate-700 flex gap-3">
                 <button
                   onClick={() => { setShowPetModal(false); setViewingBookingsPetId(null); setPetBookings([]); setPetAvailabilityMap({}); }}
                   className="flex-1 py-3 border border-slate-200 dark:border-slate-600 text-slate-600 dark:text-slate-300 font-semibold rounded-xl hover:bg-slate-50 dark:hover:bg-slate-700 transition-all"
@@ -2312,7 +2373,7 @@ export default function ClinicDetail() {
                 </button>
               </div>
 
-              <div className="px-8 pb-8">
+              <div className="px-4 sm:px-8 pb-8">
                 {/* Profile Info */}
                 <div className="relative flex flex-col md:flex-row gap-6 -mt-12 mb-8">
                   <div className="relative">
@@ -2456,7 +2517,7 @@ export default function ClinicDetail() {
                 </button>
               </div>
 
-              <div className="p-8">
+              <div className="p-4 sm:p-8">
                 {/* Title & Price */}
                 <div className="flex justify-between items-start mb-6">
                   <div>
@@ -2569,18 +2630,18 @@ export default function ClinicDetail() {
                 onClick={(e) => e.stopPropagation()}
               >
                 {/* Header */}
-                <div className="flex items-center justify-between p-6 border-b border-slate-100 dark:border-slate-800 shrink-0">
+                <div className="flex items-center justify-between p-4 sm:p-6 border-b border-slate-100 dark:border-slate-800 shrink-0">
                   <div>
-                    <h2 className="text-2xl font-black text-slate-900 dark:text-slate-100 flex items-center gap-3">
+                    <h2 className="text-xl sm:text-2xl font-black text-slate-900 dark:text-slate-100 flex items-center gap-3">
                       <span className="material-symbols-outlined text-primary text-3xl">map</span>
                       Vị trí & Chỉ đường
                     </h2>
-                    <p className="text-sm font-medium text-slate-500 mt-1">Đến {shop.shopName}</p>
+                    <p className="text-xs sm:text-sm font-medium text-slate-500 mt-1">Đến {shop.shopName}</p>
                   </div>
-                  <div className="flex items-center gap-3">
+                  <div className="flex items-center gap-2 sm:gap-3">
                     <button
                       onClick={() => setIsMapFullscreen(!isMapFullscreen)}
-                      className="w-11 h-11 flex items-center justify-center rounded-2xl bg-slate-50 dark:bg-slate-800/50 text-slate-500 hover:text-slate-900 hover:bg-slate-200 dark:hover:bg-slate-700 transition-all border border-slate-200 dark:border-slate-700"
+                      className="w-10 h-10 sm:w-11 sm:h-11 flex items-center justify-center rounded-2xl bg-slate-50 dark:bg-slate-800/50 text-slate-500 hover:text-slate-900 hover:bg-slate-200 dark:hover:bg-slate-700 transition-all border border-slate-200 dark:border-slate-700"
                       title={isMapFullscreen ? "Thu nhỏ" : "Phóng to"}
                     >
                       <span className="material-symbols-outlined">
@@ -2589,7 +2650,7 @@ export default function ClinicDetail() {
                     </button>
                     <button
                       onClick={() => handleGetDirections(shopId)}
-                      className="flex items-center gap-2 px-5 py-2.5 bg-primary text-white rounded-2xl text-sm font-black hover:bg-primary/90 transition-all shadow-xl shadow-primary/20 hover:-translate-y-0.5 uppercase tracking-widest"
+                      className="flex items-center gap-2 px-4 sm:px-5 py-2.5 bg-primary text-white rounded-2xl text-xs sm:text-sm font-black hover:bg-primary/90 transition-all shadow-xl shadow-primary/20 hover:-translate-y-0.5 uppercase tracking-widest"
                     >
                       <span className="material-symbols-outlined text-lg">directions</span>
                       Chỉ đường
@@ -2599,7 +2660,7 @@ export default function ClinicDetail() {
                         setShowMap(false);
                         setIsMapFullscreen(false);
                       }}
-                      className="w-11 h-11 flex items-center justify-center rounded-2xl bg-slate-100 dark:bg-slate-800 text-slate-500 hover:text-slate-900 hover:bg-slate-200 dark:hover:bg-slate-700 transition-all"
+                      className="w-10 h-10 sm:w-11 sm:h-11 flex items-center justify-center rounded-2xl bg-slate-100 dark:bg-slate-800 text-slate-500 hover:text-slate-900 hover:bg-slate-200 dark:hover:bg-slate-700 transition-all"
                     >
                       <span className="material-symbols-outlined">close</span>
                     </button>
@@ -2634,16 +2695,16 @@ export default function ClinicDetail() {
                       initial={{ height: 0, opacity: 0 }}
                       animate={{ height: 'auto', opacity: 1 }}
                       exit={{ height: 0, opacity: 0 }}
-                      className="border-t border-slate-100 dark:border-slate-800 p-6 shrink-0 bg-white dark:bg-slate-900"
+                      className="border-t border-slate-100 dark:border-slate-800 p-4 sm:p-6 shrink-0 bg-white dark:bg-slate-900"
                     >
-                      <div className="flex items-center gap-8 justify-center">
-                        <div className="flex items-center gap-4">
-                          <div className="w-12 h-12 rounded-[16px] bg-teal-500/10 text-teal-600 flex items-center justify-center">
-                            <span className="material-symbols-outlined text-2xl">straighten</span>
+                      <div className="flex items-center gap-4 sm:gap-8 justify-center">
+                        <div className="flex items-center gap-3 sm:gap-4">
+                          <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-[16px] bg-teal-500/10 text-teal-600 flex items-center justify-center">
+                            <span className="material-symbols-outlined text-xl sm:text-2xl">straighten</span>
                           </div>
                           <div>
-                            <p className="text-xs font-bold uppercase tracking-widest text-slate-400">Khoảng cách</p>
-                            <p className="text-2xl font-black text-slate-900 dark:text-slate-100">
+                            <p className="text-[10px] sm:text-xs font-bold uppercase tracking-widest text-slate-400">Khoảng cách</p>
+                            <p className="text-xl sm:text-2xl font-black text-slate-900 dark:text-slate-100">
                               {directions.routes[0].legs[0].distance.text}
                             </p>
                           </div>

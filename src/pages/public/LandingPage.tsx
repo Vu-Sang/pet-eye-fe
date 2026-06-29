@@ -14,6 +14,7 @@ import { trackHeroSearch, trackClickFeaturedShop, trackUseGpsNearby, trackClickC
 // Import assets
 import heroDogImage from '../../assets/landing/hero_dog_v2.png';
 import heroCatImage from '../../assets/landing/hero_cat_v2.png';
+import mobileHeroBanner from '../../assets/landing/mobile_hero_banner.png';
 import cameraPreview from '../../assets/landing/live_camera_preview_1778855116615.png';
 import spaImage from '../../assets/landing/pet_spa_grooming_1778855139420.png';
 import mockMapBg from '../../assets/landing/mock_map_bg.png';
@@ -123,7 +124,7 @@ export default function Home() {
       </div>
 
       {/* ─── Hero Section ────────────────────────────────────────────── */}
-      <section className="relative min-h-fit md:min-h-[80vh] xl:min-h-[85vh] flex items-center justify-center pt-20 pb-12 md:pt-32 md:pb-8 xl:pt-40 xl:pb-12 px-4 sm:px-6 overflow-hidden bg-transparent">
+      <section className="relative min-h-fit md:min-h-[80vh] xl:min-h-[85vh] flex items-center justify-center pt-32 pb-6 md:pt-32 md:pb-8 xl:pt-40 xl:pb-12 px-4 sm:px-6 overflow-hidden bg-transparent">
         <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none">
           {/* Falling Paw Prints (Optimized with hardware acceleration) */}
           {[...Array(5)].map((_, i) => (
@@ -153,7 +154,7 @@ export default function Home() {
         <div className="max-w-7xl mx-auto w-full relative z-10">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 xl:gap-12 items-start">
             <motion.div variants={staggerContainer} initial="initial" animate="animate" className="flex flex-col w-full gap-3 md:gap-6 lg:gap-8 text-center lg:text-left">
-              <motion.div variants={fadeIn} className="inline-flex items-center gap-2 bg-primary/5 dark:bg-white/5 border border-primary/10 dark:border-white/10 px-3 py-1.5 md:px-4 md:py-2 rounded-full w-fit mx-auto lg:mx-0 shadow-sm">
+              <motion.div variants={fadeIn} className="hidden sm:inline-flex items-center gap-2 bg-primary/5 dark:bg-white/5 border border-primary/10 dark:border-white/10 px-3 py-1.5 md:px-4 md:py-2 rounded-full w-fit mx-auto lg:mx-0 shadow-sm">
                 <span className="flex h-2 w-2 relative">
                   <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary dark:bg-cyan-400 opacity-75"></span>
                   <span className="relative inline-flex rounded-full h-2 w-2 bg-primary dark:bg-cyan-400"></span>
@@ -210,37 +211,31 @@ export default function Home() {
                 </div>
               </motion.div>
 
-              {/* Mobile Only: Beautiful Overlapping Composition */}
-              <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 0.5, delay: 0.2 }} className="relative lg:hidden w-full h-[280px] sm:h-[340px] mt-8 mb-4">
-                {/* Dog Image (Background, Left) */}
-                <motion.div animate={{ y: [0, -5, 0] }} transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }} className="absolute top-0 left-0 w-[70%] h-[80%] z-10 rounded-[32px] shadow-lg bg-white dark:bg-slate-800 overflow-hidden">
-                  <img src={heroDogImage} alt="Dog patient" className="w-full h-full object-cover" />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
-                  <div className="absolute bottom-3 left-3 right-3 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md p-2.5 rounded-2xl shadow-sm flex items-center gap-2.5">
-                    <div className="w-8 h-8 bg-blue-500 rounded-xl flex items-center justify-center text-white shrink-0">
-                      <Heart size={14} />
+              {/* Mobile Only: Single Hero Image with Gradient (Modern App Style) */}
+              <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 0.5, delay: 0.2 }} className="relative lg:hidden w-full h-[220px] sm:h-[280px] mt-4 mb-2 rounded-2xl sm:rounded-3xl overflow-hidden shadow-lg">
+                <img src={mobileHeroBanner} alt="Pet care" className="w-full h-full object-cover object-center" />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
+                {/* Floating info badges */}
+                <div className="absolute bottom-3 left-3 right-3 flex items-center justify-between">
+                  <div className="bg-white/95 dark:bg-slate-900/95 backdrop-blur-md px-3 py-2 rounded-xl shadow-sm flex items-center gap-2">
+                    <div className="w-7 h-7 bg-blue-500 rounded-lg flex items-center justify-center text-white shrink-0">
+                      <Heart size={12} />
                     </div>
-                    <div className="text-left min-w-0">
-                      <p className="text-[11px] font-black text-slate-900 dark:text-white truncate">Live Camera</p>
-                      <p className="text-[9px] text-slate-500 font-bold truncate">24/7 theo dõi</p>
-                    </div>
-                  </div>
-                </motion.div>
-
-                {/* Cat Image (Foreground, Right) */}
-                <motion.div animate={{ y: [0, 5, 0] }} transition={{ duration: 3.5, repeat: Infinity, ease: "easeInOut" }} className="absolute bottom-0 right-0 w-[65%] h-[75%] z-20 rounded-[32px] shadow-2xl border-[6px] border-slate-50 dark:border-slate-900 bg-white dark:bg-slate-800 overflow-hidden">
-                  <img src={heroCatImage} alt="Cat spa" className="w-full h-full object-cover" />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
-                  <div className="absolute bottom-2 left-2 right-2 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md p-2.5 rounded-2xl shadow-sm flex items-center gap-2.5">
-                    <div className="w-8 h-8 bg-green-500 rounded-xl flex items-center justify-center text-white shrink-0">
-                      <ShieldCheck size={14} />
-                    </div>
-                    <div className="text-left min-w-0">
-                      <p className="text-[11px] font-black text-slate-900 dark:text-white truncate">Xác thực</p>
-                      <p className="text-[9px] text-slate-500 font-bold truncate">Đối tác uy tín</p>
+                    <div className="text-left">
+                      <p className="text-[10px] font-black text-slate-900 dark:text-white">Live Camera</p>
+                      <p className="text-[8px] text-slate-500 font-bold">24/7</p>
                     </div>
                   </div>
-                </motion.div>
+                  <div className="bg-white/95 dark:bg-slate-900/95 backdrop-blur-md px-3 py-2 rounded-xl shadow-sm flex items-center gap-2">
+                    <div className="w-7 h-7 bg-green-500 rounded-lg flex items-center justify-center text-white shrink-0">
+                      <ShieldCheck size={12} />
+                    </div>
+                    <div className="text-left">
+                      <p className="text-[10px] font-black text-slate-900 dark:text-white">Xác thực</p>
+                      <p className="text-[8px] text-slate-500 font-bold">Uy tín</p>
+                    </div>
+                  </div>
+                </div>
               </motion.div>
             </motion.div>
 
@@ -313,7 +308,7 @@ export default function Home() {
       </section>
 
       {/* ─── Featured Services Showcase (API) ──────────────────────────── */}
-      <section id="co-so" className="py-8 md:py-16 xl:py-24 px-4 sm:px-6 bg-transparent relative ">
+      <section id="co-so" className="py-5 md:py-16 xl:py-24 px-4 sm:px-6 bg-transparent relative ">
         <div className="max-w-7xl mx-auto relative z-10">
           <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 md:gap-8 mb-8 md:mb-12 lg:mb-16">
             <div className="max-w-2xl space-y-1 md:space-y-4">
@@ -322,7 +317,7 @@ export default function Home() {
                 Đánh giá cao nhất
               </span>
               <h2 className="text-xl sm:text-3xl md:text-5xl xl:text-6xl font-black text-blue-950 dark:text-white leading-tight">
-                Khám phá cơ sở <br />
+                Khám phá cơ sở <br className="hidden sm:block" />
                 <span className="text-gradient">Được yêu thích</span>
               </h2>
               <p className="text-slate-600 dark:text-slate-300 text-sm sm:text-base md:text-lg font-medium max-w-xl">
@@ -347,7 +342,7 @@ export default function Home() {
                   }}
                   className="w-[75vw] sm:w-[300px] md:w-auto shrink-0 snap-start bg-white dark:bg-slate-900/60 rounded-2xl md:rounded-[32px] overflow-hidden shadow-md hover:shadow-xl border border-slate-200/85 dark:border-slate-800/80 hover:border-blue-500/20 hover:dark:border-blue-500/30 md:hover:-translate-y-2 transition-all cursor-pointer group flex flex-col"
                 >
-                  <div className="h-36 md:h-48 bg-slate-200 dark:bg-slate-800 relative overflow-hidden shrink-0">
+                  <div className="h-32 md:h-48 bg-slate-200 dark:bg-slate-800 relative overflow-hidden shrink-0">
                     {shop.logoUrl ? (
                       <img src={shop.logoUrl} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" alt={shop.shopName} />
                     ) : (
@@ -441,7 +436,7 @@ export default function Home() {
           </div>
         </div>
 
-        <div className="relative min-h-[600px] lg:min-h-[700px] flex flex-col justify-center py-16 xl:py-24 px-6 z-10 max-w-7xl mx-auto w-full">
+        <div className="relative min-h-fit lg:min-h-[700px] flex flex-col justify-center py-10 lg:py-24 px-6 z-10 max-w-7xl mx-auto w-full">
           <div className="flex flex-col lg:flex-row items-center gap-12 w-full">
             <div className="lg:w-1/2 relative z-20">
               <div className="bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl p-6 sm:p-8 md:p-0 md:bg-transparent md:dark:bg-transparent md:backdrop-blur-none rounded-2xl md:rounded-none border border-white/50 dark:border-slate-700/50 md:border-transparent shadow-xl md:shadow-none">
@@ -450,11 +445,11 @@ export default function Home() {
                     <Navigation size={12} className="text-rose-500 dark:text-rose-400" />
                     Hệ thống định vị
                   </div>
-                  <h2 className="text-3xl md:text-5xl xl:text-6xl font-black text-blue-950 dark:text-white leading-[1.1]">
+                  <h2 className="text-2xl md:text-5xl xl:text-6xl font-black text-blue-950 dark:text-white leading-[1.1]">
                     Tìm cơ sở <br className="hidden lg:block" />
                     <span className="text-gradient">Gần bạn nhất</span>
                   </h2>
-                  <p className="mt-6 text-slate-600 dark:text-slate-300 text-lg max-w-lg mx-auto lg:mx-0 leading-relaxed font-medium">
+                  <p className="mt-4 md:mt-6 text-slate-600 dark:text-slate-300 text-sm md:text-lg max-w-lg mx-auto lg:mx-0 leading-relaxed font-medium">
                     Cho phép truy cập vị trí để tìm ngay các phòng khám, spa uy tín nằm trong bán kính 10km quanh bạn.
                   </p>
                 </div>
@@ -608,12 +603,12 @@ export default function Home() {
                   />
                   
                   {/* Hiển thị Ngày/Giờ CCTV */}
-                  <div className="absolute top-6 right-6 font-mono text-white/95 text-sm md:text-base font-black tracking-widest drop-shadow-[0_2px_4px_rgba(0,0,0,0.9)] z-20">
+                  <div className="absolute top-6 right-6 font-mono text-white/95 text-sm md:text-base font-black tracking-widest drop-shadow-[0_2px_4px_rgba(0,0,0,0.9)] z-20 hidden sm:block">
                     2025-07-22 09:42:27
                   </div>
 
                   {/* Hiển thị Tên Camera CCTV */}
-                  <div className="absolute bottom-6 left-6 font-mono text-white/95 text-xl md:text-2xl font-black tracking-widest drop-shadow-[0_2px_4px_rgba(0,0,0,0.9)] z-20 flex items-center gap-3">
+                  <div className="absolute bottom-6 left-6 font-mono text-white/95 text-base md:text-2xl font-black tracking-widest drop-shadow-[0_2px_4px_rgba(0,0,0,0.9)] z-20 hidden sm:flex items-center gap-3">
                     CAM01
                   </div>
                   
@@ -681,35 +676,35 @@ export default function Home() {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true, margin: "-100px" }}
                 transition={{ duration: 0.7, ease: "easeOut" }}
-                className="w-[85vw] sm:w-[320px] lg:w-auto shrink-0 snap-start group relative bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-6 lg:p-8 rounded-3xl md:rounded-[40px] shadow-xl hover:shadow-2xl hover:shadow-blue-500/10 hover:border-blue-500/50 transition-all duration-500 overflow-hidden flex flex-col h-full"
+                className="w-[75vw] sm:w-[320px] lg:w-auto shrink-0 snap-start group relative bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-4 sm:p-6 lg:p-8 rounded-3xl md:rounded-[40px] shadow-xl hover:shadow-2xl hover:shadow-blue-500/10 hover:border-blue-500/50 transition-all duration-500 overflow-hidden flex flex-col"
               >
-                <div className="absolute -top-6 -right-6 md:-top-8 md:-right-8 text-[120px] md:text-[180px] font-black text-slate-50 dark:text-slate-800/30 leading-none select-none z-0 transition-transform duration-700 group-hover:scale-110 group-hover:-rotate-6">1</div>
+                <div className="absolute -top-4 -right-4 sm:-top-6 sm:-right-6 md:-top-8 md:-right-8 text-[100px] sm:text-[120px] md:text-[180px] font-black text-slate-50 dark:text-slate-800/30 leading-none select-none z-0 transition-transform duration-700 group-hover:scale-110 group-hover:-rotate-6">1</div>
 
                 <div className="relative z-10 flex flex-col h-full">
-                  <div className="inline-flex items-center justify-center text-[#005FFF] bg-[#F7FBFF] border border-[#D7ECFF] dark:bg-blue-900/50 dark:text-blue-400 dark:border-blue-800 text-xs font-black px-4 py-2 rounded-full mb-6 w-fit uppercase tracking-widest">
+                  <div className="inline-flex items-center justify-center text-[#005FFF] bg-[#F7FBFF] border border-[#D7ECFF] dark:bg-blue-900/50 dark:text-blue-400 dark:border-blue-800 text-[10px] sm:text-xs font-black px-3 py-1.5 sm:px-4 sm:py-2 rounded-full mb-4 sm:mb-6 w-fit uppercase tracking-widest">
                     Bước 1
                   </div>
 
                   {/* Mock UI */}
-                  <div className="w-full h-36 lg:h-40 bg-slate-50 dark:bg-slate-950/50 rounded-3xl mb-6 lg:mb-8 p-4 lg:p-5 border border-slate-100 dark:border-slate-800 flex flex-col justify-center gap-3 group-hover:bg-blue-50 dark:group-hover:bg-blue-900/10 transition-colors duration-500">
-                    <div className="w-full h-10 bg-white dark:bg-slate-800 rounded-full shadow-sm flex items-center px-4 gap-3 animate-pulse" style={{ animationDuration: '3s' }}>
-                      <Search size={16} className="text-slate-400" />
-                      <div className="h-2 w-1/3 bg-slate-200 dark:bg-slate-700 rounded-full" />
+                  <div className="w-full h-24 sm:h-36 lg:h-40 bg-slate-50 dark:bg-slate-950/50 rounded-2xl sm:rounded-3xl mb-4 sm:mb-6 p-3 sm:p-4 lg:p-5 border border-slate-100 dark:border-slate-800 flex flex-col justify-center gap-3 group-hover:bg-blue-50 dark:group-hover:bg-blue-900/10 transition-colors duration-500">
+                    <div className="w-full h-8 sm:h-10 bg-white dark:bg-slate-800 rounded-full shadow-sm flex items-center px-3 sm:px-4 gap-2 sm:gap-3 animate-pulse" style={{ animationDuration: '3s' }}>
+                      <Search size={14} className="text-slate-400" />
+                      <div className="h-1.5 sm:h-2 w-1/3 bg-slate-200 dark:bg-slate-700 rounded-full" />
                     </div>
                     <div className="flex gap-2">
-                      <div className="h-8 px-4 bg-white dark:bg-slate-800 rounded-full shadow-sm flex items-center gap-2">
-                        <MapPin size={12} className="text-blue-500" />
-                        <div className="h-1.5 w-8 bg-slate-200 dark:bg-slate-700 rounded-full" />
+                      <div className="h-6 sm:h-8 px-3 sm:px-4 bg-white dark:bg-slate-800 rounded-full shadow-sm flex items-center gap-1 sm:gap-2">
+                        <MapPin size={10} className="text-blue-500" />
+                        <div className="h-1 sm:h-1.5 w-6 sm:w-8 bg-slate-200 dark:bg-slate-700 rounded-full" />
                       </div>
-                      <div className="h-8 px-4 bg-white dark:bg-slate-800 rounded-full shadow-sm flex items-center gap-2">
-                        <Star size={12} className="text-yellow-500" />
-                        <div className="h-1.5 w-6 bg-slate-200 dark:bg-slate-700 rounded-full" />
+                      <div className="h-6 sm:h-8 px-3 sm:px-4 bg-white dark:bg-slate-800 rounded-full shadow-sm flex items-center gap-1 sm:gap-2">
+                        <Star size={10} className="text-yellow-500" />
+                        <div className="h-1 sm:h-1.5 w-4 sm:w-6 bg-slate-200 dark:bg-slate-700 rounded-full" />
                       </div>
                     </div>
                   </div>
 
-                  <h4 className="text-xl lg:text-2xl font-black text-slate-900 dark:text-white mb-3">Tìm & So sánh</h4>
-                  <p className="text-sm lg:text-base text-slate-500 dark:text-slate-400 leading-relaxed font-medium mt-auto">Khám phá và so sánh ngay các cơ sở thú y quanh bạn với đầy đủ thông tin, đánh giá và khoảng cách chi tiết.</p>
+                  <h4 className="text-lg sm:text-xl lg:text-2xl font-black text-slate-900 dark:text-white mb-2 sm:mb-3">Tìm & So sánh</h4>
+                  <p className="text-xs sm:text-sm lg:text-base text-slate-500 dark:text-slate-400 leading-relaxed font-medium mt-auto">Khám phá và so sánh ngay các cơ sở thú y quanh bạn với đầy đủ thông tin, đánh giá và khoảng cách chi tiết.</p>
                 </div>
               </motion.div>
 
@@ -719,30 +714,30 @@ export default function Home() {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true, margin: "-100px" }}
                 transition={{ duration: 0.7, delay: 0.2, ease: "easeOut" }}
-                className="w-[85vw] sm:w-[320px] lg:w-auto shrink-0 snap-start group relative bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-6 lg:p-8 rounded-3xl md:rounded-[40px] shadow-xl hover:shadow-2xl hover:shadow-purple-500/10 hover:border-purple-500/50 transition-all duration-500 overflow-hidden flex flex-col h-full"
+                className="w-[75vw] sm:w-[320px] lg:w-auto shrink-0 snap-start group relative bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-4 sm:p-6 lg:p-8 rounded-3xl md:rounded-[40px] shadow-xl hover:shadow-2xl hover:shadow-purple-500/10 hover:border-purple-500/50 transition-all duration-500 overflow-hidden flex flex-col"
               >
-                <div className="absolute -top-6 -right-6 md:-top-8 md:-right-8 text-[120px] md:text-[180px] font-black text-slate-50 dark:text-slate-800/30 leading-none select-none z-0 transition-transform duration-700 group-hover:scale-110 group-hover:-rotate-6">2</div>
+                <div className="absolute -top-4 -right-4 sm:-top-6 sm:-right-6 md:-top-8 md:-right-8 text-[100px] sm:text-[120px] md:text-[180px] font-black text-slate-50 dark:text-slate-800/30 leading-none select-none z-0 transition-transform duration-700 group-hover:scale-110 group-hover:-rotate-6">2</div>
 
                 <div className="relative z-10 flex flex-col h-full">
-                  <div className="inline-flex items-center justify-center text-[#A800FF] bg-[#FDFAFF] border border-[#F5E8FF] dark:bg-purple-900/50 dark:text-purple-400 dark:border-purple-800 text-xs font-black px-4 py-2 rounded-full mb-6 w-fit uppercase tracking-widest">
+                  <div className="inline-flex items-center justify-center text-[#A800FF] bg-[#FDFAFF] border border-[#F5E8FF] dark:bg-purple-900/50 dark:text-purple-400 dark:border-purple-800 text-[10px] sm:text-xs font-black px-3 py-1.5 sm:px-4 sm:py-2 rounded-full mb-4 sm:mb-6 w-fit uppercase tracking-widest">
                     Bước 2
                   </div>
 
-                  <div className="w-full h-36 lg:h-40 bg-slate-50 dark:bg-slate-950/50 rounded-3xl mb-6 lg:mb-8 p-4 lg:p-5 border border-slate-100 dark:border-slate-800 flex flex-col justify-center group-hover:bg-purple-50 dark:group-hover:bg-purple-900/10 transition-colors duration-500">
-                    <div className="grid grid-cols-3 gap-2">
+                  <div className="w-full h-24 sm:h-36 lg:h-40 bg-slate-50 dark:bg-slate-950/50 rounded-2xl sm:rounded-3xl mb-4 sm:mb-6 p-3 sm:p-4 lg:p-5 border border-slate-100 dark:border-slate-800 flex flex-col justify-center group-hover:bg-purple-50 dark:group-hover:bg-purple-900/10 transition-colors duration-500">
+                    <div className="grid grid-cols-3 gap-1.5 sm:gap-2">
                       {['09:00', '10:00', '11:00', '14:00', '15:00', '16:00'].map((time, idx) => (
-                        <div key={time} className={`h-7 lg:h-8 rounded-xl flex items-center justify-center text-[9px] lg:text-[10px] font-black tracking-wider transition-all duration-500 ${idx === 2 ? 'bg-purple-500 text-white shadow-lg shadow-purple-500/30 scale-105' : 'bg-white dark:bg-slate-800 text-slate-450 dark:text-slate-400 shadow-sm'}`}>
+                        <div key={time} className={`h-6 sm:h-7 lg:h-8 rounded-lg sm:rounded-xl flex items-center justify-center text-[8px] sm:text-[9px] lg:text-[10px] font-black tracking-wider transition-all duration-500 ${idx === 2 ? 'bg-purple-500 text-white shadow-lg shadow-purple-500/30 scale-105' : 'bg-white dark:bg-slate-800 text-slate-450 dark:text-slate-400 shadow-sm'}`}>
                           {time}
                         </div>
                       ))}
                     </div>
-                    <div className="mt-3 lg:mt-4 w-full h-10 bg-slate-900 dark:bg-slate-800 rounded-xl flex items-center justify-center gap-2">
-                      <div className="w-3 h-3 bg-green-400 rounded-full shadow-[0_0_10px_rgba(74,222,128,0.5)] animate-pulse" />
-                      <div className="text-[10px] lg:text-xs font-black text-white uppercase tracking-widest">Xác nhận lịch</div>
+                    <div className="mt-3 lg:mt-4 w-full h-8 sm:h-10 bg-slate-900 dark:bg-slate-800 rounded-lg sm:rounded-xl flex items-center justify-center gap-2">
+                      <div className="w-2.5 h-2.5 sm:w-3 sm:h-3 bg-green-400 rounded-full shadow-[0_0_10px_rgba(74,222,128,0.5)] animate-pulse" />
+                      <div className="text-[9px] sm:text-[10px] lg:text-xs font-black text-white uppercase tracking-widest">Xác nhận lịch</div>
                     </div>
                   </div>
-                  <h4 className="text-xl lg:text-2xl font-black text-slate-900 dark:text-white mb-3">Đặt lịch 24/7</h4>
-                  <p className="text-sm lg:text-base text-slate-500 dark:text-slate-400 leading-relaxed font-medium mt-auto">Chọn khung giờ phù hợp và đặt lịch ngay lập tức. Hệ thống tự động xác nhận không cần chờ đợi.</p>
+                  <h4 className="text-lg sm:text-xl lg:text-2xl font-black text-slate-900 dark:text-white mb-2 sm:mb-3">Đặt lịch 24/7</h4>
+                  <p className="text-xs sm:text-sm lg:text-base text-slate-500 dark:text-slate-400 leading-relaxed font-medium mt-auto">Chọn khung giờ phù hợp và đặt lịch ngay lập tức. Hệ thống tự động xác nhận không cần chờ đợi.</p>
                 </div>
               </motion.div>
 
@@ -752,32 +747,32 @@ export default function Home() {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true, margin: "-100px" }}
                 transition={{ duration: 0.7, delay: 0.4, ease: "easeOut" }}
-                className="w-[85vw] sm:w-[320px] lg:w-auto shrink-0 snap-start group relative bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-6 lg:p-8 rounded-3xl md:rounded-[40px] shadow-xl hover:shadow-2xl hover:shadow-rose-500/10 hover:border-rose-500/50 transition-all duration-500 overflow-hidden flex flex-col h-full"
+                className="w-[75vw] sm:w-[320px] lg:w-auto shrink-0 snap-start group relative bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-4 sm:p-6 lg:p-8 rounded-3xl md:rounded-[40px] shadow-xl hover:shadow-2xl hover:shadow-rose-500/10 hover:border-rose-500/50 transition-all duration-500 overflow-hidden flex flex-col"
               >
-                <div className="absolute -top-6 -right-6 md:-top-8 md:-right-8 text-[120px] md:text-[180px] font-black text-slate-50 dark:text-slate-800/30 leading-none select-none z-0 transition-transform duration-700 group-hover:scale-110 group-hover:-rotate-6">3</div>
+                <div className="absolute -top-4 -right-4 sm:-top-6 sm:-right-6 md:-top-8 md:-right-8 text-[100px] sm:text-[120px] md:text-[180px] font-black text-slate-50 dark:text-slate-800/30 leading-none select-none z-0 transition-transform duration-700 group-hover:scale-110 group-hover:-rotate-6">3</div>
 
                 <div className="relative z-10 flex flex-col h-full">
-                  <div className="inline-flex items-center justify-center text-[#FF0038] bg-[#FFF9FA] border border-[#FFE3E6] dark:bg-rose-900/50 dark:text-rose-400 dark:border-rose-800 text-xs font-black px-4 py-2 rounded-full mb-6 w-fit uppercase tracking-widest">
+                  <div className="inline-flex items-center justify-center text-[#FF0038] bg-[#FFF9FA] border border-[#FFE3E6] dark:bg-rose-900/50 dark:text-rose-400 dark:border-rose-800 text-[10px] sm:text-xs font-black px-3 py-1.5 sm:px-4 sm:py-2 rounded-full mb-4 sm:mb-6 w-fit uppercase tracking-widest">
                     Bước 3
                   </div>
 
-                  <div className="w-full h-36 lg:h-40 bg-slate-50 dark:bg-slate-950/50 rounded-3xl mb-6 lg:mb-8 p-4 lg:p-5 border border-slate-100 dark:border-slate-800 flex flex-col justify-center items-center group-hover:bg-rose-50 dark:group-hover:bg-rose-900/10 transition-colors duration-500">
-                    <div className="flex gap-1 mb-4">
+                  <div className="w-full h-24 sm:h-36 lg:h-40 bg-slate-50 dark:bg-slate-950/50 rounded-2xl sm:rounded-3xl mb-4 sm:mb-6 p-3 sm:p-4 lg:p-5 border border-slate-100 dark:border-slate-800 flex flex-col justify-center items-center group-hover:bg-rose-50 dark:group-hover:bg-rose-900/10 transition-colors duration-500">
+                    <div className="flex gap-1 mb-3 sm:mb-4">
                       {[1, 2, 3, 4, 5].map((s, idx) => (
-                        <Star key={s} size={20} className="fill-rose-400 text-rose-400 drop-shadow-sm transition-transform duration-300 hover:scale-125 hover:-rotate-12 cursor-pointer" style={{ animationDelay: `${idx * 100}ms` }} />
+                        <Star key={s} size={16} className="sm:w-5 sm:h-5 fill-rose-400 text-rose-400 drop-shadow-sm transition-transform duration-300 hover:scale-125 hover:-rotate-12 cursor-pointer" style={{ animationDelay: `${idx * 100}ms` }} />
                       ))}
                     </div>
-                    <div className="w-full bg-white dark:bg-slate-850 p-3 lg:p-4 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-700">
-                      <div className="flex items-center gap-3 mb-2 lg:mb-3">
-                        <div className="w-6 h-6 lg:w-8 lg:h-8 bg-slate-200 dark:bg-slate-700 rounded-full" />
-                        <div className="h-2 w-16 lg:w-20 bg-slate-200 dark:bg-slate-700 rounded-full" />
+                    <div className="w-full bg-white dark:bg-slate-850 p-2.5 sm:p-3 lg:p-4 rounded-xl sm:rounded-2xl shadow-sm border border-slate-100 dark:border-slate-700">
+                      <div className="flex items-center gap-2 sm:gap-3 mb-2 lg:mb-3">
+                        <div className="w-5 h-5 sm:w-6 sm:h-6 lg:w-8 lg:h-8 bg-slate-200 dark:bg-slate-700 rounded-full" />
+                        <div className="h-1.5 sm:h-2 w-14 sm:w-16 lg:w-20 bg-slate-200 dark:bg-slate-700 rounded-full" />
                       </div>
                       <div className="h-1 lg:h-1.5 w-full bg-slate-100 dark:bg-slate-700 rounded-full mb-1.5 lg:mb-2" />
                       <div className="h-1 lg:h-1.5 w-2/3 bg-slate-100 dark:bg-slate-700 rounded-full" />
                     </div>
                   </div>
-                  <h4 className="text-xl lg:text-2xl font-black text-slate-900 dark:text-white mb-3">Trải nghiệm & Review</h4>
-                  <p className="text-sm lg:text-base text-slate-500 dark:text-slate-400 leading-relaxed font-medium mt-auto">Tận hưởng dịch vụ chăm sóc chuyên nghiệp tại cơ sở và để lại đánh giá nhằm giúp cộng đồng có thêm nhiều sự lựa chọn uy tín.</p>
+                  <h4 className="text-lg sm:text-xl lg:text-2xl font-black text-slate-900 dark:text-white mb-2 sm:mb-3">Trải nghiệm & Review</h4>
+                  <p className="text-xs sm:text-sm lg:text-base text-slate-500 dark:text-slate-400 leading-relaxed font-medium mt-auto">Tận hưởng dịch vụ chăm sóc chuyên nghiệp tại cơ sở và để lại đánh giá nhằm giúp cộng đồng có thêm nhiều sự lựa chọn uy tín.</p>
                 </div>
               </motion.div>
             </div>
@@ -823,7 +818,7 @@ export default function Home() {
                   người dùng <br />
                   <span className="text-gradient text-4xl md:text-6xl xl:text-7xl mt-2 inline-block font-black">PetEye</span>
                 </h2>
-                <p className="text-slate-600 dark:text-slate-400 text-lg md:text-xl font-medium mt-6 leading-relaxed max-w-sm">
+                <p className="hidden lg:block text-slate-600 dark:text-slate-400 text-lg md:text-xl font-medium mt-6 leading-relaxed max-w-sm">
                   Kết nối yêu thương, chăm sóc tận tâm. Khám phá lý do hàng ngàn khách hàng luôn tin tưởng và lựa chọn PetEye.
                 </p>
               </div>
@@ -925,7 +920,7 @@ export default function Home() {
               <motion.div
                 animate={{ x: ["-50%", "0%"] }}
                 transition={{ duration: 35, ease: "linear", repeat: Infinity }}
-                className="flex gap-6 w-max -ml-12"
+                className="hidden lg:flex gap-6 w-max -ml-12"
               >
                 {[1, 2].map((loopIdx) => (
                   <React.Fragment key={loopIdx}>
