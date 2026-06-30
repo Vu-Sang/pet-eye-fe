@@ -192,7 +192,7 @@ export default function AdminDashboard() {
     })
     : [];
 
-  const formatNum = (n: number) => n.toLocaleString('vi-VN');
+  const formatNum = (n?: number) => (n || 0).toLocaleString('vi-VN');
 
   // Use real trends and sparklines from the backend API, with safe fallbacks
   const cards = stats ? [
