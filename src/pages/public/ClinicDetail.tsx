@@ -484,6 +484,12 @@ export default function ClinicDetail() {
   }, [showPetModal]);
 
   const toggleService = (serviceId: number) => {
+    const svc = apiServices.find((s: ServiceResponse) => s.id === serviceId);
+    if (svc && (svc.category === 'BOARDING' || svc.category.toUpperCase() === 'HOTEL')) {
+      setIsHotelSelected(prev => !prev);
+      return;
+    }
+
     trackBookingStep1_ServiceSelection(
       shopId,
       shop?.shopName || '',
@@ -809,6 +815,17 @@ export default function ClinicDetail() {
                      shop.shopType}
                   </span>
                 )}
+                
+                {/* Camera Badge */}
+                {apiServices?.some((s: any) => s.cameraEnabled) && (
+                  <span className="flex items-center gap-1.5 px-2.5 py-1 bg-red-50 dark:bg-red-500/10 text-red-600 dark:text-red-400 rounded-md text-[11px] sm:text-[12px] font-bold border border-red-100 dark:border-red-500/20">
+                    <span className="relative flex h-2 w-2">
+                      <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-500 opacity-75"></span>
+                      <span className="relative inline-flex rounded-full h-2 w-2 bg-red-600"></span>
+                    </span>
+                    Live Camera
+                  </span>
+                )}
               </div>
             )}
 
@@ -1013,10 +1030,10 @@ export default function ClinicDetail() {
                 )}
               </div>
             </section>
-
-            {/* Pet Hotel & Camera Options — chỉ hiển thị nếu shop có dịch vụ BOARDING */}
+            {/* Pet Hotel & Camera Options — chỉ hiển thị nếu shop có dịch vụ BOARDING (bản Desktop) */}
             {boardingService && (
-              <section className="border-b border-slate-200 dark:border-slate-800 pb-8">
+              <div className="hidden lg:block">
+                <section className="border-b border-slate-200 dark:border-slate-800 pb-8">
                 <div className="flex items-center justify-between mb-5">
                   <div className="flex items-center gap-3">
                     <div className="w-12 h-12 bg-indigo-50 dark:bg-indigo-900/30 rounded-2xl flex items-center justify-center text-indigo-600 dark:text-indigo-400 shadow-sm border border-indigo-100 dark:border-indigo-800">
@@ -1185,7 +1202,10 @@ export default function ClinicDetail() {
                   </div>
                 </div>
               </section>
-            )} {/* end BOARDING conditional */}
+              </div>
+            )} {/* end BOARDING conditional (Desktop) */}
+
+            
 
             {/* Featured Services */}
             <section className="border-b border-slate-200 dark:border-slate-800 pb-8">
@@ -1199,13 +1219,13 @@ export default function ClinicDetail() {
                 </div>
               )}
 
-              {!servicesLoading && nonBoardingServices.length === 0 && (
+              {!servicesLoading && apiServices.length === 0 && (
                 <p className="text-slate-400 text-sm py-4">Cơ sở này chưa có dịch vụ nào.</p>
               )}
 
               {!servicesLoading && apiServices.length > 0 && (
                 <div className="flex flex-col gap-3">
-                  {nonBoardingServices.map((svc: ServiceResponse) => {
+                  {apiServices.map((svc: ServiceResponse) => {
                     return (
                       <div key={svc.id}>
                         <div
@@ -1255,7 +1275,9 @@ export default function ClinicDetail() {
                               <span className="font-bold text-slate-900 dark:text-slate-100 text-sm">
                                 {svc.price.toLocaleString('vi-VN')}đ
                               </span>
-                              <span className="text-xs text-slate-400">/lần</span>
+                              <span className="text-xs text-slate-400">
+                                {svc.category === 'BOARDING' || svc.category.toUpperCase() === 'HOTEL' ? '/ngày' : '/lần'}
+                              </span>
                             </div>
                           </div>
                         </div>
@@ -1320,33 +1342,183 @@ export default function ClinicDetail() {
                 )}
               </div>
             </section>
-
-            {/* Live Camera Promo */}
-            {/* <section className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-slate-900 to-slate-800 text-white p-8">
-              <div
-                className="absolute top-0 right-0 w-1/2 h-full opacity-20 bg-cover bg-no-repeat bg-center rounded-2xl"
-                style={{
-                  backgroundImage:
-                    'url(https://images.unsplash.com/photo-1601758174184-07ba1e5b0a7a?q=80&w=600&auto=format&fit=crop)',
-                }}
-              />
-              <div className="relative z-10 flex flex-col gap-4 max-w-[60%]">
-                <div className="flex items-center gap-2 text-teal-400 font-bold tracking-wider text-xs uppercase">
-                  <span className="relative flex h-3 w-3">
-                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-teal-400 opacity-75" />
-                    <span className="relative inline-flex rounded-full h-3 w-3 bg-teal-500" />
-                  </span>
-                  Live Camera Experience
+            {/* Pet Hotel & Camera Options — chỉ hiển thị nếu shop có dịch vụ BOARDING (bản Mobile) */}
+            {boardingService && (
+              <div className="block lg:hidden">
+                <section className="border-b border-slate-200 dark:border-slate-800 pb-8">
+                <div className="flex items-center justify-between mb-5">
+                  <div className="flex items-center gap-3">
+                    <div className="w-12 h-12 bg-indigo-50 dark:bg-indigo-900/30 rounded-2xl flex items-center justify-center text-indigo-600 dark:text-indigo-400 shadow-sm border border-indigo-100 dark:border-indigo-800">
+                      <span className="material-symbols-outlined text-2xl">hotel</span>
+                    </div>
+                    <div>
+                      <h2 className="text-lg sm:text-xl font-bold text-slate-900 dark:text-slate-100">{boardingService.serviceName}</h2>
+                      <p className="text-xs text-slate-500 font-medium mt-0.5">{boardingService.description}</p>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <div className="flex flex-col items-end">
+                      <div className="flex items-center gap-1">
+                        <span className="text-sm font-bold text-slate-900 dark:text-white">{(boardingBasePrice + roomTypeExtraPrice).toLocaleString('vi-VN')}đ</span>
+                        <span className="text-xs text-slate-400">/ngày</span>
+                      </div>
+                      {(cageSizeExtraPrice > 0 || roomTypeExtraPrice > 0) && (
+                        <div className="flex flex-col items-end mt-0.5 gap-0.5">
+                          {cageSizeExtraPrice > 0 && (
+                            <span className="text-[10px] text-indigo-500 font-medium bg-indigo-50 dark:bg-indigo-500/10 px-1.5 py-0.5 rounded">
+                              + {cageSizeExtraPrice.toLocaleString('vi-VN')}đ (chuồng {selectedCageSize})
+                            </span>
+                          )}
+                          {roomTypeExtraPrice > 0 && (
+                            <span className="text-[10px] text-indigo-500 font-medium bg-indigo-50 dark:bg-indigo-500/10 px-1.5 py-0.5 rounded">
+                              + {roomTypeExtraPrice.toLocaleString('vi-VN')}đ (phòng {selectedRoomType})
+                            </span>
+                          )}
+                        </div>
+                      )}
+                    </div>
+                    <div
+                      onClick={() => setIsHotelSelected(!isHotelSelected)}
+                      className={`relative w-12 h-6 rounded-full cursor-pointer transition-all duration-300 ml-2 ${isHotelSelected ? 'bg-indigo-600 shadow-inner' : 'bg-slate-200 dark:bg-slate-700'}`}
+                    >
+                      <div className={`absolute top-1 w-4 h-4 bg-white rounded-full transition-all duration-300 ${isHotelSelected ? 'left-7 shadow-sm' : 'left-1'}`} />
+                    </div>
+                  </div>
                 </div>
-                <h3 className="text-2xl font-bold leading-tight">Quan sát thú cưng từ xa</h3>
-                <p className="text-slate-300 text-sm">
-                  Đặt lịch dịch vụ lưu trú và theo dõi bé yêu mọi lúc mọi nơi thông qua ứng dụng Peteye.
-                </p>
-                <button className="w-fit mt-2 px-5 py-2.5 bg-white text-slate-900 rounded-lg font-bold text-sm hover:bg-slate-100 transition-colors shadow-lg">
-                  Tải App Ngay
-                </button>
+
+                <div className={`transition-all duration-500 overflow-hidden ${isHotelSelected ? 'max-h-[900px] opacity-100 mt-4' : 'max-h-0 opacity-0'}`}>
+                  <div className="bg-white dark:bg-slate-800 rounded-2xl border border-indigo-100 dark:border-indigo-800 shadow-sm overflow-hidden mb-6">
+                    {/* Service image + description */}
+                    <div className="p-5 flex flex-col sm:flex-row gap-5">
+                      {/* Image */}
+                      <div className="w-full sm:w-48 h-40 rounded-xl overflow-hidden shadow-md shrink-0 bg-slate-100 dark:bg-slate-700">
+                        <img
+                          src={boardingService.imageUrl || 'https://images.unsplash.com/photo-1548199973-03cce0bbc87b?auto=format&fit=crop&w=600&q=80'}
+                          className="w-full h-full object-cover"
+                          alt={boardingService.serviceName}
+                        />
+                      </div>
+
+                      {/* Description as feature list — dùng cameraDescription nếu có, fallback sang description chung */}
+                      <div className="flex-1">
+                        <h4 className="font-bold text-slate-900 dark:text-slate-100 text-base mb-2">{boardingService.serviceName}</h4>
+                        {(() => {
+                          const descText = boardingService.cameraEnabled && boardingService.cameraDescription
+                            ? boardingService.cameraDescription
+                            : boardingService.description;
+                          return descText ? (
+                            <div className="flex flex-col gap-1.5">
+                              {descText.split(/[,;.\n]/).filter((s: string) => s.trim().length > 5).map((feature: string, i: number) => (
+                                <div key={i} className="flex items-start gap-2 text-sm text-slate-600 dark:text-slate-300">
+                                  <span className="material-symbols-outlined text-indigo-500 text-base mt-0.5 shrink-0" style={{ fontVariationSettings: "'FILL' 1" }}>check_circle</span>
+                                  <span>{feature.trim()}</span>
+                                </div>
+                              ))}
+                            </div>
+                          ) : null;
+                        })()}
+
+                        {/* Additional Boarding info (Cage, Room) */}
+                        {(boardingService.roomType?.length > 0 || boardingService.cageSize?.length > 0) && (
+                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-4 border-t border-slate-100 dark:border-slate-700/50 pt-4">
+                            {boardingService.roomType?.length > 0 && (
+                              <div className="flex flex-col">
+                                <span className="text-[10px] font-black uppercase text-slate-400 mb-1">Loại phòng</span>
+                                {boardingService.roomType.length > 1 ? (
+                                  <select
+                                    value={selectedRoomType}
+                                    onChange={(e) => setSelectedRoomType(e.target.value)}
+                                    className="px-3 py-1.5 border border-slate-200 dark:border-slate-700 rounded-lg text-sm font-semibold text-slate-800 dark:text-slate-200 bg-white dark:bg-slate-800 focus:ring-2 focus:ring-[#1a2b4c] outline-none"
+                                  >
+                                    {boardingService.roomType.map((r: string) => {
+                                      return (
+                                        <option key={r} value={r}>
+                                          {r}
+                                        </option>
+                                      );
+                                    })}
+                                  </select>
+                                ) : (
+                                  <span className="text-sm font-semibold text-slate-800 dark:text-slate-200">
+                                    {boardingService.roomType[0]}
+                                  </span>
+                                )}
+                              </div>
+                            )}
+                            {boardingService.cageSize?.length > 0 && (
+                              <div className="flex flex-col">
+                                <span className="text-[10px] font-black uppercase text-slate-400 mb-1">Kích thước chuồng</span>
+                                {boardingService.cageSize.length > 1 ? (
+                                  <select
+                                    value={selectedCageSize}
+                                    onChange={(e) => setSelectedCageSize(e.target.value)}
+                                    className="px-3 py-1.5 border border-slate-200 dark:border-slate-700 rounded-lg text-sm font-semibold text-slate-800 dark:text-slate-200 bg-white dark:bg-slate-800 focus:ring-2 focus:ring-[#1a2b4c] outline-none"
+                                  >
+                                    {boardingService.cageSize.map((c: string) => (
+                                      <option key={c} value={c}>{c}</option>
+                                    ))}
+                                  </select>
+                                ) : (
+                                  <span className="text-sm font-semibold text-slate-800 dark:text-slate-200">{boardingService.cageSize[0]}</span>
+                                )}
+                              </div>
+                            )}
+                          </div>
+                        )}
+                      </div>
+                    </div>
+
+                    {/* Camera tiers — only if shop configured camera */}
+                    {boardingService.cameraEnabled && supportedCameraTiers.length > 0 && (
+                      <div className="bg-indigo-50/50 dark:bg-indigo-950/20 p-5 border-t border-indigo-100 dark:border-indigo-900 mt-5">
+                        <h4 className="text-sm font-bold text-indigo-900 dark:text-indigo-400 uppercase tracking-wider mb-4">
+                          Nâng cấp Camera Giám sát
+                        </h4>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                          {supportedCameraTiers.map((tierId: string) => {
+                            const meta = CAMERA_TIER_META[tierId];
+                            if (!meta) return null;
+                            const isSelected = selectedCameraTier === tierId;
+                            const effectiveLabel = tierLabel(tierId, boardingService?.cameraTierLabels);
+                            const effectivePrice = tierPrice(tierId, boardingService?.cameraTierPrices);
+                            return (
+                              <div
+                                key={tierId}
+                                onClick={() => setSelectedCameraTier(tierId)}
+                                className={`p-4 rounded-xl border-2 cursor-pointer transition-all flex items-center justify-between group ${isSelected
+                                  ? 'bg-white dark:bg-indigo-900/40 border-indigo-500 shadow-md'
+                                  : 'bg-white dark:bg-slate-800 border-slate-100 dark:border-slate-700 hover:border-indigo-200'
+                                  }`}
+                              >
+                                <div className="flex items-center gap-3">
+                                  <div className={`w-10 h-10 rounded-lg flex items-center justify-center transition-colors ${isSelected ? 'bg-indigo-500 text-white' : 'bg-slate-100 dark:bg-slate-700 text-slate-400 group-hover:bg-indigo-100 group-hover:text-indigo-500'}`}>
+                                    <span className="material-symbols-outlined text-xl">{meta.icon}</span>
+                                  </div>
+                                  <div>
+                                    <p className="text-sm font-bold text-slate-900 dark:text-white">{effectiveLabel}</p>
+                                    <p className="text-[10px] text-slate-500 dark:text-slate-400">{meta.desc}</p>
+                                  </div>
+                                </div>
+                                <div className="text-right">
+                                  <p className={`text-xs font-bold ${effectivePrice === 0 ? 'text-teal-600' : 'text-slate-900 dark:text-white'}`}>
+                                    {effectivePrice === 0 ? 'MIỄN PHÍ' : `+${effectivePrice.toLocaleString()}đ`}
+                                  </p>
+                                  {effectivePrice > 0 && <p className="text-[8px] text-slate-400">/ngày</p>}
+                                </div>
+                              </div>
+                            );
+                          })}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </section>
               </div>
-            </section> */}
+            )} {/* end BOARDING conditional (Mobile) */}
+
+            
+
 
           </div>
 
@@ -1402,7 +1574,7 @@ export default function ClinicDetail() {
                   else if (reviewFilter === '3 sao') filteredList = filteredList.filter(r => r.rating === 3);
                   else if (reviewFilter === '2 sao') filteredList = filteredList.filter(r => r.rating === 2);
                   else if (reviewFilter === '1 sao') filteredList = filteredList.filter(r => r.rating === 1);
-                  else if (reviewFilter === 'Có hình ảnh') filteredList = filteredList.filter(r => r.images?.length > 0);
+                  else if (reviewFilter === 'Có hình ảnh') filteredList = filteredList.filter((r: any) => r.images?.length > 0);
                   
                   return filteredList.length > 0 ? (
                     filteredList.map((review: any) => (
@@ -1489,7 +1661,7 @@ export default function ClinicDetail() {
                 <div className="p-4 sm:p-6 flex flex-col gap-4 sm:gap-5">
 
                   {/* ── Chọn Dịch vụ (Sidebar) ──────────────── */}
-                  {nonBoardingServices.length > 0 && (
+                  {apiServices.length > 0 && (
                     <div className="flex flex-col gap-3">
                       <label className="text-xs font-bold uppercase tracking-wider text-slate-400 mb-0 block">
                         Chọn Dịch vụ
@@ -2087,7 +2259,7 @@ export default function ClinicDetail() {
         <div className="lg:hidden fixed bottom-0 left-0 right-0 p-4 bg-white dark:bg-slate-900 border-t border-slate-200 dark:border-slate-800 flex items-center justify-between gap-4 z-50 shadow-[0_-10px_20px_rgba(0,0,0,0.05)] pb-safe">
           <div className="flex flex-col">
             <span className="text-xs text-slate-500 font-bold uppercase tracking-wider mb-0.5">
-              {totalPrice > 0 ? 'Tổng cộng' : 'Giá khám từ'}
+              {totalPrice > 0 ? 'Tổng cộng' : 'Giá chỉ từ'}
             </span>
             <span className="font-black text-xl text-[#1a2b4c] dark:text-teal-400">
               {totalPrice > 0 
@@ -2657,15 +2829,15 @@ export default function ClinicDetail() {
                       toggleService(selectedServiceForDetail.id);
                       setSelectedServiceForDetail(null);
                     }}
-                    className={`px-6 py-3 rounded-2xl font-bold transition-all shadow-xl flex items-center gap-2 ${selectedServiceIds.includes(selectedServiceForDetail.id)
+                    className={`px-6 py-3 rounded-2xl font-bold transition-all shadow-xl flex items-center gap-2 ${(selectedServiceForDetail.category === 'BOARDING' || selectedServiceForDetail.category.toUpperCase() === 'HOTEL' ? isHotelSelected : selectedServiceIds.includes(selectedServiceForDetail.id))
                       ? 'bg-red-500 text-white hover:bg-red-600 shadow-red-200 dark:shadow-none'
                       : 'bg-[#1a2b4c] text-white hover:bg-[#243d6b] shadow-slate-200 dark:shadow-none'
                       }`}
                   >
                     <span className="material-symbols-outlined text-base">
-                      {selectedServiceIds.includes(selectedServiceForDetail.id) ? 'remove_circle' : 'add_circle'}
+                      {(selectedServiceForDetail.category === 'BOARDING' || selectedServiceForDetail.category.toUpperCase() === 'HOTEL' ? isHotelSelected : selectedServiceIds.includes(selectedServiceForDetail.id)) ? 'remove_circle' : 'add_circle'}
                     </span>
-                    {selectedServiceIds.includes(selectedServiceForDetail.id) ? 'Bỏ chọn' : 'Chọn dịch vụ'}
+                    {(selectedServiceForDetail.category === 'BOARDING' || selectedServiceForDetail.category.toUpperCase() === 'HOTEL' ? isHotelSelected : selectedServiceIds.includes(selectedServiceForDetail.id)) ? 'Bỏ chọn' : 'Chọn dịch vụ'}
                   </button>
                 </div>
               </div>

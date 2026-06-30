@@ -916,33 +916,33 @@ export default function Chatbot() {
   return (
     <>
       {/* Floating button */}
-      <button onClick={toggleOpen} className="fixed bottom-24 lg:bottom-5 right-4 lg:right-5 z-50 group" aria-label="Mo chatbot">
-        <div className="relative">
-          <div className="absolute inset-0 rounded-full bg-indigo-500 blur-lg opacity-40 group-hover:opacity-70 transition duration-300"></div>
-          {/* NOTE: Bạn có thể đổi w-16 h-16 thành w-14 h-14 (nhỏ hơn) hoặc w-20 h-20 (lớn hơn) ở class bên dưới để tùy chỉnh kích thước */}
-          <div className="relative w-16 h-16 rounded-full bg-gradient-to-br from-[#1a2b4c] via-indigo-600 to-purple-600 text-white shadow-xl flex items-center justify-center transition-all duration-300 group-hover:scale-110">
-            {open ? (
-              <span className="material-symbols-outlined text-2xl">close</span>
-            ) : (
-              <>
-                <div className="absolute inset-0 rounded-full border border-white/20 animate-ping"></div>
-                {/* Tùy chỉnh kích thước icon bên trong ở text-[...] */}
-                <span className="material-symbols-outlined text-[36px] drop-shadow-lg">support_agent</span>
-                {hasUnread && (
-                  <span className="absolute top-0.5 right-0.5 flex h-3 w-3">
-                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
-                    <span className="relative inline-flex rounded-full h-3 w-3 bg-red-500 border border-white"></span>
-                  </span>
-                )}
-              </>
-            )}
-          </div>
+      <button 
+        onClick={toggleOpen} 
+        className="fixed bottom-24 lg:bottom-5 right-4 lg:right-5 z-50 group w-12 h-12 lg:w-16 lg:h-16 rounded-full bg-gradient-to-br from-[#1a2b4c] via-indigo-600 to-purple-600 text-white shadow-xl flex items-center justify-center transition-all duration-300 hover:scale-110" 
+        aria-label="Mo chatbot"
+      >
+        <div className="absolute inset-0 rounded-full bg-indigo-500 blur-lg opacity-40 group-hover:opacity-70 transition duration-300 z-0"></div>
+        <div className="relative z-10 flex items-center justify-center w-full h-full">
+          {open ? (
+            <span className="material-symbols-outlined text-xl lg:text-2xl">close</span>
+          ) : (
+            <>
+              <div className="absolute inset-0 rounded-full border border-white/20 animate-ping"></div>
+              <span className="material-symbols-outlined text-[28px] lg:text-[36px] drop-shadow-lg">support_agent</span>
+              {hasUnread && (
+                <span className="absolute top-0.5 right-0.5 flex h-3 w-3">
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
+                  <span className="relative inline-flex rounded-full h-3 w-3 bg-red-500 border border-white"></span>
+                </span>
+              )}
+            </>
+          )}
         </div>
       </button>
 
       {/* Chat window */}
       {open && (
-        <div className="fixed bottom-24 lg:bottom-5 right-[85px] lg:right-[95px] z-[60] w-[370px] max-w-[calc(100vw-110px)] flex flex-col rounded-3xl shadow-2xl shadow-slate-900/20 overflow-hidden border border-slate-200 bg-white" style={{ height: 'min(640px, calc(100vh - 120px))' }}>
+        <div className="fixed bottom-24 lg:bottom-5 right-[68px] lg:right-[95px] z-[60] w-[320px] sm:w-[360px] lg:w-[370px] max-w-[calc(100vw-80px)] h-[480px] lg:h-[640px] max-h-[calc(100vh-120px)] lg:max-h-[640px] flex flex-col rounded-3xl shadow-2xl shadow-slate-900/20 overflow-hidden border border-slate-200 bg-white">
 
           {/* Header */}
           <div className="flex items-center gap-3 px-4 py-3 bg-gradient-to-r from-[#1a2b4c] to-indigo-600 shrink-0">

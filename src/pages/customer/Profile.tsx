@@ -334,7 +334,7 @@ export default function Profile() {
   const [email, setEmail] = useState(user?.email || '');
   const [phone, setPhone] = useState((user as any)?.phone || '');
   const [address, setAddress] = useState((user as any)?.address || '');
-  const [avatar, setAvatar] = useState(user?.avatar || 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?q=80&w=300&auto=format&fit=crop');
+  const [avatar, setAvatar] = useState(user?.avatar || '');
   const [loading, setLoading] = useState(false);
   const [saved, setSaved] = useState(false);
   const [message, setMessage] = useState('Thông tin đã được lưu thành công!');
@@ -431,8 +431,7 @@ export default function Profile() {
     try {
       setLoading(true);
       await userService.deleteAvatar(Number(user.id));
-      const defaultAvatar = 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?q=80&w=300&auto=format&fit=crop';
-      setAvatar(defaultAvatar); // Back to default
+      setAvatar(''); // Back to default empty
       
       // Update global session
       setUserSession({
@@ -469,12 +468,16 @@ export default function Profile() {
           <div className="p-6 md:p-8 border-b border-slate-100 dark:border-slate-800">
             <div className="flex flex-col sm:flex-row items-center gap-6">
               <div className="relative">
-                <div className="size-28 rounded-full border-4 border-white dark:border-slate-800 shadow-md overflow-hidden bg-slate-100">
-                  <img
-                    src={avatar}
-                    alt="Avatar"
-                    className="w-full h-full object-cover"
-                  />
+                <div className="size-28 rounded-full border-4 border-white dark:border-slate-800 shadow-md overflow-hidden bg-gradient-to-br from-[#1a2b4c] to-blue-600 flex items-center justify-center text-white text-4xl font-black">
+                  {avatar ? (
+                    <img
+                      src={avatar}
+                      alt="Avatar"
+                      className="w-full h-full object-cover"
+                    />
+                  ) : (
+                    fullName ? fullName.charAt(0).toUpperCase() : 'U'
+                  )}
                 </div>
                 <input
                   type="file"

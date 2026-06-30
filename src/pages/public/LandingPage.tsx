@@ -48,6 +48,20 @@ export default function Home() {
   const [heroCity, setHeroCity] = useState('');
   const [heroType, setHeroType] = useState('Tất cả');
 
+  // Custom Dropdown for Search Bar
+  const [isOpenType, setIsOpenType] = useState(false);
+  const typeDropdownRef = React.useRef<HTMLDivElement>(null);
+
+  React.useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (typeDropdownRef.current && !typeDropdownRef.current.contains(event.target as Node)) {
+        setIsOpenType(false);
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
   // 1. Fetch Featured Shops (API)
   const { data: featuredShops = [], isLoading: isLoadingFeatured } = useQuery({
     queryKey: ['featuredShops'],
@@ -112,7 +126,7 @@ export default function Home() {
   const [activeFaq, setActiveFaq] = useState<number | null>(null);
 
   return (
-    <main className="flex-1 overflow-x-hidden font-display relative pb-32 md:pb-0 bg-slate-50 dark:bg-slate-950">
+    <main className="flex-1 overflow-x-hidden font-display relative pb-16 bg-slate-50 dark:bg-slate-950">
       {/* Background decoration from hero section applied to entire page */}
       <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none">
         <div className="absolute top-0 left-0 w-full h-full bg-mesh opacity-10 dark:opacity-20" />
@@ -175,7 +189,7 @@ export default function Home() {
               </motion.p>
 
               {/* Glassmorphic Search Bar */}
-              <motion.div variants={fadeIn} className="w-full glass dark:bg-slate-900/80 dark:border-slate-800 p-2 md:p-2 rounded-[32px] md:rounded-full mt-4 shadow-2xl dark:shadow-[0_25px_50px_-12px_rgba(0,0,0,0.5)] group focus-within:ring-4 ring-primary/10 transition-all">
+              <motion.div variants={fadeIn} className="relative z-30 w-full glass dark:bg-slate-900/80 dark:border-slate-800 p-2 md:p-2 rounded-[32px] md:rounded-full mt-4 shadow-2xl dark:shadow-[0_25px_50px_-12px_rgba(0,0,0,0.5)] group focus-within:ring-4 ring-primary/10 transition-all">
                 <div className="flex flex-col md:grid md:grid-cols-12 gap-1.5 md:gap-2">
                   <div className="md:col-span-5 relative">
                     <MapPin className="absolute left-4 top-1/2 -translate-y-1/2 text-blue-600 dark:text-blue-400 w-5 h-5" />
@@ -187,18 +201,66 @@ export default function Home() {
                       placeholder="Tìm khu vực..."
                     />
                   </div>
-                  <div className="md:col-span-4 relative md:border-l border-slate-200 dark:border-slate-800 hidden md:block">
-                    <Sparkles className="absolute left-4 top-1/2 -translate-y-1/2 text-secondary dark:text-cyan-400 w-5 h-5" />
-                    <select
-                      value={heroType}
-                      onChange={e => setHeroType(e.target.value)}
-                      className="w-full pl-12 pr-4 py-3 xl:py-4 bg-transparent border-none focus:ring-0 text-sm font-bold appearance-none cursor-pointer text-slate-900 dark:text-white focus:outline-none">
-                      <option value="Tất cả" className="bg-white dark:bg-slate-900 text-slate-900 dark:text-white">Tất cả dịch vụ</option>
-                      <option value="CLINIC" className="bg-white dark:bg-slate-900 text-slate-900 dark:text-white">Khám thú y (Clinic)</option>
-                      <option value="SPA" className="bg-white dark:bg-slate-900 text-slate-900 dark:text-white">Spa & Grooming</option>
-                      <option value="HOTEL" className="bg-white dark:bg-slate-900 text-slate-900 dark:text-white">Lưu trú (Hotel)</option>
-                      <option value="MIXED" className="bg-white dark:bg-slate-900 text-slate-900 dark:text-white">Dịch vụ tổng hợp</option>
-                    </select>
+                  <div className="md:col-span-4 relative border-t md:border-t-0 md:border-l border-slate-200 dark:border-slate-800 pt-1.5 pb-1 md:py-0" ref={typeDropdownRef}>
+                    <Sparkles className="absolute left-4 top-1/2 -translate-y-1/2 text-secondary dark:text-cyan-400 w-5 h-5 pointer-events-none" />
+                    
+                    <button
+                      type="button"
+                      onClick={() => setIsOpenType(!isOpenType)}
+                      className="w-full pl-12 pr-10 py-3 xl:py-4 bg-transparent border-none text-sm font-bold text-slate-900 dark:text-white flex items-center justify-between text-left focus:outline-none focus:ring-0"
+                    >
+                      <span>
+                        {heroType === 'Tất cả' ? 'Tất cả dịch vụ' :
+                         heroType === 'CLINIC' ? 'Khám thú y (Clinic)' :
+                         heroType === 'SPA' ? 'Spa & Grooming' :
+                         heroType === 'HOTEL' ? 'Lưu trú (Hotel)' :
+                         'Dịch vụ tổng hợp'}
+                      </span>
+                      <ChevronDown className={`text-slate-400 w-4 h-4 transition-transform duration-200 ${isOpenType ? 'rotate-180' : ''}`} />
+                    </button>
+
+                    <AnimatePresence>
+                      {isOpenType && (
+                        <motion.div
+                          initial={{ opacity: 0, y: 10 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          exit={{ opacity: 0, y: 10 }}
+                          className="absolute z-50 w-full md:w-[260px] left-0 mt-2 bg-white dark:bg-slate-900 rounded-2xl border border-slate-150 dark:border-slate-800 shadow-xl overflow-hidden py-1.5"
+                        >
+                          {[
+                            { value: 'Tất cả', label: 'Tất cả dịch vụ' },
+                            { value: 'CLINIC', label: 'Khám thú y (Clinic)' },
+                            { value: 'SPA', label: 'Spa & Grooming' },
+                            { value: 'HOTEL', label: 'Lưu trú (Hotel)' },
+                            { value: 'MIXED', label: 'Dịch vụ tổng hợp' }
+                          ].map((item) => {
+                            const isSelected = heroType === item.value;
+                            return (
+                              <button
+                                key={item.value}
+                                type="button"
+                                onClick={() => {
+                                  setHeroType(item.value);
+                                  setIsOpenType(false);
+                                }}
+                                className={`w-full px-4 py-2.5 text-left text-sm font-medium flex items-center justify-between transition-colors ${
+                                  isSelected
+                                    ? 'bg-primary/5 dark:bg-blue-500/10 text-primary dark:text-blue-400'
+                                    : 'hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-350'
+                                }`}
+                              >
+                                <span>{item.label}</span>
+                                {isSelected && (
+                                  <span className="material-symbols-outlined text-sm font-bold text-primary dark:text-blue-400" style={{ fontVariationSettings: "'FILL' 1" }}>
+                                    check_circle
+                                  </span>
+                                )}
+                              </button>
+                            );
+                          })}
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
                   </div>
                   <div className="md:col-span-3">
                     <button
@@ -214,28 +276,7 @@ export default function Home() {
               {/* Mobile Only: Single Hero Image with Gradient (Modern App Style) */}
               <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 0.5, delay: 0.2 }} className="relative lg:hidden w-full h-[220px] sm:h-[280px] mt-4 mb-2 rounded-2xl sm:rounded-3xl overflow-hidden shadow-lg">
                 <img src={mobileHeroBanner} alt="Pet care" className="w-full h-full object-cover object-center" />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
-                {/* Floating info badges */}
-                <div className="absolute bottom-3 left-3 right-3 flex items-center justify-between">
-                  <div className="bg-white/95 dark:bg-slate-900/95 backdrop-blur-md px-3 py-2 rounded-xl shadow-sm flex items-center gap-2">
-                    <div className="w-7 h-7 bg-blue-500 rounded-lg flex items-center justify-center text-white shrink-0">
-                      <Heart size={12} />
-                    </div>
-                    <div className="text-left">
-                      <p className="text-[10px] font-black text-slate-900 dark:text-white">Live Camera</p>
-                      <p className="text-[8px] text-slate-500 font-bold">24/7</p>
-                    </div>
-                  </div>
-                  <div className="bg-white/95 dark:bg-slate-900/95 backdrop-blur-md px-3 py-2 rounded-xl shadow-sm flex items-center gap-2">
-                    <div className="w-7 h-7 bg-green-500 rounded-lg flex items-center justify-center text-white shrink-0">
-                      <ShieldCheck size={12} />
-                    </div>
-                    <div className="text-left">
-                      <p className="text-[10px] font-black text-slate-900 dark:text-white">Xác thực</p>
-                      <p className="text-[8px] text-slate-500 font-bold">Uy tín</p>
-                    </div>
-                  </div>
-                </div>
+                <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-black/10 to-transparent" />
               </motion.div>
             </motion.div>
 
@@ -316,7 +357,7 @@ export default function Home() {
                 <Star size={12} className="fill-emerald-500 text-emerald-500 dark:fill-emerald-400 dark:text-emerald-400" />
                 Đánh giá cao nhất
               </span>
-              <h2 className="text-xl sm:text-3xl md:text-5xl xl:text-6xl font-black text-blue-950 dark:text-white leading-tight">
+              <h2 className="text-2xl sm:text-3xl md:text-5xl xl:text-6xl font-black text-blue-950 dark:text-white leading-tight">
                 Khám phá cơ sở <br className="hidden sm:block" />
                 <span className="text-gradient">Được yêu thích</span>
               </h2>
@@ -340,9 +381,9 @@ export default function Home() {
                     trackClickFeaturedShop(shop.id, shop.shopName, index + 1);
                     navigate(`/clinic/${shop.id}`);
                   }}
-                  className="w-[75vw] sm:w-[300px] md:w-auto shrink-0 snap-start bg-white dark:bg-slate-900/60 rounded-2xl md:rounded-[32px] overflow-hidden shadow-md hover:shadow-xl border border-slate-200/85 dark:border-slate-800/80 hover:border-blue-500/20 hover:dark:border-blue-500/30 md:hover:-translate-y-2 transition-all cursor-pointer group flex flex-col"
+                  className="w-[68vw] sm:w-[280px] md:w-auto shrink-0 snap-start bg-white dark:bg-slate-900/60 rounded-2xl md:rounded-[32px] overflow-hidden shadow-md hover:shadow-xl border border-slate-200/85 dark:border-slate-800/80 hover:border-blue-500/20 hover:dark:border-blue-500/30 md:hover:-translate-y-2 transition-all cursor-pointer group flex flex-col"
                 >
-                  <div className="h-32 md:h-48 bg-slate-200 dark:bg-slate-800 relative overflow-hidden shrink-0">
+                  <div className="h-28 md:h-48 bg-slate-200 dark:bg-slate-800 relative overflow-hidden shrink-0">
                     {shop.logoUrl ? (
                       <img src={shop.logoUrl} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" alt={shop.shopName} />
                     ) : (
@@ -357,11 +398,11 @@ export default function Home() {
                       </div>
                     )}
                   </div>
-                  <div className="p-4 md:p-6 flex-1 flex flex-col">
-                    <h3 className="text-xl font-black text-slate-900 dark:text-white leading-tight mb-2 line-clamp-2">{shop.shopName}</h3>
-                    <div className="flex items-start gap-2 text-slate-500 mb-4">
-                      <MapPin size={16} className="shrink-0 mt-0.5 text-blue-600 dark:text-blue-400" />
-                      <span className="text-sm text-slate-500 dark:text-slate-400 font-medium line-clamp-2">{shop.address}, {shop.city}</span>
+                  <div className="p-3.5 md:p-6 flex-1 flex flex-col">
+                    <h3 className="text-base md:text-xl font-black text-slate-900 dark:text-white leading-tight mb-1.5 line-clamp-2">{shop.shopName}</h3>
+                    <div className="flex items-start gap-1.5 text-slate-500 mb-3">
+                      <MapPin size={14} className="shrink-0 mt-0.5 text-blue-600 dark:text-blue-400" />
+                      <span className="text-xs md:text-sm text-slate-550 dark:text-slate-400 font-medium line-clamp-2">{shop.address}, {shop.city}</span>
                     </div>
                     <div className="mt-auto flex flex-wrap gap-1.5 pt-4 border-t border-slate-200 dark:border-slate-700">
                       {shop.serviceNames?.slice(0, 3).map((svc: string, idx: number) => (
@@ -669,27 +710,27 @@ export default function Home() {
               </motion.div>
             </div>
 
-            <div className="flex overflow-x-auto pb-8 -mx-4 px-4 sm:mx-0 sm:px-0 lg:grid lg:grid-cols-3 gap-6 lg:gap-12 relative z-10 items-stretch snap-x snap-mandatory [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none] after:content-[''] after:w-1 after:shrink-0 lg:after:hidden">
+            <div className="flex flex-col lg:grid lg:grid-cols-3 gap-12 sm:gap-16 lg:gap-12 relative z-10 items-center lg:items-stretch">
               {/* Step 1 */}
               <motion.div
                 initial={{ opacity: 0, y: 50 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true, margin: "-100px" }}
                 transition={{ duration: 0.7, ease: "easeOut" }}
-                className="w-[75vw] sm:w-[320px] lg:w-auto shrink-0 snap-start group relative bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-4 sm:p-6 lg:p-8 rounded-3xl md:rounded-[40px] shadow-xl hover:shadow-2xl hover:shadow-blue-500/10 hover:border-blue-500/50 transition-all duration-500 overflow-hidden flex flex-col"
+                className="w-full max-w-sm lg:max-w-none group relative bg-transparent lg:bg-white lg:dark:bg-slate-900 border-none lg:border lg:border-slate-200 lg:dark:border-slate-800 p-0 lg:p-8 rounded-none lg:rounded-[40px] shadow-none lg:shadow-xl lg:hover:shadow-2xl lg:hover:shadow-blue-500/10 lg:hover:border-blue-500/50 transition-all duration-500 flex flex-col items-center text-center"
               >
-                <div className="absolute -top-4 -right-4 sm:-top-6 sm:-right-6 md:-top-8 md:-right-8 text-[100px] sm:text-[120px] md:text-[180px] font-black text-slate-50 dark:text-slate-800/30 leading-none select-none z-0 transition-transform duration-700 group-hover:scale-110 group-hover:-rotate-6">1</div>
+                <div className="absolute -top-4 -right-4 sm:-top-6 sm:-right-6 md:-top-8 md:-right-8 text-[100px] sm:text-[120px] md:text-[180px] font-black text-slate-50 dark:text-slate-800/30 leading-none select-none z-0 transition-transform duration-700 group-hover:scale-110 group-hover:-rotate-6 hidden lg:block">1</div>
 
-                <div className="relative z-10 flex flex-col h-full">
-                  <div className="inline-flex items-center justify-center text-[#005FFF] bg-[#F7FBFF] border border-[#D7ECFF] dark:bg-blue-900/50 dark:text-blue-400 dark:border-blue-800 text-[10px] sm:text-xs font-black px-3 py-1.5 sm:px-4 sm:py-2 rounded-full mb-4 sm:mb-6 w-fit uppercase tracking-widest">
+                <div className="relative z-10 flex flex-col h-full items-center w-full">
+                  <div className="inline-flex items-center justify-center text-[#005FFF] bg-[#F7FBFF] border border-[#D7ECFF] dark:bg-blue-900/50 dark:text-blue-400 dark:border-blue-800 text-[10px] sm:text-xs font-black px-3 py-1.5 sm:px-4 sm:py-2 rounded-full mb-4 sm:mb-6 w-fit uppercase tracking-widest order-1 lg:order-1">
                     Bước 1
                   </div>
 
                   {/* Mock UI */}
-                  <div className="w-full h-24 sm:h-36 lg:h-40 bg-slate-50 dark:bg-slate-950/50 rounded-2xl sm:rounded-3xl mb-4 sm:mb-6 p-3 sm:p-4 lg:p-5 border border-slate-100 dark:border-slate-800 flex flex-col justify-center gap-3 group-hover:bg-blue-50 dark:group-hover:bg-blue-900/10 transition-colors duration-500">
-                    <div className="w-full h-8 sm:h-10 bg-white dark:bg-slate-800 rounded-full shadow-sm flex items-center px-3 sm:px-4 gap-2 sm:gap-3 animate-pulse" style={{ animationDuration: '3s' }}>
+                  <div className="w-full h-36 sm:h-40 bg-slate-50 dark:bg-slate-950/50 rounded-[40px] lg:rounded-3xl mb-6 p-4 lg:p-5 border border-slate-100 dark:border-slate-800 flex flex-col justify-center items-center gap-3 group-hover:bg-blue-50 dark:group-hover:bg-blue-900/10 transition-colors duration-500 shadow-inner lg:shadow-none order-3 lg:order-2">
+                    <div className="w-3/4 lg:w-full h-8 sm:h-10 bg-white dark:bg-slate-800 rounded-full shadow-sm flex items-center px-3 sm:px-4 gap-2 sm:gap-3 animate-pulse" style={{ animationDuration: '3s' }}>
                       <Search size={14} className="text-slate-400" />
-                      <div className="h-1.5 sm:h-2 w-1/3 bg-slate-200 dark:bg-slate-700 rounded-full" />
+                      <div className="h-1.5 sm:h-2 w-1/2 bg-slate-200 dark:bg-slate-700 rounded-full" />
                     </div>
                     <div className="flex gap-2">
                       <div className="h-6 sm:h-8 px-3 sm:px-4 bg-white dark:bg-slate-800 rounded-full shadow-sm flex items-center gap-1 sm:gap-2">
@@ -703,8 +744,8 @@ export default function Home() {
                     </div>
                   </div>
 
-                  <h4 className="text-lg sm:text-xl lg:text-2xl font-black text-slate-900 dark:text-white mb-2 sm:mb-3">Tìm & So sánh</h4>
-                  <p className="text-xs sm:text-sm lg:text-base text-slate-500 dark:text-slate-400 leading-relaxed font-medium mt-auto">Khám phá và so sánh ngay các cơ sở thú y quanh bạn với đầy đủ thông tin, đánh giá và khoảng cách chi tiết.</p>
+                  <h4 className="text-xl sm:text-2xl font-black text-slate-900 dark:text-white mb-3 order-2 lg:order-3">Tìm & So sánh</h4>
+                  <p className="text-sm sm:text-base text-slate-500 dark:text-slate-400 leading-relaxed font-medium mt-auto max-w-xs lg:max-w-none order-4 lg:order-4">Khám phá và so sánh ngay các cơ sở thú y quanh bạn với đầy đủ thông tin, đánh giá và khoảng cách chi tiết.</p>
                 </div>
               </motion.div>
 
@@ -714,30 +755,30 @@ export default function Home() {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true, margin: "-100px" }}
                 transition={{ duration: 0.7, delay: 0.2, ease: "easeOut" }}
-                className="w-[75vw] sm:w-[320px] lg:w-auto shrink-0 snap-start group relative bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-4 sm:p-6 lg:p-8 rounded-3xl md:rounded-[40px] shadow-xl hover:shadow-2xl hover:shadow-purple-500/10 hover:border-purple-500/50 transition-all duration-500 overflow-hidden flex flex-col"
+                className="w-full max-w-sm lg:max-w-none group relative bg-transparent lg:bg-white lg:dark:bg-slate-900 border-none lg:border lg:border-slate-200 lg:dark:border-slate-800 p-0 lg:p-8 rounded-none lg:rounded-[40px] shadow-none lg:shadow-xl lg:hover:shadow-2xl lg:hover:shadow-purple-500/10 lg:hover:border-purple-500/50 transition-all duration-500 flex flex-col items-center text-center"
               >
-                <div className="absolute -top-4 -right-4 sm:-top-6 sm:-right-6 md:-top-8 md:-right-8 text-[100px] sm:text-[120px] md:text-[180px] font-black text-slate-50 dark:text-slate-800/30 leading-none select-none z-0 transition-transform duration-700 group-hover:scale-110 group-hover:-rotate-6">2</div>
+                <div className="absolute -top-4 -right-4 sm:-top-6 sm:-right-6 md:-top-8 md:-right-8 text-[100px] sm:text-[120px] md:text-[180px] font-black text-slate-50 dark:text-slate-800/30 leading-none select-none z-0 transition-transform duration-700 group-hover:scale-110 group-hover:-rotate-6 hidden lg:block">2</div>
 
-                <div className="relative z-10 flex flex-col h-full">
-                  <div className="inline-flex items-center justify-center text-[#A800FF] bg-[#FDFAFF] border border-[#F5E8FF] dark:bg-purple-900/50 dark:text-purple-400 dark:border-purple-800 text-[10px] sm:text-xs font-black px-3 py-1.5 sm:px-4 sm:py-2 rounded-full mb-4 sm:mb-6 w-fit uppercase tracking-widest">
+                <div className="relative z-10 flex flex-col h-full items-center w-full">
+                  <div className="inline-flex items-center justify-center text-[#A800FF] bg-[#FDFAFF] border border-[#F5E8FF] dark:bg-purple-900/50 dark:text-purple-400 dark:border-purple-800 text-[10px] sm:text-xs font-black px-3 py-1.5 sm:px-4 sm:py-2 rounded-full mb-4 sm:mb-6 w-fit uppercase tracking-widest order-1 lg:order-1">
                     Bước 2
                   </div>
 
-                  <div className="w-full h-24 sm:h-36 lg:h-40 bg-slate-50 dark:bg-slate-950/50 rounded-2xl sm:rounded-3xl mb-4 sm:mb-6 p-3 sm:p-4 lg:p-5 border border-slate-100 dark:border-slate-800 flex flex-col justify-center group-hover:bg-purple-50 dark:group-hover:bg-purple-900/10 transition-colors duration-500">
-                    <div className="grid grid-cols-3 gap-1.5 sm:gap-2">
+                  <div className="w-full h-36 sm:h-40 bg-slate-50 dark:bg-slate-950/50 rounded-[40px] lg:rounded-3xl mb-6 p-4 lg:p-5 border border-slate-100 dark:border-slate-800 flex flex-col justify-center items-center group-hover:bg-purple-50 dark:group-hover:bg-purple-900/10 transition-colors duration-500 shadow-inner lg:shadow-none order-3 lg:order-2">
+                    <div className="grid grid-cols-3 gap-2 w-3/4 lg:w-full">
                       {['09:00', '10:00', '11:00', '14:00', '15:00', '16:00'].map((time, idx) => (
-                        <div key={time} className={`h-6 sm:h-7 lg:h-8 rounded-lg sm:rounded-xl flex items-center justify-center text-[8px] sm:text-[9px] lg:text-[10px] font-black tracking-wider transition-all duration-500 ${idx === 2 ? 'bg-purple-500 text-white shadow-lg shadow-purple-500/30 scale-105' : 'bg-white dark:bg-slate-800 text-slate-450 dark:text-slate-400 shadow-sm'}`}>
+                        <div key={time} className={`h-7 sm:h-8 rounded-lg sm:rounded-xl flex items-center justify-center text-[9px] sm:text-[10px] font-black tracking-wider transition-all duration-500 ${idx === 2 ? 'bg-purple-500 text-white shadow-lg shadow-purple-500/30 scale-105' : 'bg-white dark:bg-slate-800 text-slate-450 dark:text-slate-400 shadow-sm'}`}>
                           {time}
                         </div>
                       ))}
                     </div>
-                    <div className="mt-3 lg:mt-4 w-full h-8 sm:h-10 bg-slate-900 dark:bg-slate-800 rounded-lg sm:rounded-xl flex items-center justify-center gap-2">
+                    <div className="mt-4 w-3/4 lg:w-full h-8 sm:h-10 bg-slate-900 dark:bg-slate-800 rounded-full lg:rounded-xl flex items-center justify-center gap-2">
                       <div className="w-2.5 h-2.5 sm:w-3 sm:h-3 bg-green-400 rounded-full shadow-[0_0_10px_rgba(74,222,128,0.5)] animate-pulse" />
-                      <div className="text-[9px] sm:text-[10px] lg:text-xs font-black text-white uppercase tracking-widest">Xác nhận lịch</div>
+                      <div className="text-[9px] sm:text-[10px] font-black text-white uppercase tracking-widest">Xác nhận lịch</div>
                     </div>
                   </div>
-                  <h4 className="text-lg sm:text-xl lg:text-2xl font-black text-slate-900 dark:text-white mb-2 sm:mb-3">Đặt lịch 24/7</h4>
-                  <p className="text-xs sm:text-sm lg:text-base text-slate-500 dark:text-slate-400 leading-relaxed font-medium mt-auto">Chọn khung giờ phù hợp và đặt lịch ngay lập tức. Hệ thống tự động xác nhận không cần chờ đợi.</p>
+                  <h4 className="text-xl sm:text-2xl font-black text-slate-900 dark:text-white mb-3 order-2 lg:order-3">Đặt lịch 24/7</h4>
+                  <p className="text-sm sm:text-base text-slate-500 dark:text-slate-400 leading-relaxed font-medium mt-auto max-w-xs lg:max-w-none order-4 lg:order-4">Chọn khung giờ phù hợp và đặt lịch ngay lập tức. Hệ thống tự động xác nhận không cần chờ đợi.</p>
                 </div>
               </motion.div>
 
@@ -747,32 +788,32 @@ export default function Home() {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true, margin: "-100px" }}
                 transition={{ duration: 0.7, delay: 0.4, ease: "easeOut" }}
-                className="w-[75vw] sm:w-[320px] lg:w-auto shrink-0 snap-start group relative bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-4 sm:p-6 lg:p-8 rounded-3xl md:rounded-[40px] shadow-xl hover:shadow-2xl hover:shadow-rose-500/10 hover:border-rose-500/50 transition-all duration-500 overflow-hidden flex flex-col"
+                className="w-full max-w-sm lg:max-w-none group relative bg-transparent lg:bg-white lg:dark:bg-slate-900 border-none lg:border lg:border-slate-200 lg:dark:border-slate-800 p-0 lg:p-8 rounded-none lg:rounded-[40px] shadow-none lg:shadow-xl lg:hover:shadow-2xl lg:hover:shadow-rose-500/10 lg:hover:border-rose-500/50 transition-all duration-500 flex flex-col items-center text-center"
               >
-                <div className="absolute -top-4 -right-4 sm:-top-6 sm:-right-6 md:-top-8 md:-right-8 text-[100px] sm:text-[120px] md:text-[180px] font-black text-slate-50 dark:text-slate-800/30 leading-none select-none z-0 transition-transform duration-700 group-hover:scale-110 group-hover:-rotate-6">3</div>
+                <div className="absolute -top-4 -right-4 sm:-top-6 sm:-right-6 md:-top-8 md:-right-8 text-[100px] sm:text-[120px] md:text-[180px] font-black text-slate-50 dark:text-slate-800/30 leading-none select-none z-0 transition-transform duration-700 group-hover:scale-110 group-hover:-rotate-6 hidden lg:block">3</div>
 
-                <div className="relative z-10 flex flex-col h-full">
-                  <div className="inline-flex items-center justify-center text-[#FF0038] bg-[#FFF9FA] border border-[#FFE3E6] dark:bg-rose-900/50 dark:text-rose-400 dark:border-rose-800 text-[10px] sm:text-xs font-black px-3 py-1.5 sm:px-4 sm:py-2 rounded-full mb-4 sm:mb-6 w-fit uppercase tracking-widest">
+                <div className="relative z-10 flex flex-col h-full items-center w-full">
+                  <div className="inline-flex items-center justify-center text-[#FF0038] bg-[#FFF9FA] border border-[#FFE3E6] dark:bg-rose-900/50 dark:text-rose-400 dark:border-rose-800 text-[10px] sm:text-xs font-black px-3 py-1.5 sm:px-4 sm:py-2 rounded-full mb-4 sm:mb-6 w-fit uppercase tracking-widest order-1 lg:order-1">
                     Bước 3
                   </div>
 
-                  <div className="w-full h-24 sm:h-36 lg:h-40 bg-slate-50 dark:bg-slate-950/50 rounded-2xl sm:rounded-3xl mb-4 sm:mb-6 p-3 sm:p-4 lg:p-5 border border-slate-100 dark:border-slate-800 flex flex-col justify-center items-center group-hover:bg-rose-50 dark:group-hover:bg-rose-900/10 transition-colors duration-500">
-                    <div className="flex gap-1 mb-3 sm:mb-4">
+                  <div className="w-full h-36 sm:h-40 bg-slate-50 dark:bg-slate-950/50 rounded-[40px] lg:rounded-3xl mb-6 p-4 lg:p-5 border border-slate-100 dark:border-slate-800 flex flex-col justify-center items-center group-hover:bg-rose-50 dark:group-hover:bg-rose-900/10 transition-colors duration-500 shadow-inner lg:shadow-none order-3 lg:order-2">
+                    <div className="flex gap-1.5 mb-3 sm:mb-4">
                       {[1, 2, 3, 4, 5].map((s, idx) => (
-                        <Star key={s} size={16} className="sm:w-5 sm:h-5 fill-rose-400 text-rose-400 drop-shadow-sm transition-transform duration-300 hover:scale-125 hover:-rotate-12 cursor-pointer" style={{ animationDelay: `${idx * 100}ms` }} />
+                        <Star key={s} size={20} className="sm:w-6 sm:h-6 fill-rose-400 text-rose-400 drop-shadow-sm transition-transform duration-300 hover:scale-125 hover:-rotate-12 cursor-pointer" style={{ animationDelay: `${idx * 100}ms` }} />
                       ))}
                     </div>
-                    <div className="w-full bg-white dark:bg-slate-850 p-2.5 sm:p-3 lg:p-4 rounded-xl sm:rounded-2xl shadow-sm border border-slate-100 dark:border-slate-700">
-                      <div className="flex items-center gap-2 sm:gap-3 mb-2 lg:mb-3">
-                        <div className="w-5 h-5 sm:w-6 sm:h-6 lg:w-8 lg:h-8 bg-slate-200 dark:bg-slate-700 rounded-full" />
-                        <div className="h-1.5 sm:h-2 w-14 sm:w-16 lg:w-20 bg-slate-200 dark:bg-slate-700 rounded-full" />
+                    <div className="w-3/4 lg:w-full bg-white dark:bg-slate-850 p-3 sm:p-4 rounded-xl sm:rounded-2xl shadow-sm border border-slate-100 dark:border-slate-700">
+                      <div className="flex items-center justify-center gap-2 sm:gap-3 mb-2 lg:mb-3">
+                        <div className="w-6 h-6 sm:w-8 sm:h-8 bg-slate-200 dark:bg-slate-700 rounded-full" />
+                        <div className="h-2 w-16 lg:w-20 bg-slate-200 dark:bg-slate-700 rounded-full" />
                       </div>
-                      <div className="h-1 lg:h-1.5 w-full bg-slate-100 dark:bg-slate-700 rounded-full mb-1.5 lg:mb-2" />
-                      <div className="h-1 lg:h-1.5 w-2/3 bg-slate-100 dark:bg-slate-700 rounded-full" />
+                      <div className="h-1.5 w-full bg-slate-100 dark:bg-slate-700 rounded-full mx-auto mb-2" />
+                      <div className="h-1.5 w-2/3 bg-slate-100 dark:bg-slate-700 rounded-full mx-auto" />
                     </div>
                   </div>
-                  <h4 className="text-lg sm:text-xl lg:text-2xl font-black text-slate-900 dark:text-white mb-2 sm:mb-3">Trải nghiệm & Review</h4>
-                  <p className="text-xs sm:text-sm lg:text-base text-slate-500 dark:text-slate-400 leading-relaxed font-medium mt-auto">Tận hưởng dịch vụ chăm sóc chuyên nghiệp tại cơ sở và để lại đánh giá nhằm giúp cộng đồng có thêm nhiều sự lựa chọn uy tín.</p>
+                  <h4 className="text-xl sm:text-2xl font-black text-slate-900 dark:text-white mb-3 order-2 lg:order-3">Trải nghiệm & Review</h4>
+                  <p className="text-sm sm:text-base text-slate-500 dark:text-slate-400 leading-relaxed font-medium mt-auto max-w-xs lg:max-w-none order-4 lg:order-4">Tận hưởng dịch vụ chăm sóc chuyên nghiệp tại cơ sở và để lại đánh giá nhằm giúp cộng đồng có thêm nhiều sự lựa chọn uy tín.</p>
                 </div>
               </motion.div>
             </div>
@@ -808,22 +849,22 @@ export default function Home() {
           <div className="grid lg:grid-cols-12 gap-12 lg:gap-8 items-center">
 
             {/* Left Column (Text & Stats) */}
-            <div className="lg:col-span-5 space-y-8">
-              <div>
+            <div className="lg:col-span-5 space-y-8 flex flex-col items-center text-center lg:items-start lg:text-left">
+              <div className="flex flex-col items-center text-center lg:items-start lg:text-left">
                 <span className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 font-black text-xs uppercase tracking-widest mb-6">
                   <Star size={14} className="text-blue-600 dark:text-blue-400" /> Đánh giá nổi bật
                 </span>
-                <h2 className="text-3xl md:text-5xl xl:text-6xl font-black text-blue-950 dark:text-white leading-[1.1] mb-2">
-                  Phản hồi từ <br />
-                  người dùng <br />
-                  <span className="text-gradient text-4xl md:text-6xl xl:text-7xl mt-2 inline-block font-black">PetEye</span>
+                <h2 className="text-2xl sm:text-3xl md:text-5xl xl:text-6xl font-black text-blue-950 dark:text-white leading-[1.1] mb-2">
+                  Phản hồi từ <br className="hidden lg:block" />
+                  người dùng <br className="hidden lg:block" />
+                  <span className="text-gradient text-3xl sm:text-4xl md:text-6xl xl:text-7xl mt-2 inline-block font-black">PetEye</span>
                 </h2>
                 <p className="hidden lg:block text-slate-600 dark:text-slate-400 text-lg md:text-xl font-medium mt-6 leading-relaxed max-w-sm">
                   Kết nối yêu thương, chăm sóc tận tâm. Khám phá lý do hàng ngàn khách hàng luôn tin tưởng và lựa chọn PetEye.
                 </p>
               </div>
 
-              <div className="flex items-center gap-4">
+              <div className="flex items-center gap-4 justify-center lg:justify-start">
                 <div className="flex -space-x-3">
                   <img src="https://i.pravatar.cc/150?img=1" className="w-10 h-10 rounded-full border-2 border-white dark:border-slate-900 object-cover" alt="User" />
                   <img src="https://i.pravatar.cc/150?img=5" className="w-10 h-10 rounded-full border-2 border-white dark:border-slate-900 object-cover" alt="User" />
@@ -846,25 +887,25 @@ export default function Home() {
               <motion.div
                 animate={{ x: ["0%", "-50%"] }}
                 transition={{ duration: 30, ease: "linear", repeat: Infinity }}
-                className="flex gap-6 w-max"
+                className="flex gap-4 sm:gap-6 w-max"
               >
                 {[1, 2].map((loopIdx) => (
                   <React.Fragment key={loopIdx}>
                     {/* Card 1 */}
-                    <div className="w-72 shrink-0 bg-white dark:bg-slate-900/60 p-6 rounded-[20px] shadow-md hover:shadow-lg border border-slate-200/80 dark:border-slate-800/80 hover:border-blue-500/20 hover:dark:border-blue-500/30 transition-all duration-300">
+                    <div className="w-64 sm:w-72 shrink-0 bg-white dark:bg-slate-900/60 p-4 sm:p-6 rounded-[20px] shadow-md hover:shadow-lg border border-slate-200/80 dark:border-slate-800/80 hover:border-blue-500/20 hover:dark:border-blue-500/30 transition-all duration-300">
                       <div className="flex items-center gap-2 mb-3">
-                        <div className="w-7 h-7 rounded-full bg-rose-100 dark:bg-rose-900/30 text-rose-500 flex items-center justify-center"><Heart size={12} /></div>
-                        <span className="text-[10px] font-black text-rose-500 uppercase tracking-widest">Tin cậy 100%</span>
+                        <div className="w-6 h-6 rounded-full bg-rose-100 dark:bg-rose-900/30 text-rose-500 flex items-center justify-center"><Heart size={10} /></div>
+                        <span className="text-[9px] sm:text-[10px] font-black text-rose-500 uppercase tracking-widest">Tin cậy 100%</span>
                       </div>
-                      <p className="text-slate-600 dark:text-slate-300 text-sm font-medium mb-5 leading-relaxed line-clamp-3">
+                      <p className="text-slate-600 dark:text-slate-300 text-xs sm:text-sm font-medium mb-4 sm:mb-5 leading-relaxed line-clamp-3">
                         "Từ ngày có PetEye, việc đặt lịch tắm cho bé cún dễ dàng hơn hẳn. Mình đặc biệt thích tính năng xem camera."
                       </p>
                       <div className="flex items-center justify-between mt-auto">
-                        <div className="flex items-center gap-3">
-                          <img src="https://i.pravatar.cc/150?img=1" className="w-8 h-8 rounded-full object-cover" alt="Thu Trang" />
+                        <div className="flex items-center gap-2 sm:gap-3">
+                          <img src="https://i.pravatar.cc/150?img=1" className="w-7 h-7 sm:w-8 sm:h-8 rounded-full object-cover" alt="Thu Trang" />
                           <div>
-                            <h4 className="font-black text-xs text-slate-900 dark:text-white">Thu Trang</h4>
-                            <p className="text-[9px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Mẹ bé Corgi</p>
+                            <h4 className="font-black text-[10px] sm:text-xs text-slate-900 dark:text-white">Thu Trang</h4>
+                            <p className="text-[8px] sm:text-[9px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Mẹ bé Corgi</p>
                           </div>
                         </div>
                         <div className="flex text-yellow-400"><Star size={10} className="fill-current" /><Star size={10} className="fill-current" /><Star size={10} className="fill-current" /><Star size={10} className="fill-current" /><Star size={10} className="fill-current" /></div>
@@ -872,20 +913,20 @@ export default function Home() {
                     </div>
 
                     {/* Card 2 */}
-                    <div className="w-72 shrink-0 bg-white dark:bg-slate-900/60 p-6 rounded-[20px] shadow-md hover:shadow-lg border border-slate-200/80 dark:border-slate-800/80 hover:border-blue-500/20 hover:dark:border-blue-500/30 transition-all duration-300">
+                    <div className="w-64 sm:w-72 shrink-0 bg-white dark:bg-slate-900/60 p-4 sm:p-6 rounded-[20px] shadow-md hover:shadow-lg border border-slate-200/80 dark:border-slate-800/80 hover:border-blue-500/20 hover:dark:border-blue-500/30 transition-all duration-300">
                       <div className="flex items-center gap-2 mb-3">
-                        <div className="w-7 h-7 rounded-full bg-blue-100 dark:bg-blue-900/30 text-blue-500 flex items-center justify-center"><Navigation size={12} /></div>
-                        <span className="text-[10px] font-black text-blue-500 uppercase tracking-widest">Tiện Lợi</span>
+                        <div className="w-6 h-6 rounded-full bg-blue-100 dark:bg-blue-900/30 text-blue-500 flex items-center justify-center"><Navigation size={10} /></div>
+                        <span className="text-[9px] sm:text-[10px] font-black text-blue-500 uppercase tracking-widest">Tiện Lợi</span>
                       </div>
-                      <p className="text-slate-600 dark:text-slate-300 text-sm font-medium mb-5 leading-relaxed line-clamp-3">
+                      <p className="text-slate-600 dark:text-slate-300 text-xs sm:text-sm font-medium mb-4 sm:mb-5 leading-relaxed line-clamp-3">
                         "Hệ thống lọc cơ sở rất thông minh. Mình tìm được một phòng khám ngay sát nhà có bác sĩ chuyên môn cao."
                       </p>
                       <div className="flex items-center justify-between mt-auto">
-                        <div className="flex items-center gap-3">
-                          <img src="https://i.pravatar.cc/150?img=11" className="w-8 h-8 rounded-full object-cover" alt="Minh Tuấn" />
+                        <div className="flex items-center gap-2 sm:gap-3">
+                          <img src="https://i.pravatar.cc/150?img=11" className="w-7 h-7 sm:w-8 sm:h-8 rounded-full object-cover" alt="Minh Tuấn" />
                           <div>
-                            <h4 className="font-black text-xs text-slate-900 dark:text-white">Minh Tuấn</h4>
-                            <p className="text-[9px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Chủ bé Mèo Anh</p>
+                            <h4 className="font-black text-[10px] sm:text-xs text-slate-900 dark:text-white">Minh Tuấn</h4>
+                            <p className="text-[8px] sm:text-[9px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Chủ bé Mèo Anh</p>
                           </div>
                         </div>
                         <div className="flex text-yellow-400"><Star size={10} className="fill-current" /><Star size={10} className="fill-current" /><Star size={10} className="fill-current" /><Star size={10} className="fill-current" /><Star size={10} className="fill-current" /></div>
@@ -893,20 +934,20 @@ export default function Home() {
                     </div>
 
                     {/* Card 3 */}
-                    <div className="w-72 shrink-0 bg-white dark:bg-slate-900/60 p-6 rounded-[20px] shadow-md hover:shadow-lg border border-slate-200/80 dark:border-slate-800/80 hover:border-blue-500/20 hover:dark:border-blue-500/30 transition-all duration-300">
+                    <div className="w-64 sm:w-72 shrink-0 bg-white dark:bg-slate-900/60 p-4 sm:p-6 rounded-[20px] shadow-md hover:shadow-lg border border-slate-200/80 dark:border-slate-800/80 hover:border-blue-500/20 hover:dark:border-blue-500/30 transition-all duration-300">
                       <div className="flex items-center gap-2 mb-3">
-                        <div className="w-7 h-7 rounded-full bg-emerald-100 dark:bg-emerald-900/30 text-emerald-500 flex items-center justify-center"><Shield size={12} /></div>
-                        <span className="text-[10px] font-black text-emerald-500 uppercase tracking-widest">An Tâm</span>
+                        <div className="w-6 h-6 rounded-full bg-emerald-100 dark:bg-emerald-900/30 text-emerald-500 flex items-center justify-center"><Shield size={10} /></div>
+                        <span className="text-[9px] sm:text-[10px] font-black text-emerald-500 uppercase tracking-widest">An Tâm</span>
                       </div>
-                      <p className="text-slate-600 dark:text-slate-300 text-sm font-medium mb-5 leading-relaxed line-clamp-3">
+                      <p className="text-slate-600 dark:text-slate-300 text-xs sm:text-sm font-medium mb-4 sm:mb-5 leading-relaxed line-clamp-3">
                         "Trải nghiệm tuyệt vời! Cảm giác rất an tâm khi có thể mở app lên và xem bé đang làm gì. Các phòng khám nhiệt tình."
                       </p>
                       <div className="flex items-center justify-between mt-auto">
-                        <div className="flex items-center gap-3">
-                          <img src="https://i.pravatar.cc/150?img=9" className="w-8 h-8 rounded-full object-cover" alt="Hoàng Oanh" />
+                        <div className="flex items-center gap-2 sm:gap-3">
+                          <img src="https://i.pravatar.cc/150?img=9" className="w-7 h-7 sm:w-8 sm:h-8 rounded-full object-cover" alt="Hoàng Oanh" />
                           <div>
-                            <h4 className="font-black text-xs text-slate-900 dark:text-white">Hoàng Oanh</h4>
-                            <p className="text-[9px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Mẹ bé Husky</p>
+                            <h4 className="font-black text-[10px] sm:text-xs text-slate-900 dark:text-white">Hoàng Oanh</h4>
+                            <p className="text-[8px] sm:text-[9px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Mẹ bé Husky</p>
                           </div>
                         </div>
                         <div className="flex text-yellow-400"><Star size={10} className="fill-current" /><Star size={10} className="fill-current" /><Star size={10} className="fill-current" /><Star size={10} className="fill-current" /><Star size={10} className="fill-current" /></div>
@@ -925,20 +966,20 @@ export default function Home() {
                 {[1, 2].map((loopIdx) => (
                   <React.Fragment key={loopIdx}>
                     {/* Card 4 */}
-                    <div className="w-72 shrink-0 bg-white dark:bg-slate-900/60 p-6 rounded-[20px] shadow-md hover:shadow-lg border border-slate-200/80 dark:border-slate-800/80 hover:border-blue-500/20 hover:dark:border-blue-500/30 transition-all duration-300">
+                    <div className="w-64 sm:w-72 shrink-0 bg-white dark:bg-slate-900/60 p-4 sm:p-6 rounded-[20px] shadow-md hover:shadow-lg border border-slate-200/80 dark:border-slate-800/80 hover:border-blue-500/20 hover:dark:border-blue-500/30 transition-all duration-300">
                       <div className="flex items-center gap-2 mb-3">
-                        <div className="w-7 h-7 rounded-full bg-purple-100 dark:bg-purple-900/30 text-purple-500 flex items-center justify-center"><Star size={12} /></div>
-                        <span className="text-[10px] font-black text-purple-500 uppercase tracking-widest">Chất lượng 5 sao</span>
+                        <div className="w-6 h-6 rounded-full bg-purple-100 dark:bg-purple-900/30 text-purple-500 flex items-center justify-center"><Star size={10} /></div>
+                        <span className="text-[9px] sm:text-[10px] font-black text-purple-500 uppercase tracking-widest">Chất lượng 5 sao</span>
                       </div>
-                      <p className="text-slate-600 dark:text-slate-300 text-sm font-medium mb-5 leading-relaxed line-clamp-3">
+                      <p className="text-slate-600 dark:text-slate-300 text-xs sm:text-sm font-medium mb-4 sm:mb-5 leading-relaxed line-clamp-3">
                         "Các đánh giá trên nền tảng rất chân thực. Voucher giảm giá cũng nhiều. Chắc chắn sẽ sử dụng PetEye lâu dài!"
                       </p>
                       <div className="flex items-center justify-between mt-auto">
-                        <div className="flex items-center gap-3">
-                          <img src="https://i.pravatar.cc/150?img=5" className="w-8 h-8 rounded-full object-cover" alt="Ngọc Lan" />
+                        <div className="flex items-center gap-2 sm:gap-3">
+                          <img src="https://i.pravatar.cc/150?img=5" className="w-7 h-7 sm:w-8 sm:h-8 rounded-full object-cover" alt="Ngọc Lan" />
                           <div>
-                            <h4 className="font-black text-xs text-slate-900 dark:text-white">Ngọc Lan</h4>
-                            <p className="text-[9px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Mẹ 2 bé Poodle</p>
+                            <h4 className="font-black text-[10px] sm:text-xs text-slate-900 dark:text-white">Ngọc Lan</h4>
+                            <p className="text-[8px] sm:text-[9px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Mẹ 2 bé Poodle</p>
                           </div>
                         </div>
                         <div className="flex text-yellow-400"><Star size={10} className="fill-current" /><Star size={10} className="fill-current" /><Star size={10} className="fill-current" /><Star size={10} className="fill-current" /><Star size={10} className="fill-current" /></div>
@@ -946,20 +987,20 @@ export default function Home() {
                     </div>
 
                     {/* Card 5 */}
-                    <div className="w-72 shrink-0 bg-white dark:bg-slate-900/60 p-6 rounded-[20px] shadow-md hover:shadow-lg border border-slate-200/80 dark:border-slate-800/80 hover:border-blue-500/20 hover:dark:border-blue-500/30 transition-all duration-300">
+                    <div className="w-64 sm:w-72 shrink-0 bg-white dark:bg-slate-900/60 p-4 sm:p-6 rounded-[20px] shadow-md hover:shadow-lg border border-slate-200/80 dark:border-slate-800/80 hover:border-blue-500/20 hover:dark:border-blue-500/30 transition-all duration-300">
                       <div className="flex items-center gap-2 mb-3">
-                        <div className="w-7 h-7 rounded-full bg-amber-100 dark:bg-amber-900/30 text-amber-500 flex items-center justify-center"><CheckCircle2 size={12} /></div>
-                        <span className="text-[10px] font-black text-amber-500 uppercase tracking-widest">Minh bạch</span>
+                        <div className="w-6 h-6 rounded-full bg-amber-100 dark:bg-amber-900/30 text-amber-500 flex items-center justify-center"><CheckCircle2 size={10} /></div>
+                        <span className="text-[9px] sm:text-[10px] font-black text-amber-500 uppercase tracking-widest">Minh bạch</span>
                       </div>
-                      <p className="text-slate-600 dark:text-slate-300 text-sm font-medium mb-5 leading-relaxed line-clamp-3">
+                      <p className="text-slate-600 dark:text-slate-300 text-xs sm:text-sm font-medium mb-4 sm:mb-5 leading-relaxed line-clamp-3">
                         "Giá cả minh bạch, đặt lịch nhanh gọn. Không cần phải gọi điện thoại hỏi từng phòng khám xem có rảnh không nữa."
                       </p>
                       <div className="flex items-center justify-between mt-auto">
-                        <div className="flex items-center gap-3">
-                          <img src="https://i.pravatar.cc/150?img=12" className="w-8 h-8 rounded-full object-cover" alt="Quốc Hưng" />
+                        <div className="flex items-center gap-2 sm:gap-3">
+                          <img src="https://i.pravatar.cc/150?img=12" className="w-7 h-7 sm:w-8 sm:h-8 rounded-full object-cover" alt="Quốc Hưng" />
                           <div>
-                            <h4 className="font-black text-xs text-slate-900 dark:text-white">Quốc Hưng</h4>
-                            <p className="text-[9px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Chủ 3 bé Mèo</p>
+                            <h4 className="font-black text-[10px] sm:text-xs text-slate-900 dark:text-white">Quốc Hưng</h4>
+                            <p className="text-[8px] sm:text-[9px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Chủ 3 bé Mèo</p>
                           </div>
                         </div>
                         <div className="flex text-yellow-400"><Star size={10} className="fill-current" /><Star size={10} className="fill-current" /><Star size={10} className="fill-current" /><Star size={10} className="fill-current" /><Star size={10} className="fill-current" /></div>
@@ -967,20 +1008,20 @@ export default function Home() {
                     </div>
 
                     {/* Card 6 */}
-                    <div className="w-72 shrink-0 bg-white dark:bg-slate-900/60 p-6 rounded-[20px] shadow-md hover:shadow-lg border border-slate-200/80 dark:border-slate-800/80 hover:border-blue-500/20 hover:dark:border-blue-500/30 transition-all duration-300">
+                    <div className="w-64 sm:w-72 shrink-0 bg-white dark:bg-slate-900/60 p-4 sm:p-6 rounded-[20px] shadow-md hover:shadow-lg border border-slate-200/80 dark:border-slate-800/80 hover:border-blue-500/20 hover:dark:border-blue-500/30 transition-all duration-300">
                       <div className="flex items-center gap-2 mb-3">
-                        <div className="w-7 h-7 rounded-full bg-pink-100 dark:bg-pink-900/30 text-pink-500 flex items-center justify-center"><Heart size={12} /></div>
-                        <span className="text-[10px] font-black text-pink-500 uppercase tracking-widest">Tuyệt Vời</span>
+                        <div className="w-6 h-6 rounded-full bg-pink-100 dark:bg-pink-900/30 text-pink-500 flex items-center justify-center"><Heart size={10} /></div>
+                        <span className="text-[9px] sm:text-[10px] font-black text-pink-500 uppercase tracking-widest">Tuyệt Vời</span>
                       </div>
-                      <p className="text-slate-600 dark:text-slate-300 text-sm font-medium mb-5 leading-relaxed line-clamp-3">
+                      <p className="text-slate-600 dark:text-slate-300 text-xs sm:text-sm font-medium mb-4 sm:mb-5 leading-relaxed line-clamp-3">
                         "Ứng dụng thiết kế rất thân thiện. Mình có thể dễ dàng quản lý sổ tiêm chủng của bé ngay trên điện thoại."
                       </p>
                       <div className="flex items-center justify-between mt-auto">
-                        <div className="flex items-center gap-3">
-                          <img src="https://i.pravatar.cc/150?img=20" className="w-8 h-8 rounded-full object-cover" alt="Thanh Thảo" />
+                        <div className="flex items-center gap-2 sm:gap-3">
+                          <img src="https://i.pravatar.cc/150?img=20" className="w-7 h-7 sm:w-8 sm:h-8 rounded-full object-cover" alt="Thanh Thảo" />
                           <div>
-                            <h4 className="font-black text-xs text-slate-900 dark:text-white">Thanh Thảo</h4>
-                            <p className="text-[9px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Mẹ bé Samoyed</p>
+                            <h4 className="font-black text-[10px] sm:text-xs text-slate-900 dark:text-white">Thanh Thảo</h4>
+                            <p className="text-[8px] sm:text-[9px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Mẹ bé Samoyed</p>
                           </div>
                         </div>
                         <div className="flex text-yellow-400"><Star size={10} className="fill-current" /><Star size={10} className="fill-current" /><Star size={10} className="fill-current" /><Star size={10} className="fill-current" /><Star size={10} className="fill-current" /></div>
@@ -1000,7 +1041,7 @@ export default function Home() {
       <section className="pt-10 pb-10 md:pt-16 md:pb-24 2xl:pt-20 2xl:pb-32 px-6 bg-transparent relative">
         <div className="max-w-3xl mx-auto relative z-10">
           <div className="text-center mb-6 md:mb-8 xl:mb-16">
-            <h2 className="text-3xl xl:text-4xl font-black text-slate-900 dark:text-white mb-4"><span className="text-gradient">Câu hỏi thường gặp</span></h2>
+            <h2 className="text-2xl sm:text-3xl xl:text-4xl font-black text-slate-900 dark:text-white mb-4"><span className="text-gradient">Câu hỏi thường gặp</span></h2>
             <p className="text-slate-500">Mọi thắc mắc của bạn đều được giải đáp.</p>
           </div>
           <div className="space-y-3 md:space-y-4">
@@ -1073,15 +1114,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* ─── Sticky Mobile CTA ─────────────────────────────────────────── */}
-      <div className="fixed bottom-0 left-0 right-0 p-4 bg-white/90 dark:bg-slate-900/90 backdrop-blur-xl border-t border-slate-200 dark:border-slate-800 z-[40] md:hidden flex justify-center pb-safe">
-        <button
-          onClick={() => navigate('/search')}
-          className="w-full bg-primary hover:bg-primary/95 dark:bg-blue-600 dark:hover:bg-blue-500 text-white py-4 rounded-2xl font-black shadow-xl shadow-primary/20 flex items-center justify-center gap-2 active:scale-95 transition-transform"
-        >
-          <Search size={18} /> TÌM CƠ SỞ NGAY
-        </button>
-      </div>
+
     </main>
   );
 }
