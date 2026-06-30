@@ -43,7 +43,7 @@ export default function ShopRealtimeNotification({ shopId }: Props) {
 
           if (data.message === 'Có đơn hàng mới!') {
             // Đơn mới: phát âm thanh + toast + reload
-            const audio = new Audio('/assets/sounds/notification.wav');
+            const audio = new Audio('/assets/sounds/notification.mp4');
             audio.play().catch(() => {});
             toast.success('🔔 Shop vừa có đơn hàng mới!');
             BOOKING_QUERY_KEYS.forEach(key =>
