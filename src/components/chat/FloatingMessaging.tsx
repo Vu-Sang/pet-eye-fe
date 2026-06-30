@@ -109,19 +109,20 @@ export default function FloatingMessaging() {
   return (
     <>
       {/* Floating button */}
-      <button onClick={toggleOpen} className="fixed bottom-[175px] lg:bottom-[100px] right-4 lg:right-5 z-50 group" aria-label="Mo tin nhan">
-        <div className="relative">
-          <div className="absolute inset-0 rounded-full bg-indigo-500 blur-lg opacity-40 group-hover:opacity-70 transition duration-300"></div>
-          <div className="relative w-16 h-16 rounded-full bg-gradient-to-br from-[#1a2b4c] via-indigo-600 to-purple-600 text-white shadow-xl flex items-center justify-center transition-all duration-300 group-hover:scale-110">
-            {open ? (
-              <span className="material-symbols-outlined text-[32px]">close</span>
-            ) : (
-              <span className="material-symbols-outlined text-[32px] drop-shadow-md" style={{ fontVariationSettings: "'FILL' 1" }}>forum</span>
-            )}
-          </div>
-          {/* Unread Badge shown regardless of open state, placed at the top-right of the button wrapper */}
+      <button 
+        onClick={toggleOpen} 
+        className="fixed bottom-[156px] lg:bottom-[100px] right-4 lg:right-5 z-50 group w-12 h-12 lg:w-16 lg:h-16 rounded-full bg-gradient-to-br from-[#1a2b4c] via-indigo-600 to-purple-600 text-white shadow-xl flex items-center justify-center transition-all duration-300 hover:scale-110" 
+        aria-label="Mo tin nhan"
+      >
+        <div className="absolute inset-0 rounded-full bg-indigo-500 blur-lg opacity-40 group-hover:opacity-70 transition duration-300 z-0"></div>
+        <div className="relative z-10 flex items-center justify-center w-full h-full">
+          {open ? (
+            <span className="material-symbols-outlined text-[24px] lg:text-[32px]">close</span>
+          ) : (
+            <span className="material-symbols-outlined text-[24px] lg:text-[32px] drop-shadow-md" style={{ fontVariationSettings: "'FILL' 1" }}>forum</span>
+          )}
           {totalUnread > 0 && (
-            <div className="absolute -top-1 -right-1 z-10 flex h-5 min-w-[20px] items-center justify-center rounded-full bg-red-500 px-1.5 text-[10px] font-black text-white shadow-sm border-2 border-white animate-bounce">
+            <div className="absolute -top-1 -right-1 z-20 flex h-5 min-w-[20px] items-center justify-center rounded-full bg-red-500 px-1.5 text-[10px] font-black text-white shadow-sm border-2 border-white animate-bounce">
               {totalUnread > 99 ? '99+' : totalUnread}
             </div>
           )}
@@ -129,7 +130,7 @@ export default function FloatingMessaging() {
       </button>
 
       {open && (
-        <div className="fixed bottom-[175px] lg:bottom-[100px] right-[85px] lg:right-[95px] z-[60] w-[370px] max-w-[calc(100vw-110px)] flex flex-col rounded-3xl shadow-2xl shadow-slate-900/20 overflow-hidden border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900" style={{ height: 'min(640px, calc(100vh - 120px))' }}>
+        <div className="fixed bottom-[156px] lg:bottom-[100px] right-[68px] lg:right-[95px] z-[60] w-[320px] sm:w-[360px] lg:w-[370px] max-w-[calc(100vw-80px)] h-[480px] lg:h-[640px] max-h-[calc(100vh-180px)] lg:max-h-[640px] flex flex-col rounded-3xl shadow-2xl shadow-slate-900/20 overflow-hidden border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900">
           
           {!selectedShop ? (
             // Danh sách hội thoại
