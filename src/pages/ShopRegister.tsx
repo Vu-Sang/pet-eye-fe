@@ -27,6 +27,24 @@ export default function ShopRegister() {
   const [error, setError] = React.useState('');
   const fileInputRef = React.useRef<HTMLInputElement>(null);
 
+  const [isOpenType, setIsOpenType] = React.useState(false);
+  const [isOpenCity, setIsOpenCity] = React.useState(false);
+  const typeDropdownRef = React.useRef<HTMLDivElement>(null);
+  const cityDropdownRef = React.useRef<HTMLDivElement>(null);
+
+  React.useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (typeDropdownRef.current && !typeDropdownRef.current.contains(event.target as Node)) {
+        setIsOpenType(false);
+      }
+      if (cityDropdownRef.current && !cityDropdownRef.current.contains(event.target as Node)) {
+        setIsOpenCity(false);
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
   const shopTypes = [
     { value: 'CLINIC', label: 'Phòng khám thú y' },
     { value: 'SPA', label: 'Spa & Grooming' },
@@ -232,23 +250,56 @@ export default function ShopRegister() {
                 />
               </div>
 
-              <div>
+              <div className="relative" ref={typeDropdownRef}>
                 <label className="block text-sm font-bold text-slate-700 mb-2">
                   Loại hình kinh doanh *
                 </label>
-                <select
-                  value={formData.shopType}
-                  onChange={(e) => setFormData({ ...formData, shopType: e.target.value })}
-                  className="w-full px-4 py-3 rounded-xl border-2 border-slate-200 focus:border-[#1a2b4c] outline-none"
-                  required
-                  onInvalid={(e) => (e.target as HTMLSelectElement).setCustomValidity('Vui lòng chọn loại hình kinh doanh')}
-                  onInput={(e) => (e.target as HTMLSelectElement).setCustomValidity('')}
+                <button
+                  type="button"
+                  onClick={() => setIsOpenType(!isOpenType)}
+                  className="w-full px-4 py-3 rounded-xl border-2 border-slate-200 bg-white hover:border-[#1a2b4c] focus:border-[#1a2b4c] outline-none flex items-center justify-between text-left transition-colors"
                 >
-                  <option value="">Chọn loại hình</option>
-                  {shopTypes.map((type) => (
-                    <option key={type.value} value={type.value}>{type.label}</option>
-                  ))}
-                </select>
+                  <span className={formData.shopType ? 'text-slate-900 font-medium' : 'text-slate-400'}>
+                    {formData.shopType ? (shopTypes.find(t => t.value === formData.shopType)?.label) : 'Chọn loại hình'}
+                  </span>
+                  <span className={`material-symbols-outlined text-slate-400 transition-transform duration-200 ${isOpenType ? 'rotate-180' : ''}`} style={{ fontSize: '20px' }}>
+                    expand_more
+                  </span>
+                </button>
+                
+                {isOpenType && (
+                  <motion.div
+                    initial={{ opacity: 0, y: 8 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className="absolute z-30 w-full mt-2 bg-white rounded-xl border border-slate-200 shadow-xl overflow-hidden py-1.5"
+                  >
+                    {shopTypes.map((type) => {
+                      const isSelected = formData.shopType === type.value;
+                      return (
+                        <button
+                          key={type.value}
+                          type="button"
+                          onClick={() => {
+                            setFormData({ ...formData, shopType: type.value });
+                            setIsOpenType(false);
+                          }}
+                          className={`w-full px-4 py-2.5 text-left text-sm font-medium flex items-center justify-between transition-colors ${
+                            isSelected
+                              ? 'bg-[#1a2b4c]/5 text-[#1a2b4c]'
+                              : 'hover:bg-slate-50 text-slate-700'
+                          }`}
+                        >
+                          <span>{type.label}</span>
+                          {isSelected && (
+                            <span className="material-symbols-outlined text-sm font-bold text-[#1a2b4c]" style={{ fontVariationSettings: "'FILL' 1" }}>
+                              check_circle
+                            </span>
+                          )}
+                        </button>
+                      );
+                    })}
+                  </motion.div>
+                )}
               </div>
 
               <div className="grid md:grid-cols-2 gap-6">
@@ -320,23 +371,56 @@ export default function ShopRegister() {
                 </div>
               </div>
 
-              <div>
+              <div className="relative" ref={cityDropdownRef}>
                 <label className="block text-sm font-bold text-slate-700 mb-2">
                   Thành phố *
                 </label>
-                <select
-                  value={formData.city}
-                  onChange={(e) => setFormData({ ...formData, city: e.target.value })}
-                  className="w-full px-4 py-3 rounded-xl border-2 border-slate-200 focus:border-[#1a2b4c] outline-none"
-                  required
-                  onInvalid={(e) => (e.target as HTMLSelectElement).setCustomValidity('Vui lòng chọn thành phố')}
-                  onInput={(e) => (e.target as HTMLSelectElement).setCustomValidity('')}
+                <button
+                  type="button"
+                  onClick={() => setIsOpenCity(!isOpenCity)}
+                  className="w-full px-4 py-3 rounded-xl border-2 border-slate-200 bg-white hover:border-[#1a2b4c] focus:border-[#1a2b4c] outline-none flex items-center justify-between text-left transition-colors"
                 >
-                  <option value="">Chọn thành phố</option>
-                  {cities.map((city) => (
-                    <option key={city} value={city}>{city}</option>
-                  ))}
-                </select>
+                  <span className={formData.city ? 'text-slate-900 font-medium' : 'text-slate-400'}>
+                    {formData.city || 'Chọn thành phố'}
+                  </span>
+                  <span className={`material-symbols-outlined text-slate-400 transition-transform duration-200 ${isOpenCity ? 'rotate-180' : ''}`} style={{ fontSize: '20px' }}>
+                    expand_more
+                  </span>
+                </button>
+                
+                {isOpenCity && (
+                  <motion.div
+                    initial={{ opacity: 0, y: 8 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className="absolute z-30 w-full mt-2 bg-white rounded-xl border border-slate-200 shadow-xl overflow-hidden py-1.5"
+                  >
+                    {cities.map((city) => {
+                      const isSelected = formData.city === city;
+                      return (
+                        <button
+                          key={city}
+                          type="button"
+                          onClick={() => {
+                            setFormData({ ...formData, city });
+                            setIsOpenCity(false);
+                          }}
+                          className={`w-full px-4 py-2.5 text-left text-sm font-medium flex items-center justify-between transition-colors ${
+                            isSelected
+                              ? 'bg-[#1a2b4c]/5 text-[#1a2b4c]'
+                              : 'hover:bg-slate-50 text-slate-700'
+                          }`}
+                        >
+                          <span>{city}</span>
+                          {isSelected && (
+                            <span className="material-symbols-outlined text-sm font-bold text-[#1a2b4c]" style={{ fontVariationSettings: "'FILL' 1" }}>
+                              check_circle
+                            </span>
+                          )}
+                        </button>
+                      );
+                    })}
+                  </motion.div>
+                )}
               </div>
 
               <div>

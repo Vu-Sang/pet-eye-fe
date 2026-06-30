@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { bookingService } from '../../services/booking.service';
 import { trackBookingStep4_PaymentStart, trackSelectPaymentMethod, trackSelectVoucher } from '../../lib/analytics';
-import { useTheme } from '../../contexts/ThemeContext';
 type PayMethod = 'payos' | 'cash';
 
 function formatVND(n: number) {
@@ -21,7 +20,6 @@ interface BookingService {
 export default function Payment() {
   const navigate = useNavigate();
   const location = useLocation();
-  const { isDark } = useTheme();
 
   const booking = location.state as {
     shopId: number;
@@ -285,7 +283,7 @@ export default function Payment() {
   return (
     <div className="flex-1 bg-slate-50 dark:bg-slate-900 pt-20 sm:pt-24 lg:pt-28">
       {/* Breadcrumb */}
-      <div className="bg-white dark:bg-slate-800 border-b border-slate-200 dark:border-slate-700 px-4 py-3">
+      <div className="hidden sm:block bg-white dark:bg-slate-800 border-b border-slate-200 dark:border-slate-700 px-4 py-3">
         <div className="max-w-5xl mx-auto flex items-center gap-2 text-xs text-slate-400">
           <Link to="/user/dashboard" className="hover:text-[#1a2b4c] flex items-center gap-1">
             <span className="material-symbols-outlined text-sm">home</span>Trang chủ
@@ -304,123 +302,63 @@ export default function Payment() {
         </div>
 
         {/* Steps indicator */}
-        <div className="max-w-xl mx-auto mb-10">
-          <div className="flex items-center justify-between relative">
-            <div className="absolute left-0 right-0 top-1/2 -translate-y-1/2 h-0.5 bg-slate-200 dark:bg-slate-700 z-0" />
-            <div className="absolute left-0 top-1/2 -translate-y-1/2 h-0.5 bg-[#1a2b4c] dark:bg-teal-500 z-0 transition-all duration-500" style={{ width: '100%' }} />
-
-            {['Dịch vụ', 'Thời gian', 'Thanh toán'].map((step, i) => {
-              const isCompleted = i < 2;
-              const isActive = i === 2;
-              return (
-                <div key={step} className="flex flex-col items-center relative z-10">
-                  <div className={`w-9 h-9 rounded-full flex items-center justify-center font-bold text-sm transition-all duration-300 shadow-sm border-2 ${
-                    isCompleted 
-                      ? 'bg-[#1a2b4c] border-[#1a2b4c] text-white dark:bg-teal-500 dark:border-teal-500' 
-                      : isActive 
-                        ? 'bg-white border-[#1a2b4c] text-[#1a2b4c] dark:bg-slate-800 dark:border-teal-500 dark:text-teal-400 scale-110 shadow-md shadow-indigo-500/10' 
-                        : 'bg-white border-slate-200 text-slate-400 dark:bg-slate-800 dark:border-slate-700'
-                  }`}>
-                    {isCompleted ? (
-                      <span className="material-symbols-outlined text-sm font-bold" style={{ fontVariationSettings: "'FILL' 1" }}>check</span>
-                    ) : (
-                      <span>{i + 1}</span>
-                    )}
-                  </div>
-                  <span className={`text-[11px] sm:text-[12px] font-black uppercase tracking-wider mt-2.5 transition-colors ${
-                    isActive 
-                      ? 'text-[#1a2b4c] dark:text-teal-400' 
-                      : isCompleted 
-                        ? 'text-slate-650 dark:text-slate-400' 
-                        : 'text-slate-400 dark:text-slate-500'
-                  }`}>
-                    {step}
-                  </span>
+        <div className="flex items-center gap-2 mb-8">
+          {['Chọn dịch vụ', 'Chọn lịch', 'Thanh toán'].map((step, i) => (
+            <React.Fragment key={step}>
+              <div className={`flex items-center gap-2 ${i === 2 ? '' : 'opacity-60'}`}>
+                <div className={`w-7 h-7 rounded-full flex items-center justify-center font-bold text-xs ${i < 2 ? 'bg-green-500 text-white' : 'bg-[#1a2b4c] text-white'}`}>
+                  {i < 2 ? <span className="material-symbols-outlined text-sm" style={{ fontVariationSettings: "'FILL' 1" }}>check</span> : i + 1}
                 </div>
-              );
-            })}
-          </div>
+                <span className={`text-xs font-semibold hidden sm:inline ${i === 2 ? 'text-slate-900 dark:text-slate-100' : 'text-slate-400'}`}>{step}</span>
+              </div>
+              {i < 2 && <div className="flex-1 h-0.5 bg-slate-200 dark:bg-slate-700" />}
+            </React.Fragment>
+          ))}
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-[1fr_380px] gap-6">
           {/* Left: Payment form */}
           <div className="flex flex-col gap-5">
 
-            {/* Booking Ticket Pass */}
-            <div className="bg-white dark:bg-slate-800 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-[0_8px_30px_rgb(0,0,0,0.03)] relative overflow-hidden">
-              <div className="p-5 pb-4">
-                <div className="flex items-center gap-2 text-xs font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest mb-4">
-                  <span className="material-symbols-outlined text-sm text-indigo-500">local_activity</span>
-                  Vé thông tin lịch hẹn
-                </div>
-                <div className="flex gap-4">
-                  <div
-                    className="w-20 h-20 rounded-2xl bg-cover bg-center shrink-0 bg-slate-100 border border-slate-100 dark:border-slate-700 shadow-sm"
-                    style={{ backgroundImage: booking.shopImage ? `url(${booking.shopImage})` : 'url(https://images.unsplash.com/photo-1516734212186-a967f81ad0d7?q=80&w=300&auto=format&fit=crop)' }}
-                  />
-                  <div className="flex-1 space-y-1">
-                    <h3 className="font-black text-slate-900 dark:text-slate-100 text-base leading-snug">{booking.shopName}</h3>
-                    <p className="text-xs text-slate-500 dark:text-slate-400 flex items-center gap-1">
-                      <span className="material-symbols-outlined text-[14px] text-teal-500">location_on</span>
-                      {booking.shopAddress}
+            {/* Order Summary Card */}
+            <div className="bg-white dark:bg-slate-800 rounded-2xl border border-slate-200 dark:border-slate-700 p-5 shadow-sm">
+              <h2 className="font-bold text-slate-800 dark:text-slate-100 mb-4 flex items-center gap-2">
+                <span className="material-symbols-outlined text-teal-500">event_note</span>
+                Thông tin lịch hẹn
+              </h2>
+              <div className="flex gap-4">
+                <div
+                  className="w-20 h-20 rounded-xl bg-cover bg-center shrink-0 bg-slate-100"
+                  style={{ backgroundImage: booking.shopImage ? `url(${booking.shopImage})` : 'url(https://images.unsplash.com/photo-1516734212186-a967f81ad0d7?q=80&w=300&auto=format&fit=crop)' }}
+                />
+                <div className="flex-1 space-y-1">
+                  <h3 className="font-bold text-slate-900 dark:text-slate-100 text-sm">{booking.shopName}</h3>
+                  <p className="text-xs text-slate-500 flex items-center gap-1">
+                    <span className="material-symbols-outlined text-xs text-teal-500">location_on</span>
+                    {booking.shopAddress}
+                  </p>
+                  {/* Danh sách dịch vụ đã chọn */}
+                  <div className="flex flex-wrap gap-1.5 mt-2">
+                    {serviceList.map((svc) => (
+                      <span key={svc.id} className="px-2 py-1 bg-teal-50 dark:bg-teal-900/20 text-teal-700 dark:text-teal-300 text-xs font-semibold rounded-lg flex items-center gap-1">
+                        {svc.name}
+                        {svc.durationMinutes ? ` (${svc.durationMinutes} phút)` : ''}
+                      </span>
+                    ))}
+                    <span className="px-2 py-1 bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-300 text-xs font-semibold rounded-lg flex items-center gap-1">
+                      <span className="material-symbols-outlined text-[14px]">schedule</span>
+                      Bắt đầu: {booking.date} • {booking.time}
+                      {estimatedEndTime ? ` - Dự kiến xong: ${estimatedEndTime}` : ''}
+                    </span>
+                  </div>
+                  <p className="text-xs text-slate-500 mt-1">🐾 {booking.petName}</p>
+                  {booking.staffId && (
+                    <p className="text-xs text-slate-500 mt-0.5">
+                      👤 Nhân viên: {booking.staffName ?? `#${booking.staffId}`}
                     </p>
-                    <div className="flex items-center gap-2 text-xs text-slate-650 dark:text-slate-400 mt-2 font-bold">
-                      <span className="w-5 h-5 rounded-full bg-slate-100 dark:bg-slate-700 flex items-center justify-center text-xs">🐾</span>
-                      Thú cưng: <span className="text-[#1a2b4c] dark:text-teal-400 uppercase tracking-wider">{booking.petName}</span>
-                    </div>
-                    {booking.staffId && (
-                      <div className="flex items-center gap-2 text-xs text-slate-650 dark:text-slate-400 mt-1 font-bold">
-                        <span className="w-5 h-5 rounded-full bg-slate-100 dark:bg-slate-700 flex items-center justify-center text-xs">👤</span>
-                        Nhân viên: <span className="text-slate-800 dark:text-slate-200">{booking.staffName ?? `#${booking.staffId}`}</span>
-                      </div>
-                    )}
-                  </div>
-                </div>
-              </div>
-
-              <div className="relative h-4 flex items-center my-1">
-                <div className="absolute left-[-8px] w-4 h-4 bg-slate-50 dark:bg-slate-900 border-r border-slate-200 dark:border-slate-700 rounded-full z-10" />
-                <div className="w-full border-t border-dashed border-slate-200 dark:border-slate-700" />
-                <div className="absolute right-[-8px] w-4 h-4 bg-slate-50 dark:bg-slate-900 border-l border-slate-200 dark:border-slate-700 rounded-full z-10" />
-              </div>
-
-              <div className="p-5 pt-4 bg-slate-50/40 dark:bg-slate-800/40">
-                <div className="space-y-4">
-                  <div className="space-y-2">
-                    <span className="text-[10px] font-black text-slate-400 uppercase tracking-wider block">Dịch vụ đã chọn</span>
-                    <div className="flex flex-wrap gap-2">
-                      {serviceList.map((svc) => (
-                        <span key={svc.id} className="px-3 py-1 bg-white dark:bg-slate-750 text-slate-700 dark:text-slate-350 text-xs font-bold rounded-lg border border-slate-150 dark:border-slate-700 flex items-center gap-1.5 shadow-sm">
-                          <span className="w-1.5 h-1.5 rounded-full bg-teal-500" />
-                          {svc.name}
-                          {svc.durationMinutes ? ` (${svc.durationMinutes} phút)` : ''}
-                        </span>
-                      ))}
-                    </div>
-                  </div>
-
-                  <div className="space-y-2">
-                    <span className="text-[10px] font-black text-slate-400 uppercase tracking-wider block">Thời gian hẹn</span>
-                    <div className="flex flex-wrap gap-2">
-                      <span className="px-3 py-1 bg-indigo-50/50 dark:bg-indigo-950/20 text-indigo-700 dark:text-indigo-400 text-xs font-bold rounded-lg border border-indigo-100 dark:border-indigo-900/50 flex items-center gap-1.5 shadow-sm">
-                        <span className="material-symbols-outlined text-[14px]">calendar_today</span>
-                        {booking.date}
-                      </span>
-                      <span className="px-3 py-1 bg-blue-50/50 dark:bg-blue-950/20 text-blue-700 dark:text-blue-400 text-xs font-bold rounded-lg border border-blue-100 dark:border-blue-900/50 flex items-center gap-1.5 shadow-sm">
-                        <span className="material-symbols-outlined text-[14px]">schedule</span>
-                        {booking.time}
-                        {estimatedEndTime ? ` - Dự kiến xong: ${estimatedEndTime}` : ''}
-                      </span>
-                    </div>
-                  </div>
-
+                  )}
                   {booking.petNote && (
-                    <div className="pt-2">
-                      <span className="text-[10px] font-black text-slate-400 uppercase tracking-wider block mb-1">Ghi chú sức khỏe thú cưng</span>
-                      <p className="text-xs text-slate-500 dark:text-slate-400 italic bg-amber-50/40 dark:bg-amber-950/10 border-l-2 border-amber-400 px-3 py-1.5 rounded-r-lg">
-                        {booking.petNote}
-                      </p>
-                    </div>
+                    <p className="text-xs text-slate-400 mt-0.5 italic">📝 {booking.petNote}</p>
                   )}
                 </div>
               </div>
@@ -446,64 +384,30 @@ export default function Payment() {
                 <span className="material-symbols-outlined text-[#1a2b4c] dark:text-teal-400">payments</span>
                 Phương thức thanh toán
               </h2>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-5">
+              <div className="grid grid-cols-2 gap-3 mb-5">
                 {([
-                  { id: 'payos', icon: 'qr_code_2', label: 'Chuyển khoản QR (PayOS)', desc: 'Thanh toán trực tuyến bảo mật', badge: 'Khuyên dùng' },
-                  { id: 'cash', icon: 'payments', label: 'Tiền mặt tại quầy', desc: 'Đặt cọc trước 10%, phần còn lại tại cơ sở', badge: 'Đặt cọc giữ lịch' },
-                ] as { id: PayMethod; icon: string; label: string; desc: string; badge?: string }[]).map(m => {
-                  const isSelected = payMethod === m.id;
-                  return (
-                    <button
-                      key={m.id}
-                      type="button"
-                      onClick={() => {
-                        setPayMethod(m.id);
-                        trackSelectPaymentMethod(m.id);
-                      }}
-                      className={`flex items-start gap-4 p-4 rounded-2xl border-2 text-left transition-all relative overflow-hidden group ${
-                        isSelected
-                          ? (isDark ? 'border-teal-500 bg-teal-950/20' : 'border-[#1a2b4c] bg-[#1a2b4c]/5 shadow-sm')
-                          : (isDark ? 'border-slate-750 bg-slate-800/40 hover:border-slate-600' : 'border-slate-150 bg-white hover:border-slate-200')
-                      }`}
-                    >
-                      {isSelected && (
-                        <div className={`absolute top-0 right-0 w-8 h-8 flex items-center justify-center rounded-bl-2xl ${
-                          isDark ? 'bg-teal-500 text-slate-900' : 'bg-[#1a2b4c] text-white'
-                        }`}>
-                          <span className="material-symbols-outlined text-sm font-bold">check</span>
-                        </div>
-                      )}
-
-                      <div className={`w-12 h-12 rounded-xl flex items-center justify-center shrink-0 transition-colors ${
-                        isSelected
-                          ? (isDark ? 'bg-teal-500/20 text-teal-400' : 'bg-[#1a2b4c] text-white')
-                          : (isDark ? 'bg-slate-800 text-slate-400' : 'bg-slate-100 text-slate-500')
-                      }`}>
-                        <span className="material-symbols-outlined text-2xl">{m.icon}</span>
-                      </div>
-
-                      <div className="pr-4 space-y-1">
-                        <div className="flex items-center gap-1.5 flex-wrap">
-                          <span className={`text-sm font-black ${
-                            isSelected ? (isDark ? 'text-teal-400' : 'text-slate-900') : 'text-slate-700 dark:text-slate-300'
-                          }`}>
-                            {m.label}
-                          </span>
-                          {m.badge && (
-                            <span className={`px-1.5 py-0.5 rounded text-[8px] font-black uppercase tracking-wider ${
-                              m.id === 'payos'
-                                ? 'bg-indigo-500 text-white'
-                                : 'bg-amber-500 text-white'
-                            }`}>
-                              {m.badge}
-                            </span>
-                          )}
-                        </div>
-                        <p className="text-[11px] text-slate-400 dark:text-slate-500 font-medium leading-normal">{m.desc}</p>
-                      </div>
-                    </button>
-                  );
-                })}
+                  { id: 'payos', icon: 'qr_code_2', label: 'Chuyển khoản QR (PayOS)' },
+                  { id: 'cash', icon: 'payments', label: 'Tiền mặt tại quầy' },
+                ] as { id: PayMethod; icon: string; label: string }[]).map(m => (
+                  <button
+                    key={m.id}
+                    onClick={() => {
+                      setPayMethod(m.id);
+                      trackSelectPaymentMethod(m.id);
+                    }}
+                    className={`flex flex-col items-center gap-2 p-4 rounded-xl border-2 transition-all ${payMethod === m.id
+                      ? 'border-[#1a2b4c] bg-[#1a2b4c]/5 dark:border-teal-400 dark:bg-teal-900/10'
+                      : 'border-slate-200 dark:border-slate-700 hover:border-slate-300'
+                    }`}
+                  >
+                    <span className={`material-symbols-outlined text-2xl ${payMethod === m.id ? 'text-[#1a2b4c] dark:text-teal-400' : 'text-slate-400'}`}>
+                      {m.icon}
+                    </span>
+                    <span className={`text-xs font-semibold text-center ${payMethod === m.id ? 'text-[#1a2b4c] dark:text-teal-400' : 'text-slate-500'}`}>
+                      {m.label}
+                    </span>
+                  </button>
+                ))}
               </div>
 
               {payMethod === 'payos' && (
@@ -594,63 +498,53 @@ export default function Payment() {
 
           {/* Right: Summary */}
           <div>
-            <div className="sticky top-24 bg-white dark:bg-slate-800 rounded-[24px] border border-slate-200 dark:border-slate-700 p-6 shadow-sm space-y-5">
-              <h2 className="text-base font-black text-slate-900 dark:text-slate-100 uppercase tracking-wider border-b border-slate-100 dark:border-slate-700 pb-3">Chi tiết hóa đơn</h2>
+            <div className="sticky top-24 bg-white dark:bg-slate-800 rounded-2xl border border-slate-200 dark:border-slate-700 p-6 shadow-sm space-y-4">
+              <h2 className="font-bold text-slate-800 dark:text-slate-100 text-base">Tổng đơn hàng</h2>
 
               {/* Từng dịch vụ */}
-              <div className="space-y-3.5">
+              <div className="space-y-2 text-sm">
                 {serviceList.map((svc) => {
                   const rate = getCommissionRateForService(svc);
                   return (
-                    <div key={svc.id} className="flex flex-col text-slate-600 dark:text-slate-400">
-                      <div className="flex justify-between items-start text-sm">
-                        <span className="flex-1 pr-4 font-bold text-slate-800 dark:text-slate-200 leading-normal">{svc.name}</span>
-                        <span className="shrink-0 font-black text-slate-900 dark:text-white">{formatVND(svc.price)}</span>
-                      </div>
-                      {svc.durationMinutes ? (
-                        <span className="text-[11px] text-slate-400 dark:text-slate-500 mt-1 flex items-center gap-1 font-medium">
-                          ⏱ Thời lượng: {svc.durationMinutes} phút
-                        </span>
-                      ) : null}
-                      {payMethod === 'cash' && (
-                        <span className="text-[10px] text-amber-600 dark:text-amber-400 mt-1 font-bold uppercase tracking-wider">
-                          • Cọc giữ lịch {rate * 100}%
-                        </span>
-                      )}
+                  <div key={svc.id} className="flex flex-col text-slate-600 dark:text-slate-400">
+                    <div className="flex justify-between">
+                      <span className="flex-1 pr-2 leading-snug">{svc.name}</span>
+                      <span className="shrink-0 font-semibold">{formatVND(svc.price)}</span>
                     </div>
-                  );
-                })}
+                    {svc.durationMinutes ? (
+                      <span className="text-xs text-slate-400 mt-0.5">⏱ Thời gian: {svc.durationMinutes} phút</span>
+                    ) : null}
+                    {payMethod === 'cash' && (
+                      <span className="text-xs text-amber-600 dark:text-amber-400 mt-0.5 font-medium">
+                        • Cọc trước {rate * 100}%
+                      </span>
+                    )}
+                  </div>
+                )})}
               </div>
 
-              <div className="border-t border-dashed border-slate-200 dark:border-slate-700 pt-4 space-y-2.5">
-                <div className="flex justify-between text-xs text-slate-550 dark:text-slate-400 font-semibold">
-                  <span>Tạm tính</span>
-                  <span>{formatVND(rawTotalPrice)}</span>
+              {discountAmount > 0 && payMethod === 'payos' && (
+                <div className="flex justify-between text-rose-500 text-sm font-semibold pt-2">
+                  <span>Voucher giảm giá</span>
+                  <span>-{formatVND(discountAmount)}</span>
                 </div>
+              )}
 
-                {discountAmount > 0 && payMethod === 'payos' && (
-                  <div className="flex justify-between text-xs text-rose-500 font-bold">
-                    <span>Mã giảm giá (Voucher)</span>
-                    <span>-{formatVND(discountAmount)}</span>
-                  </div>
-                )}
+              <div className="border-t border-dashed border-slate-200 dark:border-slate-700 pt-4 flex justify-between items-center">
+                <span className="font-bold text-slate-900 dark:text-slate-100">Tổng cộng</span>
+                <span className="text-xl font-black text-[#1a2b4c] dark:text-teal-400">{formatVND(totalPrice)}</span>
               </div>
 
-              {payMethod === 'cash' ? (
-                <div className="bg-amber-500/5 dark:bg-amber-550/10 rounded-2xl p-4 space-y-2 text-xs border border-amber-200/40 dark:border-amber-900/30">
-                  <div className="flex justify-between text-amber-800 dark:text-amber-300 font-bold">
-                    <span>Tiền cọc cần trả trước (PayOS)</span>
-                    <span className="text-sm font-black">{formatVND(depositAmount)}</span>
+              {payMethod === 'cash' && (
+                <div className="bg-amber-50 dark:bg-amber-900/20 rounded-xl p-3 space-y-1.5 text-xs border border-amber-200 dark:border-amber-800">
+                  <div className="flex justify-between text-amber-700 dark:text-amber-300 pb-1">
+                    <span>Tổng tiền cọc thanh toán qua PayOS</span>
+                    <span className="font-bold text-sm">{formatVND(depositAmount)}</span>
                   </div>
-                  <div className="flex justify-between text-slate-500 dark:text-slate-400 border-t border-dashed border-amber-200/40 dark:border-amber-900/30 pt-2 font-medium">
+                  <div className="flex justify-between text-amber-600 dark:text-amber-400 border-t border-amber-200/50 dark:border-amber-800/50 pt-1.5">
                     <span>Thanh toán tại quầy</span>
-                    <span className="font-bold">{formatVND(rawTotalPrice - depositAmount)}</span>
+                    <span className="font-semibold">{formatVND(rawTotalPrice - depositAmount)}</span>
                   </div>
-                </div>
-              ) : (
-                <div className="border-t border-slate-200 dark:border-slate-700 pt-4 flex justify-between items-center">
-                  <span className="text-sm font-bold text-slate-800 dark:text-slate-200">Tổng thanh toán</span>
-                  <span className="text-xl font-black text-[#1a2b4c] dark:text-teal-400">{formatVND(totalPrice)}</span>
                 </div>
               )}
 

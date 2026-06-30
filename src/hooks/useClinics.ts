@@ -13,6 +13,41 @@ function useDebounce<T>(value: T, delay = 400): T {
   return debounced;
 }
 
+export const POPULAR_SERVICES = [
+  { 
+    label: 'Cắt tỉa & Tạo kiểu', 
+    keywords: ['cắt', 'tỉa', 'grooming', 'tạo kiểu', 'styling', 'trim', 'cạo lông', 'cat tia', 'cat long', 'tia long'] 
+  },
+  { 
+    label: 'Tắm & Sấy vệ sinh', 
+    keywords: ['tắm', 'sấy', 'vệ sinh', 'shower', 'bath', 'cleaning', 'wash', 'tam say', 'say kho', 'bo long'] 
+  },
+  { 
+    label: 'Khám & Điều trị bệnh', 
+    keywords: ['khám', 'chữa', 'điều trị', 'clinic', 'thú y', 'bác sĩ', 'bệnh', 'kham benh', 'dieu tri', 'thu y', 'bac si', 'medical', 'care'] 
+  },
+  { 
+    label: 'Tiêm phòng (Vaccine)', 
+    keywords: ['tiêm', 'chích', 'vaccine', 'ngừa', 'dại', 'tiem phong', 'chich ngua', 'vacxin'] 
+  },
+  { 
+    label: 'Triệt sản & Phẫu thuật', 
+    keywords: ['triệt sản', 'thiến', 'mổ', 'phẫu thuật', 'surg', 'triet san', 'thien', 'phau thuat', 'castration'] 
+  },
+  { 
+    label: 'Khách sạn & Lưu trú', 
+    keywords: ['lưu trú', 'khách sạn', 'boarding', 'hotel', 'gửi', 'luu tru', 'khach san', 'gui pet', 'chuồng'] 
+  },
+  { 
+    label: 'Xét nghiệm & Siêu âm', 
+    keywords: ['xét nghiệm', 'siêu âm', 'x-quang', 'test', 'máu', 'xet nghiem', 'sieu am', 'xquang'] 
+  },
+  { 
+    label: 'Spa & Trị liệu chuyên sâu', 
+    keywords: ['trị liệu', 'dưỡng', 'nhuộm', 'cạo', 'massage', 'spa', 'tri lieu', 'duong long', 'nhuom long'] 
+  }
+];
+
 export function useClinics() {
   const [searchParams] = useSearchParams();
   const initialType = searchParams.get('type') || 'Tất cả';
@@ -56,21 +91,22 @@ export function useClinics() {
     if (selectedServices.length > 0) {
       result = result.filter((s: ShopPublicResponse) => {
         if (!s.serviceNames || s.serviceNames.length === 0) return false;
-        return selectedServices.some(svc => s.serviceNames?.includes(svc));
+        return selectedServices.some(selectedLabel => {
+          const popularDef = POPULAR_SERVICES.find(p => p.label === selectedLabel);
+          if (!popularDef) return false;
+          return s.serviceNames!.some(shopSvcName => {
+            const lowerName = shopSvcName.toLowerCase();
+            return popularDef.keywords.some(keyword => lowerName.includes(keyword));
+          });
+        });
       });
     }
     return result;
   }, [shops, minRating, selectedServices]);
 
   const availableServices = useMemo(() => {
-    const services = new Set<string>();
-    shops.forEach((s: ShopPublicResponse) => {
-      if (s.serviceNames) {
-        s.serviceNames.forEach(svc => services.add(svc));
-      }
-    });
-    return Array.from(services).sort();
-  }, [shops]);
+    return POPULAR_SERVICES.map(s => s.label);
+  }, []);
 
   // Reset page khi filter thay đổi
   useEffect(() => { setPage(0); }, [debouncedSearch, debouncedCity, activeService]);

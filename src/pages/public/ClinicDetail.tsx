@@ -23,6 +23,25 @@ const CAMERA_TIER_META: Record<string, { label: string; desc: string; icon: stri
   AI: { label: 'AI Giám sát', desc: 'Cảnh báo tự động hành vi bất thường', icon: 'psychology', defaultPrice: 150000 },
 };
 
+const SPECIALTY_MAP: Record<string, string> = {
+  'Grooming': 'Làm đẹp & Spa',
+  'Vet / Clinic': 'Thú y & Phòng khám',
+  'Boarding': 'Khách sạn & Lưu trú',
+  'General': 'Lĩnh vực chung / Khác'
+};
+
+const ROLE_MAP: Record<string, string> = {
+  'Groomer': 'Kỹ thuật viên Grooming',
+  'GROOMER': 'Kỹ thuật viên Grooming',
+  'Vet': 'Bác sĩ thú y',
+  'VET': 'Bác sĩ thú y',
+  'VETERINARIAN': 'Bác sĩ thú y',
+  'Care': 'Chuyên viên chăm sóc',
+  'CARE': 'Chuyên viên chăm sóc',
+  'Manager': 'Quản lý vận hành',
+  'MANAGER': 'Quản lý vận hành'
+};
+
 /** Resolve effective price for a tier: use shop's custom price if set, else default */
 function tierPrice(tierId: string, tierPrices?: Record<string, number>): number {
   if (tierPrices && tierId in tierPrices) return tierPrices[tierId];
@@ -779,14 +798,14 @@ export default function ClinicDetail() {
                   </>
                 ) : (
                   <span className={`px-2.5 py-1 rounded-md text-[11px] sm:text-[12px] font-medium border ${
-                    shop.shopType === 'GROOMING' ? 'bg-purple-50 dark:bg-purple-500/10 text-purple-600 dark:text-purple-400 border-purple-100 dark:border-purple-500/20' : 
+                    (shop.shopType === 'GROOMING' || shop.shopType === 'SPA') ? 'bg-purple-50 dark:bg-purple-500/10 text-purple-600 dark:text-purple-400 border-purple-100 dark:border-purple-500/20' : 
                     shop.shopType === 'CLINIC' ? 'bg-blue-50 dark:bg-blue-500/10 text-blue-600 dark:text-blue-400 border-blue-100 dark:border-blue-500/20' : 
-                    shop.shopType === 'HOTEL' ? 'bg-orange-50 dark:bg-orange-500/10 text-orange-600 dark:text-orange-400 border-orange-100 dark:border-orange-500/20' : 
+                    (shop.shopType === 'HOTEL' || shop.shopType === 'BOARDING') ? 'bg-orange-50 dark:bg-orange-500/10 text-orange-600 dark:text-orange-400 border-orange-100 dark:border-orange-500/20' : 
                     'bg-slate-50 dark:bg-slate-800 text-slate-600 dark:text-slate-300 border-slate-200 dark:border-slate-700'
                   }`}>
-                    {shop.shopType === 'GROOMING' ? 'Spa & Grooming' : 
+                    {(shop.shopType === 'GROOMING' || shop.shopType === 'SPA') ? 'Spa & Grooming' : 
                      shop.shopType === 'CLINIC' ? 'Phòng khám thú y' : 
-                     shop.shopType === 'HOTEL' ? 'Khách sạn thú cưng' : 
+                     (shop.shopType === 'HOTEL' || shop.shopType === 'BOARDING') ? 'Khách sạn thú cưng' : 
                      shop.shopType}
                   </span>
                 )}
@@ -1275,8 +1294,8 @@ export default function ClinicDetail() {
                           <h4 className="text-sm font-bold text-slate-900 dark:text-slate-100 group-hover:text-[#1a2b4c] dark:group-hover:text-teal-400 transition-colors">
                             {staff.fullName}
                           </h4>
-                          <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5 font-medium">{staff.role}</p>
-                          <p className="text-[10px] text-slate-400 mt-0.5 italic">{staff.specialization}</p>
+                          <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5 font-medium">{ROLE_MAP[staff.role] || staff.role}</p>
+                          <p className="text-[10px] text-slate-400 mt-0.5 italic">{SPECIALTY_MAP[staff.specialization] || staff.specialization}</p>
                         </div>
                       </div>
 
@@ -1288,7 +1307,7 @@ export default function ClinicDetail() {
                             {staff.certificates.filter((c: any) => c.status === 'VERIFIED').map((cert: any) => (
                               <div key={cert.id} className="flex items-center gap-1.5 px-2 py-1 bg-teal-50 dark:bg-teal-900/20 text-teal-700 dark:text-teal-400 rounded border border-teal-100 dark:border-teal-800/50">
                                 <span className="material-symbols-outlined text-[12px]" style={{ fontVariationSettings: "'FILL' 1" }}>verified</span>
-                                <span className="text-[10px] font-bold">{cert.certificateName}</span>
+                                <span className="text-[10px] font-bold capitalize">{cert.certificateName}</span>
                               </div>
                             ))}
                           </div>
@@ -1858,7 +1877,7 @@ export default function ClinicDetail() {
                                       </div>
                                       <div className="flex-1 min-w-0">
                                         <p className="text-xs font-bold text-slate-800 dark:text-slate-100 truncate">{staff.fullName}</p>
-                                        <p className="text-[10px] text-slate-400 truncate">{staff.specialization || staff.role || 'Nhân viên'}</p>
+                                        <p className="text-[10px] text-slate-400 truncate">{(staff.specialization && SPECIALTY_MAP[staff.specialization]) || staff.specialization || ROLE_MAP[staff.role] || staff.role || 'Nhân viên'}</p>
                                       </div>
                                       <div className="shrink-0 text-right">
                                         {isBusy ? (
@@ -1899,7 +1918,7 @@ export default function ClinicDetail() {
                                           </div>
                                           <div className="flex-1 min-w-0">
                                             <p className="text-xs font-bold text-slate-800 dark:text-slate-100 truncate">{s.fullName}</p>
-                                            <p className="text-[10px] text-slate-400 truncate">{s.specialization || s.role || 'Nhân viên'}</p>
+                                            <p className="text-[10px] text-slate-400 truncate">{(s.specialization && SPECIALTY_MAP[s.specialization]) || s.specialization || ROLE_MAP[s.role] || s.role || 'Nhân viên'}</p>
                                           </div>
                                           <span className="text-[10px] font-bold text-green-600 bg-green-50 dark:bg-green-900/20 px-1.5 py-0.5 rounded-full shrink-0">Chọn</span>
                                         </button>
@@ -2437,11 +2456,11 @@ export default function ClinicDetail() {
                     </h3>
                     <div className="flex flex-wrap items-center gap-3 mt-2">
                       <span className="px-3 py-1 bg-indigo-50 dark:bg-indigo-950/40 text-indigo-600 dark:text-indigo-400 rounded-full text-xs font-bold uppercase tracking-wider">
-                        {selectedStaff.role}
+                        {ROLE_MAP[selectedStaff.role] || selectedStaff.role}
                       </span>
                       <span className="text-slate-400">•</span>
                       <span className="text-sm font-medium text-slate-500 dark:text-slate-400 italic">
-                        {selectedStaff.specialization}
+                        {SPECIALTY_MAP[selectedStaff.specialization] || selectedStaff.specialization}
                       </span>
                     </div>
                   </div>
@@ -2489,7 +2508,7 @@ export default function ClinicDetail() {
                                 }`}
                             >
                               <div className="flex items-center justify-between">
-                                <span className="text-xs font-bold text-slate-700 dark:text-slate-200">{cert.certificateName}</span>
+                                <span className="text-xs font-bold text-slate-700 dark:text-slate-200 capitalize">{cert.certificateName}</span>
                                 {cert.status === 'VERIFIED' && (
                                   <span className="material-symbols-outlined text-teal-500 text-sm" style={{ fontVariationSettings: "'FILL' 1" }}>verified</span>
                                 )}
