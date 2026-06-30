@@ -7,6 +7,13 @@ import { staffService, type StaffResponse, type StaffCertificateRequest } from '
 import { userService } from '../../services/user.service';
 import toast from 'react-hot-toast';
 
+const SPECIALTY_MAP: Record<string, string> = {
+    'Grooming': 'Làm đẹp & Spa',
+    'Vet / Clinic': 'Thú y & Phòng khám',
+    'Boarding': 'Khách sạn & Lưu trú',
+    'General': 'Lĩnh vực chung / Khác'
+};
+
 export default function StaffProfile() {
     const [profile, setProfile] = useState<StaffResponse | null>(null);
     const [loading, setLoading] = useState(true);
@@ -92,7 +99,7 @@ export default function StaffProfile() {
                                     <Phone size={16} /> {profile?.phone || 'Chưa cập nhật'}
                                 </div>
                                 <div className="flex items-center gap-3 text-sm text-slate-500">
-                                    <Briefcase size={16} /> {profile?.specialization || 'Chưa rõ'}
+                                    <Briefcase size={16} /> {(profile?.specialization && SPECIALTY_MAP[profile.specialization]) || profile?.specialization || 'Chưa rõ'}
                                 </div>
                             </div>
                         </div>

@@ -11,6 +11,13 @@ import { useTheme } from '../../contexts/ThemeContext';
 
 type ChannelType = 'ADMIN_SUPPORT' | 'INTERNAL_STAFF' | 'DIRECT' | 'CUSTOMER_CHAT';
 
+const SPECIALTY_MAP: Record<string, string> = {
+  'Grooming': 'Làm đẹp & Spa',
+  'Vet / Clinic': 'Thú y & Phòng khám',
+  'Boarding': 'Khách sạn & Lưu trú',
+  'General': 'Lĩnh vực chung / Khác'
+};
+
 export default function ShopMessages() {
   const { isDark } = useTheme();
   const { user } = useAuth();
@@ -79,8 +86,8 @@ export default function ShopMessages() {
           <h1 className={`text-2xl font-bold ${isDark ? 'text-white' : 'text-slate-900'}`}>Tin nhắn</h1>
           <div className="mt-4 relative">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
-            <input 
-              type="text" 
+            <input
+              type="text"
               placeholder="Tìm kiếm hội thoại..."
               className={`w-full pl-10 pr-4 py-2.5 border-none rounded-xl text-sm focus:ring-2 focus:ring-indigo-500/50 transition-all shadow-sm outline-none ${isDark ? 'bg-slate-800/50 text-white placeholder-slate-500' : 'bg-white text-slate-900 placeholder-slate-400'}`}
             />
@@ -91,15 +98,14 @@ export default function ShopMessages() {
           <div className="px-3 mb-2">
             <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Hệ thống</span>
           </div>
-          
+
           {user?.role === 'SHOP_OWNER' && (
-            <button 
+            <button
               onClick={() => setActiveChannel({ type: 'ADMIN_SUPPORT', id: 'admin', title: 'Hệ thống Admin' })}
-              className={`w-full flex items-center gap-3 p-3 rounded-2xl transition-all ${
-                activeChannel.type === 'ADMIN_SUPPORT' 
-                ? (isDark ? 'bg-indigo-500/20 shadow-sm ring-1 ring-indigo-500/50' : 'bg-white shadow-sm ring-1 ring-slate-200') 
-                : (isDark ? 'hover:bg-white/5' : 'hover:bg-white/50')
-              }`}
+              className={`w-full flex items-center gap-3 p-3 rounded-2xl transition-all ${activeChannel.type === 'ADMIN_SUPPORT'
+                  ? (isDark ? 'bg-indigo-500/20 shadow-sm ring-1 ring-indigo-500/50' : 'bg-white shadow-sm ring-1 ring-slate-200')
+                  : (isDark ? 'hover:bg-white/5' : 'hover:bg-white/50')
+                }`}
             >
               <div className="w-10 h-10 rounded-xl bg-blue-600 flex items-center justify-center shrink-0 shadow-lg shadow-blue-500/20">
                 <Shield size={20} className="text-white" />
@@ -111,13 +117,12 @@ export default function ShopMessages() {
             </button>
           )}
 
-          <button 
+          <button
             onClick={() => setActiveChannel({ type: 'INTERNAL_STAFF', id: 'internal', title: 'Nhóm Nội bộ Shop' })}
-            className={`w-full flex items-center gap-3 p-3 rounded-2xl transition-all ${
-              activeChannel.type === 'INTERNAL_STAFF' 
-              ? (isDark ? 'bg-indigo-500/20 shadow-sm ring-1 ring-indigo-500/50' : 'bg-white shadow-sm ring-1 ring-slate-200') 
-              : (isDark ? 'hover:bg-white/5' : 'hover:bg-white/50')
-            }`}
+            className={`w-full flex items-center gap-3 p-3 rounded-2xl transition-all ${activeChannel.type === 'INTERNAL_STAFF'
+                ? (isDark ? 'bg-indigo-500/20 shadow-sm ring-1 ring-indigo-500/50' : 'bg-white shadow-sm ring-1 ring-slate-200')
+                : (isDark ? 'hover:bg-white/5' : 'hover:bg-white/50')
+              }`}
           >
             <div className="w-10 h-10 rounded-xl bg-emerald-500 flex items-center justify-center shrink-0 shadow-lg shadow-emerald-500/20">
               <Users size={20} className="text-white" />
@@ -135,19 +140,18 @@ export default function ShopMessages() {
           {customers.length === 0 ? (
             <div className="px-6 py-4 text-[11px] text-slate-400 italic">Chưa có khách hàng nào</div>
           ) : customers.map(customer => (
-            <button 
+            <button
               key={customer.email}
-              onClick={() => setActiveChannel({ 
-                type: 'CUSTOMER_CHAT', 
-                id: customer.email, 
+              onClick={() => setActiveChannel({
+                type: 'CUSTOMER_CHAT',
+                id: customer.email,
                 title: `Khách hàng: ${customer.fullName}`,
-                recipientEmail: customer.email 
+                recipientEmail: customer.email
               })}
-              className={`w-full flex items-center gap-3 p-3 rounded-2xl transition-all ${
-                activeChannel.id === customer.email 
-                ? (isDark ? 'bg-indigo-500/20 shadow-sm ring-1 ring-indigo-500/50' : 'bg-white shadow-sm ring-1 ring-slate-200') 
-                : (isDark ? 'hover:bg-white/5' : 'hover:bg-white/50')
-              }`}
+              className={`w-full flex items-center gap-3 p-3 rounded-2xl transition-all ${activeChannel.id === customer.email
+                  ? (isDark ? 'bg-indigo-500/20 shadow-sm ring-1 ring-indigo-500/50' : 'bg-white shadow-sm ring-1 ring-slate-200')
+                  : (isDark ? 'hover:bg-white/5' : 'hover:bg-white/50')
+                }`}
             >
               <div className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 ${isDark ? 'bg-indigo-500/20' : 'bg-indigo-100'}`}>
                 <MessageCircle size={20} className={isDark ? 'text-indigo-400' : 'text-indigo-600'} />
@@ -171,21 +175,20 @@ export default function ShopMessages() {
           </div>
 
           {staffList.filter(s => s.email !== user?.email).map(staff => (
-            <button 
+            <button
               key={staff.id}
               onClick={() => setActiveChannel({ type: 'DIRECT', id: staff.email!, title: staff.fullName })}
-              className={`w-full flex items-center gap-3 p-3 rounded-2xl transition-all ${
-                activeChannel.type === 'DIRECT' && activeChannel.id === staff.email
-                ? (isDark ? 'bg-indigo-500/20 shadow-sm ring-1 ring-indigo-500/50' : 'bg-white shadow-sm ring-1 ring-slate-200') 
-                : (isDark ? 'hover:bg-white/5' : 'hover:bg-white/50')
-              }`}
+              className={`w-full flex items-center gap-3 p-3 rounded-2xl transition-all ${activeChannel.type === 'DIRECT' && activeChannel.id === staff.email
+                  ? (isDark ? 'bg-indigo-500/20 shadow-sm ring-1 ring-indigo-500/50' : 'bg-white shadow-sm ring-1 ring-slate-200')
+                  : (isDark ? 'hover:bg-white/5' : 'hover:bg-white/50')
+                }`}
             >
               <div className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 overflow-hidden ${isDark ? 'bg-slate-800' : 'bg-slate-200'}`}>
                 <User size={20} className="text-slate-500" />
               </div>
               <div className="flex-1 text-left">
                 <p className={`font-bold text-sm leading-tight ${isDark ? 'text-white' : 'text-slate-900'}`}>{staff.fullName}</p>
-                <p className="text-[11px] text-slate-500 truncate mt-0.5">{staff.specialization || 'Nhân viên'}</p>
+                <p className="text-[11px] text-slate-500 truncate mt-0.5">{(staff.specialization && SPECIALTY_MAP[staff.specialization]) || staff.specialization || 'Nhân viên'}</p>
               </div>
             </button>
           ))}
@@ -193,7 +196,7 @@ export default function ShopMessages() {
       </div>
 
       {/* Main Chat Area */}
-      <ConversationThread 
+      <ConversationThread
         key={`${activeChannel.type}-${activeChannel.id}`}
         containerClassName={`flex-1 rounded-r-3xl ${isDark ? 'bg-slate-900/60' : 'bg-white'}`}
         isDark={isDark}
@@ -207,11 +210,11 @@ export default function ShopMessages() {
         isTyping={isTyping}
         onTyping={(typing) => sendTypingEvent(typing)}
         headerInfo={{
-            title: activeChannel.title,
-            icon: activeChannel.type === 'ADMIN_SUPPORT' ? <Shield size={24} className="text-blue-600" /> :
-                  activeChannel.type === 'INTERNAL_STAFF' ? <Users size={24} className="text-emerald-500" /> : 
-                  activeChannel.type === 'CUSTOMER_CHAT' ? <MessageCircle size={24} className="text-primary" /> :
-                  <User size={24} className="text-slate-500" />
+          title: activeChannel.title,
+          icon: activeChannel.type === 'ADMIN_SUPPORT' ? <Shield size={24} className="text-blue-600" /> :
+            activeChannel.type === 'INTERNAL_STAFF' ? <Users size={24} className="text-emerald-500" /> :
+              activeChannel.type === 'CUSTOMER_CHAT' ? <MessageCircle size={24} className="text-primary" /> :
+                <User size={24} className="text-slate-500" />
         }}
       />
     </div>

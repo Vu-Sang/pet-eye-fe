@@ -10,6 +10,13 @@ import ConversationThread from '../../components/chat/shared/ConversationThread'
 
 type ChannelType = 'ADMIN_SUPPORT' | 'INTERNAL_STAFF' | 'DIRECT' | 'CUSTOMER_CHAT';
 
+const SPECIALTY_MAP: Record<string, string> = {
+  'Grooming': 'Làm đẹp & Spa',
+  'Vet / Clinic': 'Thú y & Phòng khám',
+  'Boarding': 'Khách sạn & Lưu trú',
+  'General': 'Lĩnh vực chung / Khác'
+};
+
 export default function StaffMessages() {
   const { user } = useAuth();
   
@@ -127,7 +134,7 @@ export default function StaffMessages() {
               </div>
               <div className="flex-1 text-left">
                 <p className="font-bold text-sm text-slate-900 dark:text-white leading-tight">{staff.fullName}</p>
-                <p className="text-[11px] text-slate-500 truncate mt-0.5">{staff.specialization || 'Nhân viên'}</p>
+                <p className="text-[11px] text-slate-500 truncate mt-0.5">{(staff.specialization && SPECIALTY_MAP[staff.specialization]) || staff.specialization || 'Nhân viên'}</p>
               </div>
             </button>
           ))}
