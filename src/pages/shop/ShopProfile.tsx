@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Store, MapPin, Phone, Mail, Clock, Camera, Save, Loader2, ShieldCheck, Image as ImageIcon, CalendarX, Plus, X, Calendar } from 'lucide-react';
+import { Store, MapPin, Phone, Mail, Clock, Camera, Save, Loader2, ShieldCheck, Image as ImageIcon, CalendarX, Plus, X, Calendar, Volume2, VolumeX, Bell } from 'lucide-react';
 import { shopService } from '../../services/shop.service';
 import { fileService } from '../../services/file.service';
 import toast from 'react-hot-toast';
@@ -10,6 +10,71 @@ export default function ShopProfile() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [uploadingLogo, setUploadingLogo] = useState(false);
+
+  const [soundEnabled, setSoundEnabled] = useState(() => {
+    return localStorage.getItem('shop_notif_sound_enabled') !== 'false';
+  });
+  const [soundMode, setSoundMode] = useState(() => {
+    return localStorage.getItem('shop_notif_sound_mode') || 'once';
+  });
+  const [isTestingSound, setIsTestingSound] = useState(false);
+  const testAudioRef = React.useRef<HTMLAudioElement | null>(null);
+
+  // Sync to localStorage
+  const handleToggleSound = (enabled: boolean) => {
+    setSoundEnabled(enabled);
+    localStorage.setItem('shop_notif_sound_enabled', String(enabled));
+    if (!enabled && isTestingSound) {
+      if (testAudioRef.current) {
+        testAudioRef.current.pause();
+        testAudioRef.current = null;
+      }
+      setIsTestingSound(false);
+    }
+  };
+
+  const handleChangeSoundMode = (mode: string) => {
+    setSoundMode(mode);
+    localStorage.setItem('shop_notif_sound_mode', mode);
+  };
+
+  const handleTestSound = () => {
+    if (isTestingSound) {
+      if (testAudioRef.current) {
+        testAudioRef.current.pause();
+        testAudioRef.current = null;
+      }
+      setIsTestingSound(false);
+    } else {
+      const audio = new Audio('/assets/sounds/notification.mp4');
+      testAudioRef.current = audio;
+      
+      let playCount = 1;
+      audio.play().catch(() => {
+        toast.error('Không thể phát âm thanh thử.');
+      });
+      setIsTestingSound(true);
+      
+      audio.onended = () => {
+        if (soundMode === 'loop' && playCount < 5) {
+          playCount++;
+          audio.play().catch(() => {});
+        } else {
+          setIsTestingSound(false);
+          testAudioRef.current = null;
+        }
+      };
+    }
+  };
+
+  // Cleanup test audio on unmount
+  useEffect(() => {
+    return () => {
+      if (testAudioRef.current) {
+        testAudioRef.current.pause();
+      }
+    };
+  }, []);
   const [uploadingBanner, setUploadingBanner] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -817,7 +882,118 @@ export default function ShopProfile() {
                 </div>
               </div>
             </div>
-          </div>
+            </div>
+
+            {/* Notification Sound Settings */}
+            <div className={`rounded-xl p-6 shadow-sm border transition-all ${isDark ? 'admin-glass-card bg-slate-900/40 border-white/10' : 'bg-white border-slate-100'}`}>
+              <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-6">
+                <div>
+                  <h3 className={`font-bold text-lg flex items-center gap-2.5 ${isDark ? 'text-white' : 'text-slate-900'}`}>
+                    {soundEnabled ? (
+                      <Volume2 size={20} className="text-indigo-500 animate-pulse" />
+                    ) : (
+                      <VolumeX size={20} className="text-slate-400" />
+                    )}
+                    Âm thanh thông báo đơn hàng
+                  </h3>
+                  <p className={`text-xs mt-1 font-medium ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>
+                    Cài đặt âm thanh báo khi có lịch đặt hẹn mới từ khách hàng
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  onClick={handleTestSound}
+                  disabled={!soundEnabled}
+                  className={`px-4 py-2 text-xs font-bold uppercase tracking-wider rounded-xl transition-all border flex items-center gap-2 ${
+                    !soundEnabled 
+                      ? 'border-slate-200 text-slate-400 dark:border-slate-800 bg-slate-50 dark:bg-slate-900 cursor-not-allowed opacity-50'
+                      : isTestingSound
+                        ? 'bg-rose-500 hover:bg-rose-600 text-white border-rose-500'
+                        : isDark
+                          ? 'bg-indigo-600/20 hover:bg-indigo-600/30 text-indigo-400 border-indigo-500/20'
+                          : 'bg-indigo-50 hover:bg-indigo-100 text-indigo-600 border-indigo-100'
+                  }`}
+                >
+                  {isTestingSound ? (
+                    <>
+                      <span className="w-1.5 h-1.5 bg-white rounded-full animate-ping" />
+                      Dừng nghe thử
+                    </>
+                  ) : (
+                    'Nghe thử âm thanh'
+                  )}
+                </button>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-start">
+                {/* Switch Enable/Disable */}
+                <div className={`p-4 rounded-2xl border flex items-center justify-between transition-all ${
+                  isDark ? 'bg-slate-800/20 border-slate-700/50' : 'bg-slate-50 border-slate-200/50'
+                }`}>
+                  <div>
+                    <span className={`block text-sm font-bold ${isDark ? 'text-slate-200' : 'text-slate-700'}`}>
+                      Kích hoạt chuông báo
+                    </span>
+                    <span className={`block text-[10px] mt-0.5 font-medium ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>
+                      Phát âm thanh thông báo khi có đơn hàng mới
+                    </span>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => handleToggleSound(!soundEnabled)}
+                    className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none ${
+                      soundEnabled ? 'bg-green-500' : 'bg-slate-200 dark:bg-slate-700'
+                    }`}
+                  >
+                    <span
+                      className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out ${
+                        soundEnabled ? 'translate-x-5' : 'translate-x-0'
+                      }`}
+                    />
+                  </button>
+                </div>
+
+                {/* Sound Mode Select */}
+                <div className={`p-4 rounded-2xl border transition-all ${
+                  !soundEnabled 
+                    ? 'opacity-55 pointer-events-none'
+                    : ''
+                } ${
+                  isDark ? 'bg-slate-800/20 border-slate-700/50' : 'bg-slate-50 border-slate-200/50'
+                }`}>
+                  <span className={`block text-sm font-bold ${isDark ? 'text-slate-200' : 'text-slate-700'}`}>
+                    Chế độ phát chuông
+                  </span>
+                  <div className="flex gap-4 mt-3">
+                    <label className="flex items-center gap-2 cursor-pointer text-xs font-semibold text-slate-700 dark:text-slate-300">
+                      <input
+                        type="radio"
+                        name="soundMode"
+                        value="once"
+                        checked={soundMode === 'once'}
+                        onChange={() => handleChangeSoundMode('once')}
+                        className="text-indigo-600 focus:ring-indigo-500 size-4 border-slate-300"
+                      />
+                      Phát 1 lần
+                    </label>
+                    <label className="flex items-center gap-2 cursor-pointer text-xs font-semibold text-slate-700 dark:text-slate-300">
+                      <input
+                        type="radio"
+                        name="soundMode"
+                        value="loop"
+                        checked={soundMode === 'loop'}
+                        onChange={() => handleChangeSoundMode('loop')}
+                        className="text-indigo-600 focus:ring-indigo-500 size-4 border-slate-300"
+                      />
+                      Lặp lại (Tối đa 5 lần)
+                    </label>
+                  </div>
+                  <span className={`block text-[10px] mt-2 font-medium ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>
+                    * Chế độ lặp lại sẽ tự động tắt chuông sau 5 lần phát nếu không được tắt thủ công để tránh làm phiền.
+                  </span>
+                </div>
+              </div>
+            </div>
 
             {/* Submit */}
             <div className="flex justify-end gap-4">

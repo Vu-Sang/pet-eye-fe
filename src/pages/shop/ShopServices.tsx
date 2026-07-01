@@ -6,11 +6,9 @@ import { useTheme } from '../../contexts/ThemeContext';
 
 // ─── Camera tier options (defaults — shop can override label & price) ─────────
 
-const CAMERA_TIERS = [
+const DEFAULT_CAMERA_TIERS = [
   { id: 'BASIC',     label: 'Cơ bản (720p)',     desc: 'Giám sát tiêu chuẩn, đã bao gồm trong gói', icon: '👁️',  defaultPrice: 0      },
   { id: 'HD',        label: 'Sắc nét (1080p HD)', desc: 'Hình ảnh sắc nét, màu sắc trung thực',       icon: '📺',  defaultPrice: 50000  },
-  { id: 'PANORAMIC', label: 'Toàn cảnh (360°)',   desc: 'Xoay 360 độ, không góc chết',                icon: '🔄',  defaultPrice: 100000 },
-  { id: 'AI',        label: 'AI Giám sát',         desc: 'Cảnh báo tự động hành vi bất thường',        icon: '🤖',  defaultPrice: 150000 },
 ];
 
 // ─── Category helpers ────────────────────────────────────────────────────────
@@ -22,6 +20,7 @@ const CATEGORY_LABELS: Record<string, string> = {
 };
 
 const ALL_CATEGORIES = ['Tất cả', 'GROOMING', 'CLINIC', 'BOARDING'];
+
 
 function categoryLabel(cat: string): string {
   return CATEGORY_LABELS[cat] ?? cat;
@@ -78,6 +77,7 @@ export default function ShopServices() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [successMsg, setSuccessMsg] = useState<string | null>(null);
+  const [dynamicCameraTiers, setDynamicCameraTiers] = useState<Array<{ id: string; label: string; desc: string; icon: string; defaultPrice: number }>>([]);
 
   const [searchQuery, setSearchQuery] = useState('');
   const [activeCategory, setActiveCategory] = useState('Tất cả');
@@ -157,6 +157,7 @@ export default function ShopServices() {
     setModalMode('add');
     setEditingId(null);
     setForm(EMPTY_FORM);
+    setDynamicCameraTiers([...DEFAULT_CAMERA_TIERS]);
     setImagePreview('');
     setShowModal(true);
   }
@@ -167,6 +168,30 @@ export default function ShopServices() {
     const durationDays = service.category === 'BOARDING'
       ? Math.round(service.durationMinutes / 1440) || 1
       : 1;
+
+    // Load dynamic camera tiers
+    const existingTiers = service.cameraTiers ?? [];
+    const loadedTiers = [...DEFAULT_CAMERA_TIERS];
+    existingTiers.forEach((tierId) => {
+      if (tierId !== 'BASIC' && tierId !== 'HD') {
+        const customLabel = service.cameraTierLabels?.[tierId] ?? 
+          (tierId === 'PANORAMIC' ? 'Toàn cảnh (360°)' : tierId === 'AI' ? 'AI Giám sát' : 'Camera khác');
+        const defaultPrice = service.cameraTierPrices?.[tierId] ?? 
+          (tierId === 'PANORAMIC' ? 100000 : tierId === 'AI' ? 150000 : 0);
+        const icon = tierId === 'PANORAMIC' ? '🔄' : tierId === 'AI' ? '🤖' : '📷';
+        const desc = tierId === 'PANORAMIC' ? 'Xoay 360 độ, không góc chết' : tierId === 'AI' ? 'Cảnh báo tự động hành vi bất thường' : 'Giám sát bổ sung';
+        
+        loadedTiers.push({
+          id: tierId,
+          label: customLabel,
+          desc,
+          icon,
+          defaultPrice,
+        });
+      }
+    });
+    setDynamicCameraTiers(loadedTiers);
+
     setForm({
       serviceName: service.serviceName,
       price: service.price,
@@ -189,6 +214,24 @@ export default function ShopServices() {
     setImagePreview(service.imageUrl ?? '');
     setShowModal(true);
   }
+
+  const handleAddCustomCamera = () => {
+    const customId = `CUSTOM_${Date.now()}`;
+    const newTier = {
+      id: customId,
+      label: 'Camera tùy chỉnh',
+      desc: 'Giám sát bổ sung, cấu hình tùy ý',
+      icon: '📷',
+      defaultPrice: 0,
+    };
+    setDynamicCameraTiers((prev) => [...prev, newTier]);
+    setForm((prev) => ({
+      ...prev,
+      cameraTiers: [...prev.cameraTiers, customId],
+      cameraTierLabels: { ...prev.cameraTierLabels, [customId]: 'Camera tùy chỉnh' },
+      cameraTierPrices: { ...prev.cameraTierPrices, [customId]: 0 },
+    }));
+  };
 
   function closeModal() {
     setShowModal(false);
@@ -944,7 +987,7 @@ export default function ShopServices() {
                       </p>
 
                       <div className="flex flex-col gap-3">
-                        {CAMERA_TIERS.map((tier) => {
+                        {dynamicCameraTiers.map((tier) => {
                           const isChecked = form.cameraTiers.includes(tier.id);
                           const customLabel = form.cameraTierLabels[tier.id] ?? '';
                           const customPrice = form.cameraTierPrices[tier.id] ?? tier.defaultPrice;
@@ -994,7 +1037,7 @@ export default function ShopServices() {
                                 {/* Default info */}
                                 <div className="flex-1 min-w-0">
                                   <p className={`text-sm font-bold ${isChecked ? (isDark ? 'text-indigo-300' : 'text-indigo-900') : (isDark ? 'text-slate-300' : 'text-slate-700')}`}>
-                                    {tier.label}
+                                    {form.cameraTierLabels[tier.id] || tier.label}
                                   </p>
                                   <p className={`text-[11px] ${isDark ? 'text-slate-400' : 'text-slate-400'}`}>{tier.desc}</p>
                                 </div>
@@ -1002,6 +1045,32 @@ export default function ShopServices() {
                                 <span className={`text-xs shrink-0 ${isDark ? 'text-slate-500' : 'text-slate-400'}`}>
                                   mặc định: {tier.defaultPrice === 0 ? 'Miễn phí' : `+${tier.defaultPrice.toLocaleString('vi-VN')}đ`}
                                 </span>
+                                {tier.id !== 'BASIC' && tier.id !== 'HD' && (
+                                  <button
+                                    type="button"
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      setDynamicCameraTiers((prev) => prev.filter((t) => t.id !== tier.id));
+                                      setForm((prev) => {
+                                        const newTiers = prev.cameraTiers.filter((t) => t !== tier.id);
+                                        const newLabels = { ...prev.cameraTierLabels };
+                                        const newPrices = { ...prev.cameraTierPrices };
+                                        delete newLabels[tier.id];
+                                        delete newPrices[tier.id];
+                                        return {
+                                          ...prev,
+                                          cameraTiers: newTiers,
+                                          cameraTierLabels: newLabels,
+                                          cameraTierPrices: newPrices,
+                                        };
+                                      });
+                                    }}
+                                    className="p-1.5 rounded-lg hover:bg-rose-500/10 text-rose-500 transition-colors ml-2"
+                                    title="Xóa loại camera này"
+                                  >
+                                    <Trash2 size={14} />
+                                  </button>
+                                )}
                               </button>
 
                               {/* Custom label & price inputs — only when tier is selected */}
@@ -1044,6 +1113,19 @@ export default function ShopServices() {
                           );
                         })}
                       </div>
+
+                      <button
+                        type="button"
+                        onClick={handleAddCustomCamera}
+                        className={`w-full py-2.5 border-2 border-dashed rounded-xl flex items-center justify-center gap-2 text-xs font-bold transition-all mt-1 ${
+                          isDark 
+                            ? 'border-slate-700 text-slate-400 hover:border-indigo-500 hover:text-indigo-400 bg-slate-800/10 hover:bg-indigo-500/5' 
+                            : 'border-slate-200 text-slate-500 hover:border-indigo-500 hover:text-indigo-600 bg-slate-50 hover:bg-indigo-50'
+                        }`}
+                      >
+                        <Plus size={14} />
+                        Thêm loại camera khác
+                      </button>
 
                       {/* Validation hint */}
                       {form.cameraTiers.length === 0 && (
