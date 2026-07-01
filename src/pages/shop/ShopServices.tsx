@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Plus, Search, Edit2, Trash2, Camera, X, Clock, DollarSign, Tag, ToggleLeft, ToggleRight, Loader2, Package, LayoutGrid, List as ListIcon, Scissors, Stethoscope, Home } from 'lucide-react';
+import { Plus, Search, Edit2, Trash2, Camera, X, Clock, DollarSign, Tag, ToggleLeft, ToggleRight, Loader2, Package, LayoutGrid, List as ListIcon, Scissors, Stethoscope, Home, ChevronDown } from 'lucide-react';
 import { serviceService } from '../../services/service.service';
 import type { ServiceResponse, ServiceCreationRequest, ServiceUpdateRequest } from '../../types/api';
 import { useTheme } from '../../contexts/ThemeContext';
@@ -94,6 +94,20 @@ export default function ShopServices() {
   const [saving, setSaving] = useState(false);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const categoryDropdownRef = useRef<HTMLDivElement>(null);
+  const [isCategoryDropdownOpen, setIsCategoryDropdownOpen] = useState(false);
+
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (categoryDropdownRef.current && !categoryDropdownRef.current.contains(event.target as Node)) {
+        setIsCategoryDropdownOpen(false);
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
 
   // ── Load services on mount ──────────────────────────────────────────────────
 
@@ -181,6 +195,7 @@ export default function ShopServices() {
     setForm(EMPTY_FORM);
     setImagePreview('');
     setEditingId(null);
+    setIsCategoryDropdownOpen(false);
   }
 
   // ── Image upload ────────────────────────────────────────────────────────────
@@ -641,7 +656,7 @@ export default function ShopServices() {
       {/* ── Modal ── */}
       {showModal && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4 backdrop-blur-sm">
-          <div className={`rounded-2xl w-full max-w-lg max-h-[90vh] overflow-y-auto shadow-[0_32px_64px_-12px_rgba(0,0,0,0.6)] border ${isDark ? 'bg-[#0f172a] border-white/5' : 'bg-white border-slate-100'}`}>
+          <div className={`rounded-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto shadow-[0_32px_64px_-12px_rgba(0,0,0,0.6)] border ${isDark ? 'bg-[#0f172a] border-white/5' : 'bg-white border-slate-100'}`}>
             {/* Modal header */}
             <div className={`flex items-center justify-between p-6 border-b ${isDark ? 'border-slate-800' : 'border-slate-100'}`}>
               <h2 className={`text-xl font-bold ${isDark ? 'text-white' : 'text-slate-900'}`}>
@@ -708,18 +723,58 @@ export default function ShopServices() {
               {/* Category */}
               <div>
                 <label className={`block text-sm font-bold mb-2 ${isDark ? 'text-slate-300' : 'text-slate-700'}`}>Danh mục *</label>
-                <select
-                  value={form.category}
-                  onChange={(e) => setForm((prev) => ({ ...prev, category: e.target.value }))}
-                  onInvalid={(e) => (e.target as HTMLSelectElement).setCustomValidity('Vui lòng chọn danh mục.')}
-                  onInput={(e) => (e.target as HTMLSelectElement).setCustomValidity('')}
-                  className={`w-full px-4 py-2 border rounded-lg focus:ring-2 outline-none transition-all ${isDark ? 'bg-[#0b1121] border-white/10 text-white focus:ring-indigo-500/50 focus:border-indigo-500' : 'bg-white border-slate-200 text-slate-900 focus:ring-indigo-500/20 focus:border-indigo-500'}`}
-                  required
-                >
-                  <option value="GROOMING" className={isDark ? 'bg-slate-800 text-white' : ''}>Chăm sóc (Grooming)</option>
-                  <option value="CLINIC" className={isDark ? 'bg-slate-800 text-white' : ''}>Khám bệnh (Clinic)</option>
-                  <option value="BOARDING" className={isDark ? 'bg-slate-800 text-white' : ''}>Lưu trú (Boarding)</option>
-                </select>
+                <div ref={categoryDropdownRef} className="relative w-full">
+                  <button
+                    type="button"
+                    onClick={() => setIsCategoryDropdownOpen((prev) => !prev)}
+                    className={`w-full px-4 py-2.5 border rounded-lg flex items-center justify-between outline-none transition-all text-left cursor-pointer ${
+                      isDark 
+                        ? 'bg-[#0b1121] border-white/10 text-white focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500' 
+                        : 'bg-white border-slate-200 text-slate-900 focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500'
+                    }`}
+                  >
+                    <span>
+                      {form.category === 'GROOMING' && 'Chăm sóc (Grooming)'}
+                      {form.category === 'CLINIC' && 'Khám bệnh (Clinic)'}
+                      {form.category === 'BOARDING' && 'Lưu trú (Boarding)'}
+                    </span>
+                    <ChevronDown size={18} className={`transition-transform duration-300 ${isCategoryDropdownOpen ? 'rotate-180' : ''}`} />
+                  </button>
+
+                  {isCategoryDropdownOpen && (
+                    <div className={`absolute z-50 left-0 right-0 mt-1 border rounded-lg overflow-hidden shadow-xl transition-all ${
+                      isDark 
+                        ? 'bg-[#0f172a] border-slate-800 text-white' 
+                        : 'bg-white border-slate-100 text-slate-900'
+                    }`}>
+                      <ul role="listbox" className="py-1">
+                        {[
+                          { value: 'GROOMING', label: 'Chăm sóc (Grooming)', icon: <Scissors size={14} className="text-pink-500" /> },
+                          { value: 'CLINIC', label: 'Khám bệnh (Clinic)', icon: <Stethoscope size={14} className="text-emerald-500" /> },
+                          { value: 'BOARDING', label: 'Lưu trú (Boarding)', icon: <Home size={14} className="text-indigo-500" /> }
+                        ].map((opt) => (
+                          <li
+                            key={opt.value}
+                            role="option"
+                            aria-selected={form.category === opt.value}
+                            onClick={() => {
+                              setForm((prev) => ({ ...prev, category: opt.value }));
+                              setIsCategoryDropdownOpen(false);
+                            }}
+                            className={`px-4 py-2.5 text-sm cursor-pointer flex items-center gap-2.5 transition-colors ${
+                              form.category === opt.value
+                                ? (isDark ? 'bg-indigo-600/30 text-indigo-400 font-bold' : 'bg-indigo-50 text-indigo-600 font-bold')
+                                : (isDark ? 'hover:bg-slate-800 text-slate-300' : 'hover:bg-slate-50 text-slate-700')
+                            }`}
+                          >
+                            {opt.icon}
+                            {opt.label}
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
+                </div>
               </div>
 
               {/* Price & Duration */}
