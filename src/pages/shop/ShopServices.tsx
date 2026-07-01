@@ -1,16 +1,14 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Plus, Search, Edit2, Trash2, Camera, X, Clock, DollarSign, Tag, ToggleLeft, ToggleRight, Loader2, Package, LayoutGrid, List as ListIcon, Scissors, Stethoscope, Home } from 'lucide-react';
+import { Plus, Search, Edit2, Trash2, Camera, X, Clock, DollarSign, Tag, ToggleLeft, ToggleRight, Loader2, Package, LayoutGrid, List as ListIcon, Scissors, Stethoscope, Home, ChevronDown } from 'lucide-react';
 import { serviceService } from '../../services/service.service';
 import type { ServiceResponse, ServiceCreationRequest, ServiceUpdateRequest } from '../../types/api';
 import { useTheme } from '../../contexts/ThemeContext';
 
 // ─── Camera tier options (defaults — shop can override label & price) ─────────
 
-const CAMERA_TIERS = [
+const DEFAULT_CAMERA_TIERS = [
   { id: 'BASIC',     label: 'Cơ bản (720p)',     desc: 'Giám sát tiêu chuẩn, đã bao gồm trong gói', icon: '👁️',  defaultPrice: 0      },
   { id: 'HD',        label: 'Sắc nét (1080p HD)', desc: 'Hình ảnh sắc nét, màu sắc trung thực',       icon: '📺',  defaultPrice: 50000  },
-  { id: 'PANORAMIC', label: 'Toàn cảnh (360°)',   desc: 'Xoay 360 độ, không góc chết',                icon: '🔄',  defaultPrice: 100000 },
-  { id: 'AI',        label: 'AI Giám sát',         desc: 'Cảnh báo tự động hành vi bất thường',        icon: '🤖',  defaultPrice: 150000 },
 ];
 
 // ─── Category helpers ────────────────────────────────────────────────────────
@@ -22,6 +20,7 @@ const CATEGORY_LABELS: Record<string, string> = {
 };
 
 const ALL_CATEGORIES = ['Tất cả', 'GROOMING', 'CLINIC', 'BOARDING'];
+
 
 function categoryLabel(cat: string): string {
   return CATEGORY_LABELS[cat] ?? cat;
@@ -78,6 +77,7 @@ export default function ShopServices() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [successMsg, setSuccessMsg] = useState<string | null>(null);
+  const [dynamicCameraTiers, setDynamicCameraTiers] = useState<Array<{ id: string; label: string; desc: string; icon: string; defaultPrice: number }>>([]);
 
   const [searchQuery, setSearchQuery] = useState('');
   const [activeCategory, setActiveCategory] = useState('Tất cả');
@@ -94,6 +94,20 @@ export default function ShopServices() {
   const [saving, setSaving] = useState(false);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const categoryDropdownRef = useRef<HTMLDivElement>(null);
+  const [isCategoryDropdownOpen, setIsCategoryDropdownOpen] = useState(false);
+
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (categoryDropdownRef.current && !categoryDropdownRef.current.contains(event.target as Node)) {
+        setIsCategoryDropdownOpen(false);
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
 
   // ── Load services on mount ──────────────────────────────────────────────────
 
@@ -143,6 +157,7 @@ export default function ShopServices() {
     setModalMode('add');
     setEditingId(null);
     setForm(EMPTY_FORM);
+    setDynamicCameraTiers([...DEFAULT_CAMERA_TIERS]);
     setImagePreview('');
     setShowModal(true);
   }
@@ -153,6 +168,30 @@ export default function ShopServices() {
     const durationDays = service.category === 'BOARDING'
       ? Math.round(service.durationMinutes / 1440) || 1
       : 1;
+
+    // Load dynamic camera tiers
+    const existingTiers = service.cameraTiers ?? [];
+    const loadedTiers = [...DEFAULT_CAMERA_TIERS];
+    existingTiers.forEach((tierId) => {
+      if (tierId !== 'BASIC' && tierId !== 'HD') {
+        const customLabel = service.cameraTierLabels?.[tierId] ?? 
+          (tierId === 'PANORAMIC' ? 'Toàn cảnh (360°)' : tierId === 'AI' ? 'AI Giám sát' : 'Camera khác');
+        const defaultPrice = service.cameraTierPrices?.[tierId] ?? 
+          (tierId === 'PANORAMIC' ? 100000 : tierId === 'AI' ? 150000 : 0);
+        const icon = tierId === 'PANORAMIC' ? '🔄' : tierId === 'AI' ? '🤖' : '📷';
+        const desc = tierId === 'PANORAMIC' ? 'Xoay 360 độ, không góc chết' : tierId === 'AI' ? 'Cảnh báo tự động hành vi bất thường' : 'Giám sát bổ sung';
+        
+        loadedTiers.push({
+          id: tierId,
+          label: customLabel,
+          desc,
+          icon,
+          defaultPrice,
+        });
+      }
+    });
+    setDynamicCameraTiers(loadedTiers);
+
     setForm({
       serviceName: service.serviceName,
       price: service.price,
@@ -176,11 +215,30 @@ export default function ShopServices() {
     setShowModal(true);
   }
 
+  const handleAddCustomCamera = () => {
+    const customId = `CUSTOM_${Date.now()}`;
+    const newTier = {
+      id: customId,
+      label: 'Camera tùy chỉnh',
+      desc: 'Giám sát bổ sung, cấu hình tùy ý',
+      icon: '📷',
+      defaultPrice: 0,
+    };
+    setDynamicCameraTiers((prev) => [...prev, newTier]);
+    setForm((prev) => ({
+      ...prev,
+      cameraTiers: [...prev.cameraTiers, customId],
+      cameraTierLabels: { ...prev.cameraTierLabels, [customId]: 'Camera tùy chỉnh' },
+      cameraTierPrices: { ...prev.cameraTierPrices, [customId]: 0 },
+    }));
+  };
+
   function closeModal() {
     setShowModal(false);
     setForm(EMPTY_FORM);
     setImagePreview('');
     setEditingId(null);
+    setIsCategoryDropdownOpen(false);
   }
 
   // ── Image upload ────────────────────────────────────────────────────────────
@@ -641,7 +699,7 @@ export default function ShopServices() {
       {/* ── Modal ── */}
       {showModal && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4 backdrop-blur-sm">
-          <div className={`rounded-2xl w-full max-w-lg max-h-[90vh] overflow-y-auto shadow-[0_32px_64px_-12px_rgba(0,0,0,0.6)] border ${isDark ? 'bg-[#0f172a] border-white/5' : 'bg-white border-slate-100'}`}>
+          <div className={`rounded-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto shadow-[0_32px_64px_-12px_rgba(0,0,0,0.6)] border ${isDark ? 'bg-[#0f172a] border-white/5' : 'bg-white border-slate-100'}`}>
             {/* Modal header */}
             <div className={`flex items-center justify-between p-6 border-b ${isDark ? 'border-slate-800' : 'border-slate-100'}`}>
               <h2 className={`text-xl font-bold ${isDark ? 'text-white' : 'text-slate-900'}`}>
@@ -708,18 +766,58 @@ export default function ShopServices() {
               {/* Category */}
               <div>
                 <label className={`block text-sm font-bold mb-2 ${isDark ? 'text-slate-300' : 'text-slate-700'}`}>Danh mục *</label>
-                <select
-                  value={form.category}
-                  onChange={(e) => setForm((prev) => ({ ...prev, category: e.target.value }))}
-                  onInvalid={(e) => (e.target as HTMLSelectElement).setCustomValidity('Vui lòng chọn danh mục.')}
-                  onInput={(e) => (e.target as HTMLSelectElement).setCustomValidity('')}
-                  className={`w-full px-4 py-2 border rounded-lg focus:ring-2 outline-none transition-all ${isDark ? 'bg-[#0b1121] border-white/10 text-white focus:ring-indigo-500/50 focus:border-indigo-500' : 'bg-white border-slate-200 text-slate-900 focus:ring-indigo-500/20 focus:border-indigo-500'}`}
-                  required
-                >
-                  <option value="GROOMING" className={isDark ? 'bg-slate-800 text-white' : ''}>Chăm sóc (Grooming)</option>
-                  <option value="CLINIC" className={isDark ? 'bg-slate-800 text-white' : ''}>Khám bệnh (Clinic)</option>
-                  <option value="BOARDING" className={isDark ? 'bg-slate-800 text-white' : ''}>Lưu trú (Boarding)</option>
-                </select>
+                <div ref={categoryDropdownRef} className="relative w-full">
+                  <button
+                    type="button"
+                    onClick={() => setIsCategoryDropdownOpen((prev) => !prev)}
+                    className={`w-full px-4 py-2.5 border rounded-lg flex items-center justify-between outline-none transition-all text-left cursor-pointer ${
+                      isDark 
+                        ? 'bg-[#0b1121] border-white/10 text-white focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500' 
+                        : 'bg-white border-slate-200 text-slate-900 focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500'
+                    }`}
+                  >
+                    <span>
+                      {form.category === 'GROOMING' && 'Chăm sóc (Grooming)'}
+                      {form.category === 'CLINIC' && 'Khám bệnh (Clinic)'}
+                      {form.category === 'BOARDING' && 'Lưu trú (Boarding)'}
+                    </span>
+                    <ChevronDown size={18} className={`transition-transform duration-300 ${isCategoryDropdownOpen ? 'rotate-180' : ''}`} />
+                  </button>
+
+                  {isCategoryDropdownOpen && (
+                    <div className={`absolute z-50 left-0 right-0 mt-1 border rounded-lg overflow-hidden shadow-xl transition-all ${
+                      isDark 
+                        ? 'bg-[#0f172a] border-slate-800 text-white' 
+                        : 'bg-white border-slate-100 text-slate-900'
+                    }`}>
+                      <ul role="listbox" className="py-1">
+                        {[
+                          { value: 'GROOMING', label: 'Chăm sóc (Grooming)', icon: <Scissors size={14} className="text-pink-500" /> },
+                          { value: 'CLINIC', label: 'Khám bệnh (Clinic)', icon: <Stethoscope size={14} className="text-emerald-500" /> },
+                          { value: 'BOARDING', label: 'Lưu trú (Boarding)', icon: <Home size={14} className="text-indigo-500" /> }
+                        ].map((opt) => (
+                          <li
+                            key={opt.value}
+                            role="option"
+                            aria-selected={form.category === opt.value}
+                            onClick={() => {
+                              setForm((prev) => ({ ...prev, category: opt.value }));
+                              setIsCategoryDropdownOpen(false);
+                            }}
+                            className={`px-4 py-2.5 text-sm cursor-pointer flex items-center gap-2.5 transition-colors ${
+                              form.category === opt.value
+                                ? (isDark ? 'bg-indigo-600/30 text-indigo-400 font-bold' : 'bg-indigo-50 text-indigo-600 font-bold')
+                                : (isDark ? 'hover:bg-slate-800 text-slate-300' : 'hover:bg-slate-50 text-slate-700')
+                            }`}
+                          >
+                            {opt.icon}
+                            {opt.label}
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
+                </div>
               </div>
 
               {/* Price & Duration */}
@@ -889,7 +987,7 @@ export default function ShopServices() {
                       </p>
 
                       <div className="flex flex-col gap-3">
-                        {CAMERA_TIERS.map((tier) => {
+                        {dynamicCameraTiers.map((tier) => {
                           const isChecked = form.cameraTiers.includes(tier.id);
                           const customLabel = form.cameraTierLabels[tier.id] ?? '';
                           const customPrice = form.cameraTierPrices[tier.id] ?? tier.defaultPrice;
@@ -939,7 +1037,7 @@ export default function ShopServices() {
                                 {/* Default info */}
                                 <div className="flex-1 min-w-0">
                                   <p className={`text-sm font-bold ${isChecked ? (isDark ? 'text-indigo-300' : 'text-indigo-900') : (isDark ? 'text-slate-300' : 'text-slate-700')}`}>
-                                    {tier.label}
+                                    {form.cameraTierLabels[tier.id] || tier.label}
                                   </p>
                                   <p className={`text-[11px] ${isDark ? 'text-slate-400' : 'text-slate-400'}`}>{tier.desc}</p>
                                 </div>
@@ -947,6 +1045,32 @@ export default function ShopServices() {
                                 <span className={`text-xs shrink-0 ${isDark ? 'text-slate-500' : 'text-slate-400'}`}>
                                   mặc định: {tier.defaultPrice === 0 ? 'Miễn phí' : `+${tier.defaultPrice.toLocaleString('vi-VN')}đ`}
                                 </span>
+                                {tier.id !== 'BASIC' && tier.id !== 'HD' && (
+                                  <button
+                                    type="button"
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      setDynamicCameraTiers((prev) => prev.filter((t) => t.id !== tier.id));
+                                      setForm((prev) => {
+                                        const newTiers = prev.cameraTiers.filter((t) => t !== tier.id);
+                                        const newLabels = { ...prev.cameraTierLabels };
+                                        const newPrices = { ...prev.cameraTierPrices };
+                                        delete newLabels[tier.id];
+                                        delete newPrices[tier.id];
+                                        return {
+                                          ...prev,
+                                          cameraTiers: newTiers,
+                                          cameraTierLabels: newLabels,
+                                          cameraTierPrices: newPrices,
+                                        };
+                                      });
+                                    }}
+                                    className="p-1.5 rounded-lg hover:bg-rose-500/10 text-rose-500 transition-colors ml-2"
+                                    title="Xóa loại camera này"
+                                  >
+                                    <Trash2 size={14} />
+                                  </button>
+                                )}
                               </button>
 
                               {/* Custom label & price inputs — only when tier is selected */}
@@ -989,6 +1113,19 @@ export default function ShopServices() {
                           );
                         })}
                       </div>
+
+                      <button
+                        type="button"
+                        onClick={handleAddCustomCamera}
+                        className={`w-full py-2.5 border-2 border-dashed rounded-xl flex items-center justify-center gap-2 text-xs font-bold transition-all mt-1 ${
+                          isDark 
+                            ? 'border-slate-700 text-slate-400 hover:border-indigo-500 hover:text-indigo-400 bg-slate-800/10 hover:bg-indigo-500/5' 
+                            : 'border-slate-200 text-slate-500 hover:border-indigo-500 hover:text-indigo-600 bg-slate-50 hover:bg-indigo-50'
+                        }`}
+                      >
+                        <Plus size={14} />
+                        Thêm loại camera khác
+                      </button>
 
                       {/* Validation hint */}
                       {form.cameraTiers.length === 0 && (
