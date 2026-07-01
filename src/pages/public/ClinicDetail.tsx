@@ -1714,6 +1714,74 @@ export default function ClinicDetail() {
                             <span>Dịch vụ đã chọn</span>
                             <span className="bg-[#1a2b4c] text-white px-2 py-0.5 rounded-full">{selectedServiceIds.length + (isHotelSelected ? 1 : 0)}</span>
                           </div>
+
+                          {/* Detailed selected services list */}
+                          <div className="flex flex-col gap-2 my-3 max-h-48 overflow-y-auto pr-1">
+                            {isHotelSelected && boardingService && (
+                              <div className="flex items-center justify-between gap-3 p-2.5 bg-white dark:bg-slate-900 border border-indigo-100 dark:border-indigo-950/50 shadow-sm rounded-xl">
+                                <div className="flex flex-col min-w-0">
+                                  <span className="font-bold text-slate-800 dark:text-slate-200 text-xs truncate">
+                                    {boardingService.serviceName}
+                                  </span>
+                                  <span className="text-[10px] text-slate-500 dark:text-slate-400 mt-0.5 leading-tight">
+                                    {selectedCageSize} • {selectedRoomType}
+                                    {selectedCameraTier !== 'BASIC' && ` • Camera ${tierLabel(selectedCameraTier, boardingService.cameraTierLabels)}`}
+                                    {` (${boardingDays} ngày)`}
+                                  </span>
+                                </div>
+                                <div className="flex items-center gap-1.5 flex-shrink-0">
+                                  <span className="font-bold text-indigo-600 dark:text-indigo-400 text-xs">
+                                    {((boardingBasePrice + cameraTierExtraPrice + roomTypeExtraPrice) * boardingDays).toLocaleString('vi-VN')}đ
+                                  </span>
+                                  <button
+                                    type="button"
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      setIsHotelSelected(false);
+                                    }}
+                                    className="text-slate-400 hover:text-red-500 transition-colors p-0.5 flex items-center justify-center rounded hover:bg-slate-100 dark:hover:bg-slate-800"
+                                    title="Xóa dịch vụ lưu trú"
+                                  >
+                                    <span className="material-symbols-outlined text-[14px]">close</span>
+                                  </button>
+                                </div>
+                              </div>
+                            )}
+
+                            {selectedServiceIds.map((id) => {
+                              const svc = apiServices.find((s: ServiceResponse) => s.id === id);
+                              if (!svc) return null;
+                              return (
+                                <div key={svc.id} className="flex items-center justify-between gap-3 p-2.5 bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 shadow-sm rounded-xl">
+                                  <div className="flex flex-col min-w-0">
+                                    <span className="font-bold text-slate-800 dark:text-slate-200 text-xs truncate">
+                                      {svc.serviceName}
+                                    </span>
+                                    <span className="text-[10px] text-slate-500 dark:text-slate-400 mt-0.5">
+                                      Thời gian: {svc.durationMinutes} phút
+                                    </span>
+                                  </div>
+                                  <div className="flex items-center gap-1.5 flex-shrink-0">
+                                    <span className="font-bold text-teal-600 dark:text-teal-400 text-xs">
+                                      {svc.price.toLocaleString('vi-VN')}đ
+                                    </span>
+                                    <button
+                                      type="button"
+                                      onClick={(e) => {
+                                        e.stopPropagation();
+                                        toggleService(svc.id);
+                                      }}
+                                      className="text-slate-400 hover:text-red-500 transition-colors p-0.5 flex items-center justify-center rounded hover:bg-slate-100 dark:hover:bg-slate-800"
+                                      title="Xóa dịch vụ"
+                                    >
+                                      <span className="material-symbols-outlined text-[14px]">close</span>
+                                    </button>
+                                  </div>
+                                </div>
+                              );
+                            })}
+                          </div>
+
                           {/* Hiển thị tổng thời gian nếu có dịch vụ thường */}
                           {selectedServiceIds.length > 0 && (
                             <div className="flex justify-between items-center text-xs text-slate-600 dark:text-slate-400 mb-2">
