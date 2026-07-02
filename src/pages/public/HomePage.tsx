@@ -140,9 +140,9 @@ export default function HomePage() {
     }
 
     return (
-        <div className="min-h-screen bg-slate-50 dark:bg-slate-900 text-slate-800 dark:text-slate-100 font-body pb-20 overflow-x-hidden">
+        <div className="min-h-screen bg-slate-50 dark:bg-slate-900 text-slate-800 dark:text-slate-100 font-body pt-24 sm:pt-32 pb-20 overflow-x-hidden">
             {/* Hero Section */}
-            <section className="pt-8 pb-12 px-6 md:px-12 lg:px-20 relative overflow-hidden">
+            <section className="pt-8 pb-12 px-4 sm:px-6 md:px-12 lg:px-20 relative overflow-hidden">
                 {/* Background decorative elements */}
                 <div className="absolute -top-24 -left-24 w-96 h-96 bg-primary/5 rounded-full blur-3xl pointer-events-none"></div>
                 <div className="absolute top-1/2 -right-24 w-64 h-64 bg-secondary/5 rounded-full blur-3xl pointer-events-none"></div>
@@ -156,10 +156,10 @@ export default function HomePage() {
                         className="space-y-8"
                     >
                         <div>
-                            <h1 className="text-6xl md:text-7xl font-black text-slate-900 dark:text-white mb-3 tracking-tight">
+                            <h1 className="text-3xl sm:text-4xl md:text-6xl lg:text-7xl font-black text-slate-900 dark:text-white mb-3 tracking-tight">
                                 {getGreeting()} <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-secondary">{user?.name?.split(' ')[0] || 'bạn'}!</span> <span className="inline-block origin-bottom-right hover:rotate-12 transition-transform cursor-pointer">👋</span>
                             </h1>
-                            <p className="text-xl text-slate-500 dark:text-slate-400 font-medium">Hôm nay bé cưng của bạn cần gì?</p>
+                            <p className="text-base sm:text-lg md:text-xl text-slate-500 dark:text-slate-400 font-medium">Hôm nay bé cưng của bạn cần gì?</p>
                         </div>
 
                         <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 items-center">
@@ -228,9 +228,9 @@ export default function HomePage() {
                         initial={{ opacity: 0, x: 30 }}
                         animate={{ opacity: 1, x: 0 }}
                         transition={{ duration: 0.8, delay: 0.2 }}
-                        className="bg-gradient-to-br from-primary via-blue-500 to-secondary p-1 rounded-[32px] shadow-2xl shadow-primary/30"
+                        className="bg-gradient-to-br from-primary via-blue-500 to-secondary p-1 rounded-3xl sm:rounded-[32px] shadow-2xl shadow-primary/30"
                     >
-                        <div className="bg-white/90 dark:bg-slate-800/90 backdrop-blur-xl rounded-[28px] p-8 h-full flex flex-col relative overflow-hidden border border-white/20">
+                        <div className="bg-white/90 dark:bg-slate-800/90 backdrop-blur-xl rounded-2xl sm:rounded-[28px] p-5 sm:p-8 h-full flex flex-col relative overflow-hidden border border-white/20">
                             <div className="absolute -right-20 -bottom-20 w-64 h-64 bg-primary/10 rounded-full blur-3xl pointer-events-none"></div>
 
                             <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-8 flex items-center gap-3">
@@ -320,7 +320,7 @@ export default function HomePage() {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ duration: 0.8 }}
-                className="py-12 px-6 md:px-12 lg:px-20"
+                className="py-12 px-4 sm:px-6 md:px-12 lg:px-20"
             >
                 <div className="max-w-7xl mx-auto">
                     <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-6 mb-12">
@@ -389,7 +389,7 @@ export default function HomePage() {
                 initial={{ opacity: 0 }}
                 whileInView={{ opacity: 1 }}
                 viewport={{ once: true }}
-                className="py-16 px-6 md:px-12 lg:px-20 bg-white dark:bg-slate-800/30"
+                className="py-16 px-4 sm:px-6 md:px-12 lg:px-20 bg-white dark:bg-slate-800/30"
             >
                 <div className="max-w-7xl mx-auto">
                     <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-8 mb-12">
@@ -409,7 +409,7 @@ export default function HomePage() {
                             {/* Modern Search Bar */}
                             <div className="relative w-full lg:w-[450px] group">
                                 <div className="absolute inset-y-0 left-0 pl-5 flex items-center pointer-events-none">
-                                    <span className="material-symbols-outlined text-slate-400 group-focus-within:text-primary transition-colors">search</span>
+                                    <span className="material-symbols-outlined text-slate-400 group-focus-within:text-primary transition-all duration-300">search</span>
                                 </div>
                                 <input
                                     type="text"
@@ -419,46 +419,90 @@ export default function HomePage() {
                                         setSearchTerm(e.target.value);
                                         setVisibleCount(4);
                                     }}
-                                    className="block w-full pl-14 pr-12 py-4 bg-white dark:bg-slate-800 border-2 border-slate-100 dark:border-slate-700 focus:border-primary focus:ring-4 focus:ring-primary/10 rounded-2xl outline-none text-sm font-bold transition-all shadow-sm group-hover:border-slate-200 dark:group-hover:border-slate-600"
+                                    className="block w-full pl-13 pr-24 py-3 sm:py-3.5 bg-white/70 dark:bg-slate-850/70 backdrop-blur-md border border-slate-200 dark:border-slate-700/80 focus:border-primary focus:ring-4 focus:ring-primary/10 rounded-2xl outline-none text-xs sm:text-sm font-semibold transition-all shadow-sm group-hover:border-slate-300 dark:group-hover:border-slate-600"
                                 />
-                                {searchTerm && (
-                                    <button
-                                        onClick={() => setSearchTerm('')}
-                                        className="absolute inset-y-0 right-0 pr-4 flex items-center text-slate-400 hover:text-primary transition-all active:scale-90"
-                                    >
-                                        <span className="material-symbols-outlined text-lg">cancel</span>
+                                <div className="absolute inset-y-0 right-1.5 flex items-center gap-1.5">
+                                    {searchTerm && (
+                                        <button
+                                            onClick={() => setSearchTerm('')}
+                                            className="text-slate-400 hover:text-red-500 transition-colors p-1 flex items-center justify-center"
+                                        >
+                                            <span className="material-symbols-outlined text-base">close</span>
+                                        </button>
+                                    )}
+                                    <button className="h-8 px-3.5 bg-gradient-to-r from-primary to-blue-600 text-white rounded-xl text-xs font-bold shadow-md hover:shadow-lg hover:brightness-110 active:scale-95 transition-all">
+                                        Tìm
                                     </button>
-                                )}
+                                </div>
                             </div>
 
                             {/* Category Filter Pills */}
-                            <div className="flex overflow-x-auto gap-2 pt-2 pb-4 lg:pb-0 scrollbar-hide -mx-6 px-6 lg:mx-0 lg:px-0 scroll-smooth">
-                                {['Tất cả', 'CLINIC', 'GROOMING', 'BOARDING'].map((cat) => (
-                                    <button
-                                        key={cat}
-                                        onClick={() => {
-                                            trackHomepageSearchService('', cat);
-                                            setSelectedCategory(cat);
-                                            setVisibleCount(4);
-                                        }}
-                                        className={`px-6 py-2.5 rounded-xl text-[13px] font-black transition-all duration-300 whitespace-nowrap flex items-center gap-2 border-2 flex-shrink-0 ${selectedCategory === cat
-                                            ? 'bg-primary text-white border-primary shadow-lg shadow-primary/25 translate-y-[-4px]'
-                                            : 'bg-white dark:bg-slate-800 text-slate-500 dark:text-slate-400 border-slate-100 dark:border-slate-700 hover:border-primary/30 hover:text-primary hover:translate-y-[-2px]'
-                                            }`}
-                                    >
-                                        {cat === 'CLINIC' && <span className="material-symbols-outlined text-lg">medical_services</span>}
-                                        {cat === 'GROOMING' && <span className="material-symbols-outlined text-lg">content_cut</span>}
-                                        {cat === 'BOARDING' && <span className="material-symbols-outlined text-lg">hotel</span>}
-                                        {cat === 'Tất cả' ? 'Tất cả' :
-                                            cat === 'CLINIC' ? 'Phòng khám' :
-                                                cat === 'GROOMING' ? 'Spa & Grooming' : 'Lưu trú'}
-                                    </button>
-                                ))}
+                            <div className="flex overflow-x-auto gap-2.5 pt-2 pb-4 lg:pb-0 scrollbar-hide -mx-6 px-6 lg:mx-0 lg:px-0 scroll-smooth">
+                                {['Tất cả', 'CLINIC', 'GROOMING', 'BOARDING'].map((cat) => {
+                                    const isActive = selectedCategory === cat;
+                                    
+                                    const categoryMeta: Record<string, { icon: string; label: string; activeColor: string; inactiveBg: string; activeBg: string; textActive: string }> = {
+                                        'Tất cả': {
+                                            icon: 'apps',
+                                            label: 'Tất cả',
+                                            activeColor: 'bg-primary text-white dark:bg-blue-600',
+                                            inactiveBg: 'bg-slate-100 dark:bg-slate-800 text-slate-500',
+                                            activeBg: 'bg-primary/20 text-primary',
+                                            textActive: 'text-primary dark:text-blue-400'
+                                        },
+                                        'CLINIC': {
+                                            icon: 'medical_services',
+                                            label: 'Phòng khám',
+                                            activeColor: 'bg-blue-500 text-white',
+                                            inactiveBg: 'bg-blue-50 dark:bg-blue-900/20 text-blue-500 dark:text-blue-400',
+                                            activeBg: 'bg-blue-500/20 text-blue-600 dark:text-blue-400',
+                                            textActive: 'text-blue-600 dark:text-blue-400'
+                                        },
+                                        'GROOMING': {
+                                            icon: 'content_cut',
+                                            label: 'Spa & Grooming',
+                                            activeColor: 'bg-pink-500 text-white',
+                                            inactiveBg: 'bg-pink-50 dark:bg-pink-900/20 text-pink-500 dark:text-pink-400',
+                                            activeBg: 'bg-pink-500/20 text-pink-600 dark:text-pink-400',
+                                            textActive: 'text-pink-600 dark:text-pink-400'
+                                        },
+                                        'BOARDING': {
+                                            icon: 'hotel',
+                                            label: 'Lưu trú',
+                                            activeColor: 'bg-orange-500 text-white',
+                                            inactiveBg: 'bg-orange-50 dark:bg-orange-900/20 text-orange-500 dark:text-orange-400',
+                                            activeBg: 'bg-orange-500/20 text-orange-600 dark:text-orange-400',
+                                            textActive: 'text-orange-600 dark:text-orange-400'
+                                        }
+                                    };
+                                    
+                                    const meta = categoryMeta[cat];
+                                    
+                                    return (
+                                        <button
+                                            key={cat}
+                                            onClick={() => {
+                                                trackHomepageSearchService('', cat);
+                                                setSelectedCategory(cat);
+                                                setVisibleCount(4);
+                                            }}
+                                            className={`px-4.5 py-1.5 rounded-2xl text-xs font-bold transition-all duration-300 whitespace-nowrap flex items-center gap-2 border flex-shrink-0 cursor-pointer ${isActive
+                                                ? `bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-700 shadow-md ${meta.textActive} scale-102`
+                                                : 'bg-white dark:bg-slate-800 text-slate-500 dark:text-slate-400 border-slate-100 dark:border-slate-800 hover:border-slate-200 dark:hover:border-slate-700 hover:text-slate-750'
+                                                }`}
+                                        >
+                                            <div className={`w-6 h-6 rounded-lg flex items-center justify-center transition-colors ${isActive ? meta.activeColor : meta.inactiveBg}`}>
+                                                <span className="material-symbols-outlined text-sm">{meta.icon}</span>
+                                            </div>
+                                            <span>{meta.label}</span>
+                                        </button>
+                                    );
+                                })}
                             </div>
                         </div>
                     </div>
 
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 min-h-[400px]">
+                    <div className="flex overflow-x-auto lg:grid lg:grid-cols-4 gap-6 pb-6 scrollbar-hide -mx-6 px-6 lg:mx-0 lg:px-0 min-h-[400px]">
                         {featuredServices
                             .filter(s => {
                                 const sCat = (s.category || '').toUpperCase();
@@ -493,7 +537,7 @@ export default function HomePage() {
                                         viewport={{ once: true }}
                                         transition={{ delay: idx * 0.1 }}
                                         whileHover={{ y: -10 }}
-                                        className="bg-white dark:bg-slate-800 rounded-[40px] overflow-hidden border border-slate-100 dark:border-slate-700 shadow-sm hover:shadow-2xl hover:border-primary/20 transition-all group flex flex-col h-full"
+                                        className="min-w-[280px] sm:min-w-0 bg-white dark:bg-slate-800 rounded-3xl sm:rounded-[40px] overflow-hidden border border-slate-100 dark:border-slate-700 shadow-sm hover:shadow-2xl hover:border-primary/20 transition-all group flex flex-col h-full"
                                     >
                                         <div className="relative aspect-[4/3] overflow-hidden">
                                             <img
@@ -519,7 +563,7 @@ export default function HomePage() {
                                                 </button>
                                             </div>
                                         </div>
-                                        <div className="p-8 flex flex-col flex-1">
+                                        <div className="p-5 sm:p-8 flex flex-col flex-1">
                                             <div className="flex-1 space-y-3">
                                                 <div className="flex items-center justify-between">
                                                     <h3 className="font-black text-slate-900 dark:text-white text-lg line-clamp-1 group-hover:text-primary transition-colors">
@@ -553,7 +597,7 @@ export default function HomePage() {
                                     </motion.div>
                                 ))
                         ) : (
-                            <div className="col-span-full py-20 bg-slate-50 dark:bg-slate-800/20 rounded-[40px] border-2 border-dashed border-slate-200 dark:border-slate-700 text-center">
+                            <div className="col-span-full w-full min-w-full lg:min-w-0 py-20 bg-slate-50 dark:bg-slate-800/20 rounded-[40px] border-2 border-dashed border-slate-200 dark:border-slate-700 text-center">
                                 <div className="w-20 h-20 bg-white dark:bg-slate-800 rounded-full flex items-center justify-center mx-auto mb-4 shadow-sm">
                                     <span className="material-symbols-outlined text-3xl text-slate-300">search_off</span>
                                 </div>
@@ -627,7 +671,7 @@ export default function HomePage() {
                 initial={{ opacity: 0, y: 30 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
-                className="py-16 px-6 md:px-12 lg:px-20"
+                className="py-16 px-4 sm:px-6 md:px-12 lg:px-20"
             >
                 <div className="max-w-7xl mx-auto">
                     <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-6 mb-12">
@@ -651,23 +695,23 @@ export default function HomePage() {
                                 <motion.div
                                     whileHover={{ y: -5 }}
                                     key={booking.id}
-                                    className="bg-white dark:bg-slate-800 p-6 rounded-3xl border border-slate-100 dark:border-slate-700 shadow-sm hover:shadow-xl hover:border-primary/20 transition-all group"
+                                    className="bg-white dark:bg-slate-800 p-4 sm:p-5 rounded-2xl border border-slate-100 dark:border-slate-700 shadow-sm hover:shadow-xl hover:border-primary/20 transition-all group"
                                 >
-                                    <div className="flex items-start justify-between mb-4">
+                                    <div className="flex items-start justify-between mb-3">
                                         <div>
-                                            <h4 className="font-black text-lg text-slate-900 dark:text-white line-clamp-1 group-hover:text-primary transition-colors">{booking.shopName}</h4>
-                                            <p className="text-xs font-bold text-slate-400 mt-1 uppercase tracking-widest">{formatDateTime(booking.appointmentDatetime)}</p>
+                                            <h4 className="font-black text-base sm:text-lg text-slate-900 dark:text-white line-clamp-1 group-hover:text-primary transition-colors">{booking.shopName}</h4>
+                                            <p className="text-[10px] sm:text-xs font-bold text-slate-400 mt-0.5 uppercase tracking-widest">{formatDateTime(booking.appointmentDatetime)}</p>
                                         </div>
-                                        <div className={`${statusInfo.dot} w-3 h-3 rounded-full mt-1.5 shadow-lg shadow-${statusInfo.dot.split('-')[1]}-500/20`} title={statusInfo.text}></div>
+                                        <div className={`${statusInfo.dot} w-2 h-2 rounded-full mt-1.5 shadow-lg shadow-${statusInfo.dot.split('-')[1]}-500/20`} title={statusInfo.text}></div>
                                     </div>
-                                    <div className="flex items-center justify-between pt-4 border-t border-slate-50 dark:border-slate-700">
+                                    <div className="flex items-center justify-between pt-3 border-t border-slate-50 dark:border-slate-700">
                                         <div className="flex items-center gap-2">
-                                            <div className="w-8 h-8 rounded-full bg-slate-50 dark:bg-slate-900 flex items-center justify-center text-slate-400 group-hover:text-primary transition-colors">
-                                                <span className="material-symbols-outlined text-[16px]">pets</span>
+                                            <div className="w-7 h-7 rounded-full bg-slate-50 dark:bg-slate-900 flex items-center justify-center text-slate-400 group-hover:text-primary transition-colors">
+                                                <span className="material-symbols-outlined text-[14px]">pets</span>
                                             </div>
-                                            <span className="text-sm font-bold text-slate-700 dark:text-slate-300">{booking.petName}</span>
+                                            <span className="text-xs sm:text-sm font-bold text-slate-700 dark:text-slate-300">{booking.petName}</span>
                                         </div>
-                                        <button onClick={() => navigate('/profile/bookings')} className="text-[10px] font-black uppercase text-primary bg-primary/10 px-4 py-2 rounded-xl hover:bg-primary hover:text-white transition-all">
+                                        <button onClick={() => navigate('/profile/bookings')} className="text-[9px] sm:text-[10px] font-black uppercase text-primary bg-primary/10 px-3 py-1.5 rounded-lg hover:bg-primary hover:text-white transition-all cursor-pointer">
                                             Chi tiết
                                         </button>
                                     </div>
@@ -687,7 +731,7 @@ export default function HomePage() {
                 initial={{ opacity: 0, y: 30 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
-                className="py-16 px-6 md:px-12 lg:px-20 bg-slate-50 dark:bg-slate-900/20"
+                className="py-16 px-4 sm:px-6 md:px-12 lg:px-20 bg-slate-50 dark:bg-slate-900/20"
             >
                 <div className="max-w-7xl mx-auto">
                     <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-6 mb-12">
@@ -704,12 +748,12 @@ export default function HomePage() {
                         <Link to="/search" className="text-sm font-black text-primary bg-primary/5 hover:bg-primary/10 px-5 py-2.5 rounded-2xl transition-all w-fit">Khám phá thêm</Link>
                     </div>
 
-                    <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                    <div className="flex overflow-x-auto lg:grid lg:grid-cols-4 gap-6 pb-6 scrollbar-hide -mx-6 px-6 lg:mx-0 lg:px-0">
                         {shops.slice(0, 4).map(shop => (
                             <motion.div
                                 key={shop.id}
                                 whileHover={{ y: -8 }}
-                                className="bg-white dark:bg-slate-800 p-5 rounded-[32px] border border-slate-100 dark:border-slate-700 shadow-sm flex flex-col hover:shadow-2xl hover:border-primary/20 transition-all group cursor-pointer"
+                                className="min-w-[260px] sm:min-w-0 bg-white dark:bg-slate-800 p-5 rounded-[32px] border border-slate-100 dark:border-slate-700 shadow-sm flex flex-col hover:shadow-2xl hover:border-primary/20 transition-all group cursor-pointer"
                                 onClick={() => navigate(`/clinic/${shop.id}`)}
                             >
                                 <div className="w-full aspect-square rounded-2xl overflow-hidden relative shadow-lg mb-4">
@@ -738,7 +782,7 @@ export default function HomePage() {
                             </motion.div>
                         ))}
                         {shops.length === 0 && (
-                            <div className="col-span-full text-center py-20 bg-slate-50 dark:bg-slate-800/50 rounded-[40px] border-2 border-dashed border-slate-200 dark:border-slate-700">
+                            <div className="col-span-full w-full min-w-full lg:min-w-0 text-center py-20 bg-slate-50 dark:bg-slate-800/50 rounded-[40px] border-2 border-dashed border-slate-200 dark:border-slate-700">
                                 <p className="text-sm font-bold text-slate-400">Đang tìm kiếm cơ sở phù hợp...</p>
                             </div>
                         )}
@@ -751,7 +795,7 @@ export default function HomePage() {
                     initial={{ opacity: 0, y: 30 }}
                     whileInView={{ opacity: 1, y: 0 }}
                     viewport={{ once: true }}
-                    className="py-20 px-6 md:px-12 lg:px-20 bg-slate-100/50 dark:bg-slate-900/30"
+                    className="py-12 sm:py-20 px-4 sm:px-6 md:px-12 lg:px-20 bg-slate-100/50 dark:bg-slate-900/30"
                 >
                     <div className="max-w-7xl mx-auto">
                         <div className="text-center mb-16 space-y-4">
@@ -772,7 +816,7 @@ export default function HomePage() {
                                     initial={{ opacity: 0, y: 20 }}
                                     whileInView={{ opacity: 1, y: 0 }}
                                     transition={{ delay: idx * 0.1 }}
-                                    className="bg-white dark:bg-slate-800 p-8 rounded-[40px] shadow-sm border border-slate-100 dark:border-slate-700 relative group hover:shadow-2xl transition-all"
+                                    className="bg-white dark:bg-slate-800 p-5 sm:p-8 rounded-3xl sm:rounded-[40px] shadow-sm border border-slate-100 dark:border-slate-700 relative group hover:shadow-2xl transition-all"
                                 >
                                     <div className="absolute top-8 right-8 text-slate-100 dark:text-slate-700 group-hover:text-primary/10 transition-colors">
                                         <span className="material-symbols-outlined text-6xl">format_quote</span>
