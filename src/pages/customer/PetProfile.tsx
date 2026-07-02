@@ -8,7 +8,7 @@ import {
   Calendar, Clock, MapPin, Syringe, FileText, Heart,
   Activity, Utensils, Droplets, Check, AlertCircle,
   ShieldCheck, Star, Image, Upload, Trash2, Video, ClipboardList,
-  Loader2, Scissors, Stethoscope
+  Loader2, Scissors, Stethoscope, ChevronDown
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 
@@ -36,6 +36,8 @@ const fadeIn = {
 function EditModal({ pet, onSave, onClose }: { pet: PetData; onSave: (p: PetData) => void; onClose: () => void }) {
   const [form, setForm] = useState(pet);
   const [isUploading, setIsUploading] = useState(false);
+  const [isSpeciesDropdownOpen, setIsSpeciesDropdownOpen] = useState(false);
+  const [isCustomSpecies, setIsCustomSpecies] = useState(!['Chó', 'Mèo', 'Thỏ'].includes(pet.species));
   const fileInputRef = React.useRef<HTMLInputElement>(null);
   const set = (key: keyof PetData, val: any) =>
     setForm(prev => ({ ...prev, [key]: val }));
@@ -99,6 +101,84 @@ function EditModal({ pet, onSave, onClose }: { pet: PetData; onSave: (p: PetData
           </div>
 
           <div className="grid grid-cols-2 gap-4">
+            <div className="col-span-2">
+              <label className="text-xs font-bold text-slate-500 uppercase tracking-wider block mb-1.5">Tên bé cưng *</label>
+              <input 
+                required
+                value={form.name} 
+                onChange={e => set('name', e.target.value)}
+                className="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-900 dark:text-white text-sm focus:outline-none focus:ring-2 focus:ring-secondary/50" 
+              />
+            </div>
+            <div className="relative col-span-2 sm:col-span-1">
+              <label className="text-xs font-bold text-slate-500 uppercase tracking-wider block mb-1.5">Loài</label>
+              <div 
+                className="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-900 dark:text-white text-sm focus:outline-none focus:ring-2 focus:ring-secondary/50 cursor-pointer flex items-center justify-between"
+                onClick={() => setIsSpeciesDropdownOpen(!isSpeciesDropdownOpen)}
+              >
+                <span>{form.species === 'Chó' ? '🐶 ' : form.species === 'Mèo' ? '🐱 ' : form.species === 'Thỏ' ? '🐰 ' : '✨ '}{isCustomSpecies ? 'Khác' : form.species}</span>
+                <ChevronDown size={16} className="text-slate-400" />
+              </div>
+              
+              <AnimatePresence>
+                {isSpeciesDropdownOpen && (
+                  <>
+                    <div className="fixed inset-0 z-40" onClick={() => setIsSpeciesDropdownOpen(false)} />
+                    <motion.div 
+                      initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }}
+                      className="absolute z-50 mt-2 w-full bg-white dark:bg-slate-700 border border-slate-100 dark:border-slate-600 rounded-xl shadow-xl overflow-hidden p-2"
+                    >
+                      {[
+                        { val: 'Chó', icon: '🐶' },
+                        { val: 'Mèo', icon: '🐱' },
+                        { val: 'Thỏ', icon: '🐰' },
+                        { val: 'Khác', icon: '✨' },
+                      ].map(opt => (
+                        <button
+                          key={opt.val}
+                          type="button"
+                          onClick={() => {
+                            if (opt.val === 'Khác') {
+                              set('species', '');
+                              setIsCustomSpecies(true);
+                            } else {
+                              set('species', opt.val);
+                              setIsCustomSpecies(false);
+                            }
+                            setIsSpeciesDropdownOpen(false);
+                          }}
+                          className={`w-full text-left px-3 py-2 rounded-lg font-bold text-xs transition-colors flex items-center ${form.species === opt.val ? 'bg-blue-50 dark:bg-blue-900/30 text-blue-600' : 'text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-650/50'}`}
+                        >
+                          <span className="mr-2 text-sm">{opt.icon}</span> {opt.val}
+                        </button>
+                      ))}
+                    </motion.div>
+                  </>
+                )}
+              </AnimatePresence>
+            </div>
+            <div className="col-span-2 sm:col-span-1">
+              <label className="text-xs font-bold text-slate-500 uppercase tracking-wider block mb-1.5">Giống *</label>
+              <input 
+                required
+                value={form.breed} 
+                onChange={e => set('breed', e.target.value)}
+                className="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-900 dark:text-white text-sm focus:outline-none focus:ring-2 focus:ring-secondary/50" 
+              />
+            </div>
+            {isCustomSpecies && (
+              <div className="col-span-2">
+                <label className="text-xs font-bold text-slate-500 uppercase tracking-wider block mb-1.5">Nhập loài khác *</label>
+                <input
+                  required
+                  maxLength={50}
+                  className="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-900 dark:text-white text-sm focus:outline-none focus:ring-2 focus:ring-secondary/50"
+                  placeholder="Vd: Chuột Hamster, Rùa, Chim..."
+                  value={form.species}
+                  onChange={e => set('species', e.target.value)}
+                />
+              </div>
+            )}
             <div>
               <label className="text-xs font-bold text-slate-500 uppercase tracking-wider block mb-1.5">Giới tính</label>
               <select value={form.gender} onChange={e => set('gender', e.target.value)}
