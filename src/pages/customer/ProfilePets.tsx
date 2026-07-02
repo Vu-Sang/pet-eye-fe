@@ -43,6 +43,7 @@ export default function ProfilePets() {
   });
   const [isSpeciesDropdownOpen, setIsSpeciesDropdownOpen] = useState(false);
   const [isGenderDropdownOpen, setIsGenderDropdownOpen] = useState(false);
+  const [isCustomSpecies, setIsCustomSpecies] = useState(false);
   const [step, setStep] = useState(1);
   const [submitting, setSubmitting] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
@@ -143,6 +144,7 @@ export default function ProfilePets() {
 
   const resetForm = () => {
     setStep(1);
+    setIsCustomSpecies(false);
     setFormData({
       name: '', species: 'Chó', breed: '', gender: 'Đực', color: '', sterilized: false,
       weight: '', dob: '', healthNote: '', favoriteFood: '', allergies: '',
@@ -518,7 +520,7 @@ export default function ProfilePets() {
                                 className="w-full px-6 py-4 bg-slate-50 dark:bg-slate-800 border-2 border-transparent focus-within:border-blue-600/30 rounded-2xl text-slate-900 dark:text-white transition-all font-bold cursor-pointer flex items-center justify-between"
                                 onClick={() => setIsSpeciesDropdownOpen(!isSpeciesDropdownOpen)}
                               >
-                                <span>{formData.species === 'Chó' ? '🐶 ' : formData.species === 'Mèo' ? '🐱 ' : formData.species === 'Thỏ' ? '🐰 ' : '✨ '}{formData.species}</span>
+                                <span>{formData.species === 'Chó' ? '🐶 ' : formData.species === 'Mèo' ? '🐱 ' : formData.species === 'Thỏ' ? '🐰 ' : '✨ '}{isCustomSpecies ? 'Khác' : formData.species}</span>
                                 <ChevronDown size={20} className="text-slate-400" />
                               </div>
                               
@@ -540,7 +542,13 @@ export default function ProfilePets() {
                                           key={opt.val}
                                           type="button"
                                           onClick={() => {
-                                            setFormData({...formData, species: opt.val});
+                                            if (opt.val === 'Khác') {
+                                              setFormData({...formData, species: ''});
+                                              setIsCustomSpecies(true);
+                                            } else {
+                                              setFormData({...formData, species: opt.val});
+                                              setIsCustomSpecies(false);
+                                            }
                                             setIsSpeciesDropdownOpen(false);
                                           }}
                                           className={`w-full text-left px-4 py-3 rounded-xl font-bold transition-colors flex items-center ${formData.species === opt.val ? 'bg-blue-50 dark:bg-blue-900/30 text-blue-600' : 'text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700/50'}`}
@@ -553,6 +561,20 @@ export default function ProfilePets() {
                                 )}
                               </AnimatePresence>
                             </div>
+
+                            {isCustomSpecies && (
+                              <div className="col-span-2">
+                                <label className="text-sm font-bold text-slate-400 mb-2 block">Nhập loại thú cưng khác *</label>
+                                <input
+                                  required
+                                  maxLength={50}
+                                  className="w-full px-6 py-4 bg-slate-50 dark:bg-slate-800 border-2 border-transparent focus:border-blue-600/30 focus:bg-white dark:focus:bg-slate-900 rounded-2xl text-slate-900 dark:text-white outline-none transition-all font-bold shadow-sm"
+                                  placeholder="Vd: Chuột Hamster, Rùa, Chim..."
+                                  value={formData.species}
+                                  onChange={e => setFormData({...formData, species: e.target.value})}
+                                />
+                              </div>
+                            )}
 
                             <div>
                               <label className="text-sm font-bold text-slate-400 mb-2 block">Giống *</label>
