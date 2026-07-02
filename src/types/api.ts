@@ -132,6 +132,7 @@ export interface StaffResponse {
   phone: string;
   specialization: string;
   isActive: boolean;
+  avatar?: string;
   /** true = rảnh tại khung giờ được query, false = bận, undefined = chưa query */
   available?: boolean;
   certificates?: {
