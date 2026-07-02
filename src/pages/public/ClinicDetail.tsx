@@ -723,7 +723,7 @@ export default function ClinicDetail() {
         shopId,
         shopName: shop?.shopName,
         shopAddress: shop ? `${shop.address}${shop.city ? `, ${shop.city}` : ''}` : '',
-        shopImage: shop?.licenseImageUrl,
+        shopImage: shop?.logoUrl || shop?.licenseImageUrl,
         serviceId: primaryServiceId,
         // Danh sách đầy đủ để hiển thị trên Payment
         services: selectedServices,
@@ -1082,7 +1082,7 @@ export default function ClinicDetail() {
                       return (
                         <div key={item.id} className={`flex items-center justify-between p-4 rounded-2xl border transition-all ${isCurrentSelected ? 'bg-indigo-50/30 border-indigo-100 dark:bg-indigo-950/15 dark:border-indigo-900/50' : 'bg-slate-50 dark:bg-slate-800/20 border-transparent hover:border-slate-200 dark:hover:border-slate-700'}`}>
                           <div className="flex items-center gap-3">
-                            <div className="w-12 h-12 bg-indigo-50 dark:bg-indigo-900/30 rounded-2xl flex items-center justify-center text-indigo-600 dark:text-indigo-400 shadow-sm border border-indigo-100 dark:border-indigo-800">
+                            <div className="w-12 h-12 bg-indigo-50 dark:bg-indigo-900/30 rounded-2xl flex items-center justify-center text-indigo-600 dark:text-indigo-400 shadow-sm border border-indigo-100 dark:border-indigo-800 shrink-0">
                               <span className="material-symbols-outlined text-2xl">hotel</span>
                             </div>
                             <div>
@@ -1236,7 +1236,7 @@ export default function ClinicDetail() {
                                   }`}
                               >
                                 <div className="flex items-center gap-3">
-                                  <div className={`w-10 h-10 rounded-lg flex items-center justify-center transition-colors ${isSelected ? 'bg-indigo-500 text-white' : 'bg-slate-100 dark:bg-slate-700 text-slate-400 group-hover:bg-indigo-100 group-hover:text-indigo-500'}`}>
+                                  <div className={`w-10 h-10 rounded-lg flex items-center justify-center transition-colors shrink-0 ${isSelected ? 'bg-indigo-500 text-white' : 'bg-slate-100 dark:bg-slate-700 text-slate-400 group-hover:bg-indigo-100 group-hover:text-indigo-500'}`}>
                                     <span className="material-symbols-outlined text-xl">{meta.icon}</span>
                                   </div>
                                   <div>
@@ -1415,7 +1415,7 @@ export default function ClinicDetail() {
                       return (
                         <div key={item.id} className={`flex items-center justify-between p-4 rounded-2xl border transition-all ${isCurrentSelected ? 'bg-indigo-50/30 border-indigo-100 dark:bg-indigo-950/15 dark:border-indigo-900/50' : 'bg-slate-50 dark:bg-slate-800/20 border-transparent'}`}>
                           <div className="flex items-center gap-3">
-                            <div className="w-12 h-12 bg-indigo-50 dark:bg-indigo-900/30 rounded-2xl flex items-center justify-center text-indigo-600 dark:text-indigo-400 shadow-sm border border-indigo-100 dark:border-indigo-800">
+                            <div className="w-12 h-12 bg-indigo-50 dark:bg-indigo-900/30 rounded-2xl flex items-center justify-center text-indigo-600 dark:text-indigo-400 shadow-sm border border-indigo-100 dark:border-indigo-800 shrink-0">
                               <span className="material-symbols-outlined text-2xl">hotel</span>
                             </div>
                             <div>
@@ -1569,7 +1569,7 @@ export default function ClinicDetail() {
                                   }`}
                               >
                                 <div className="flex items-center gap-3">
-                                  <div className={`w-10 h-10 rounded-lg flex items-center justify-center transition-colors ${isSelected ? 'bg-indigo-500 text-white' : 'bg-slate-100 dark:bg-slate-700 text-slate-400 group-hover:bg-indigo-100 group-hover:text-indigo-500'}`}>
+                                  <div className={`w-10 h-10 rounded-lg flex items-center justify-center transition-colors shrink-0 ${isSelected ? 'bg-indigo-500 text-white' : 'bg-slate-100 dark:bg-slate-700 text-slate-400 group-hover:bg-indigo-100 group-hover:text-indigo-500'}`}>
                                     <span className="material-symbols-outlined text-xl">{meta.icon}</span>
                                   </div>
                                   <div>
