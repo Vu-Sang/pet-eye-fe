@@ -280,6 +280,28 @@ export default function ClinicDetail() {
     return apiServices.filter((s: ServiceResponse) => s.category !== 'BOARDING' && s.category.toUpperCase() !== 'HOTEL');
   }, [apiServices]);
 
+  // Pagination for featured services
+  const [featuredServicesPage, setFeaturedServicesPage] = useState(0);
+  const SERVICES_PER_PAGE = 4;
+  
+  const paginatedFeaturedServices = useMemo(() => {
+    const startIndex = featuredServicesPage * SERVICES_PER_PAGE;
+    return apiServices.slice(startIndex, startIndex + SERVICES_PER_PAGE);
+  }, [apiServices, featuredServicesPage]);
+
+  const totalFeaturedPages = Math.ceil(apiServices.length / SERVICES_PER_PAGE);
+
+  // Pagination for boarding services
+  const [boardingServicesPage, setBoardingServicesPage] = useState(0);
+  const BOARDING_SERVICES_PER_PAGE = 4;
+  
+  const paginatedBoardingServices = useMemo(() => {
+    const startIndex = boardingServicesPage * BOARDING_SERVICES_PER_PAGE;
+    return boardingServices.slice(startIndex, startIndex + BOARDING_SERVICES_PER_PAGE);
+  }, [boardingServices, boardingServicesPage]);
+
+  const totalBoardingPages = Math.ceil(boardingServices.length / BOARDING_SERVICES_PER_PAGE);
+
   useEffect(() => {
     if (boardingService) {
       const validCage = boardingService.cageSize?.includes(selectedCageSize);
@@ -1073,7 +1095,7 @@ export default function ClinicDetail() {
                 <section className="border-b border-slate-200 dark:border-slate-800 pb-8">
                   <h2 className="text-lg sm:text-xl font-bold text-slate-900 dark:text-slate-100 mb-5">Dịch vụ Lưu trú & Camera</h2>
                   <div className="flex flex-col gap-4 mb-5">
-                    {boardingServices.map((item: ServiceResponse) => {
+                    {paginatedBoardingServices.map((item: ServiceResponse) => {
                       const isCurrentSelected = isHotelSelected && selectedBoardingServiceId === item.id;
                       const isThisSelected = selectedBoardingServiceId === item.id;
                       const itemBasePrice = isThisSelected ? boardingBasePrice : (item.price ?? 0);
@@ -1129,6 +1151,49 @@ export default function ClinicDetail() {
                       );
                     })}
                   </div>
+
+                  {/* Pagination Controls for Boarding Services */}
+                  {totalBoardingPages > 1 && (
+                    <div className="flex items-center justify-between mb-5">
+                      <div className="flex items-center gap-2">
+                        <button
+                          onClick={() => setBoardingServicesPage(prev => Math.max(0, prev - 1))}
+                          disabled={boardingServicesPage === 0}
+                          className="px-3 py-1.5 text-xs font-medium rounded-lg bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                        >
+                          Trước
+                        </button>
+                        
+                        <div className="flex items-center gap-1">
+                          {Array.from({ length: totalBoardingPages }, (_, i) => (
+                            <button
+                              key={i}
+                              onClick={() => setBoardingServicesPage(i)}
+                              className={`w-8 h-8 text-xs font-medium rounded-lg transition-colors ${
+                                boardingServicesPage === i
+                                  ? 'bg-indigo-600 text-white'
+                                  : 'bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-600'
+                              }`}
+                            >
+                              {i + 1}
+                            </button>
+                          ))}
+                        </div>
+
+                        <button
+                          onClick={() => setBoardingServicesPage(prev => Math.min(totalBoardingPages - 1, prev + 1))}
+                          disabled={boardingServicesPage >= totalBoardingPages - 1}
+                          className="px-3 py-1.5 text-xs font-medium rounded-lg bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                        >
+                          Sau
+                        </button>
+                      </div>
+
+                      <span className="text-xs text-slate-500 dark:text-slate-400">
+                        {boardingServicesPage * BOARDING_SERVICES_PER_PAGE + 1}-{Math.min((boardingServicesPage + 1) * BOARDING_SERVICES_PER_PAGE, boardingServices.length)} của {boardingServices.length}
+                      </span>
+                    </div>
+                  )}
 
                   <div className={`transition-all duration-500 overflow-hidden ${isHotelSelected && boardingService ? 'max-h-[1200px] opacity-100 mt-4' : 'max-h-0 opacity-0'}`}>
                     {boardingService && (
@@ -1282,66 +1347,111 @@ export default function ClinicDetail() {
               )}
 
               {!servicesLoading && apiServices.length > 0 && (
-                <div className="flex flex-col gap-3">
-                  {apiServices.map((svc: ServiceResponse) => {
-                    return (
-                      <div key={svc.id}>
-                        <div
-                          className="flex items-center gap-4 p-3 rounded-xl bg-slate-50 dark:bg-slate-800/50 transition-colors group border border-transparent"
-                        >
-                          {/* Service Image */}
-                          <div className="relative w-20 h-20 rounded-lg overflow-hidden shrink-0 shadow-sm bg-slate-200 dark:bg-slate-700">
-                            {svc.imageUrl ? (
-                              <img
-                                src={svc.imageUrl}
-                                alt={svc.serviceName}
-                                className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
-                              />
-                            ) : (
-                              <div className="w-full h-full flex items-center justify-center">
-                                <span className="material-symbols-outlined text-slate-400 text-2xl">pets</span>
-                              </div>
-                            )}
-                          </div>
-
-                          {/* Service Info */}
-                          <div className="flex-1 min-w-0">
-                            <h4 className="font-bold text-slate-900 dark:text-slate-100 text-sm group-hover:text-[#1a2b4c] dark:group-hover:text-teal-400 transition-colors">
-                              {svc.serviceName}
-                            </h4>
-                            <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 line-clamp-1">
-                              {svc.description}
-                            </p>
-                            <div className="flex items-center gap-3 mt-1">
-                              <span className="inline-flex items-center gap-1 text-xs font-semibold text-slate-400">
-                                ⏱ {svc.durationMinutes} phút
-                              </span>
-                              <span className="text-slate-300 dark:text-slate-600">•</span>
-                              <button
-                                onClick={(e) => { e.stopPropagation(); setSelectedServiceForDetail(svc); }}
-                                className="text-xs text-[#1a2b4c] dark:text-teal-400 hover:underline flex items-center gap-1"
-                              >
-                                <span className="material-symbols-outlined text-xs">info</span>
-                                Chi tiết
-                              </button>
+                <div>
+                  <div className="flex flex-col gap-3">
+                    {paginatedFeaturedServices.map((svc: ServiceResponse) => {
+                      return (
+                        <div key={svc.id}>
+                          <div
+                            className="flex items-center gap-4 p-3 rounded-xl bg-slate-50 dark:bg-slate-800/50 transition-colors group border border-transparent"
+                          >
+                            {/* Service Image */}
+                            <div className="relative w-20 h-20 rounded-lg overflow-hidden shrink-0 shadow-sm bg-slate-200 dark:bg-slate-700">
+                              {svc.imageUrl ? (
+                                <img
+                                  src={svc.imageUrl}
+                                  alt={svc.serviceName}
+                                  className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
+                                />
+                              ) : (
+                                <div className="w-full h-full flex items-center justify-center">
+                                  <span className="material-symbols-outlined text-slate-400 text-2xl">pets</span>
+                                </div>
+                              )}
                             </div>
-                          </div>
 
-                          {/* Price */}
-                          <div className="text-right shrink-0 flex flex-col items-end gap-2">
-                            <div className="flex items-baseline gap-1">
-                              <span className="font-bold text-slate-900 dark:text-slate-100 text-sm">
-                                {svc.price.toLocaleString('vi-VN')}đ
-                              </span>
-                              <span className="text-xs text-slate-400">
-                                {svc.category === 'BOARDING' || svc.category.toUpperCase() === 'HOTEL' ? '/ngày' : '/lần'}
-                              </span>
+                            {/* Service Info */}
+                            <div className="flex-1 min-w-0">
+                              <h4 className="font-bold text-slate-900 dark:text-slate-100 text-sm group-hover:text-[#1a2b4c] dark:group-hover:text-teal-400 transition-colors">
+                                {svc.serviceName}
+                              </h4>
+                              <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 line-clamp-1">
+                                {svc.description}
+                              </p>
+                              <div className="flex items-center gap-3 mt-1">
+                                <span className="inline-flex items-center gap-1 text-xs font-semibold text-slate-400">
+                                  ⏱ {svc.durationMinutes} phút
+                                </span>
+                                <span className="text-slate-300 dark:text-slate-600">•</span>
+                                <button
+                                  onClick={(e) => { e.stopPropagation(); setSelectedServiceForDetail(svc); }}
+                                  className="text-xs text-[#1a2b4c] dark:text-teal-400 hover:underline flex items-center gap-1"
+                                >
+                                  <span className="material-symbols-outlined text-xs">info</span>
+                                  Chi tiết
+                                </button>
+                              </div>
+                            </div>
+
+                            {/* Price */}
+                            <div className="text-right shrink-0 flex flex-col items-end gap-2">
+                              <div className="flex items-baseline gap-1">
+                                <span className="font-bold text-slate-900 dark:text-slate-100 text-sm">
+                                  {svc.price.toLocaleString('vi-VN')}đ
+                                </span>
+                                <span className="text-xs text-slate-400">
+                                  {svc.category === 'BOARDING' || svc.category.toUpperCase() === 'HOTEL' ? '/ngày' : '/lần'}
+                                </span>
+                              </div>
                             </div>
                           </div>
                         </div>
+                      );
+                    })}
+                  </div>
+
+                  {/* Pagination Controls */}
+                  {totalFeaturedPages > 1 && (
+                    <div className="flex items-center justify-between mt-4">
+                      <div className="flex items-center gap-2">
+                        <button
+                          onClick={() => setFeaturedServicesPage(prev => Math.max(0, prev - 1))}
+                          disabled={featuredServicesPage === 0}
+                          className="px-3 py-1.5 text-xs font-medium rounded-lg bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                        >
+                          Trước
+                        </button>
+                        
+                        <div className="flex items-center gap-1">
+                          {Array.from({ length: totalFeaturedPages }, (_, i) => (
+                            <button
+                              key={i}
+                              onClick={() => setFeaturedServicesPage(i)}
+                              className={`w-8 h-8 text-xs font-medium rounded-lg transition-colors ${
+                                featuredServicesPage === i
+                                  ? 'bg-[#1a2b4c] dark:bg-teal-500 text-white'
+                                  : 'bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-600'
+                              }`}
+                            >
+                              {i + 1}
+                            </button>
+                          ))}
+                        </div>
+
+                        <button
+                          onClick={() => setFeaturedServicesPage(prev => Math.min(totalFeaturedPages - 1, prev + 1))}
+                          disabled={featuredServicesPage >= totalFeaturedPages - 1}
+                          className="px-3 py-1.5 text-xs font-medium rounded-lg bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                        >
+                          Sau
+                        </button>
                       </div>
-                    );
-                  })}
+
+                      <span className="text-xs text-slate-500 dark:text-slate-400">
+                        {featuredServicesPage * SERVICES_PER_PAGE + 1}-{Math.min((featuredServicesPage + 1) * SERVICES_PER_PAGE, apiServices.length)} của {apiServices.length}
+                      </span>
+                    </div>
+                  )}
                 </div>
               )}
             </section>
@@ -1406,7 +1516,7 @@ export default function ClinicDetail() {
                 <section className="border-b border-slate-200 dark:border-slate-800 pb-8">
                   <h2 className="text-lg sm:text-xl font-bold text-slate-900 dark:text-slate-100 mb-5">Dịch vụ Lưu trú & Camera</h2>
                   <div className="flex flex-col gap-4 mb-5">
-                    {boardingServices.map((item: ServiceResponse) => {
+                    {paginatedBoardingServices.map((item: ServiceResponse) => {
                       const isCurrentSelected = isHotelSelected && selectedBoardingServiceId === item.id;
                       const isThisSelected = selectedBoardingServiceId === item.id;
                       const itemBasePrice = isThisSelected ? boardingBasePrice : (item.price ?? 0);
@@ -1462,6 +1572,49 @@ export default function ClinicDetail() {
                       );
                     })}
                   </div>
+
+                  {/* Pagination Controls for Boarding Services */}
+                  {totalBoardingPages > 1 && (
+                    <div className="flex items-center justify-between mb-5">
+                      <div className="flex items-center gap-2">
+                        <button
+                          onClick={() => setBoardingServicesPage(prev => Math.max(0, prev - 1))}
+                          disabled={boardingServicesPage === 0}
+                          className="px-3 py-1.5 text-xs font-medium rounded-lg bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                        >
+                          Trước
+                        </button>
+                        
+                        <div className="flex items-center gap-1">
+                          {Array.from({ length: totalBoardingPages }, (_, i) => (
+                            <button
+                              key={i}
+                              onClick={() => setBoardingServicesPage(i)}
+                              className={`w-8 h-8 text-xs font-medium rounded-lg transition-colors ${
+                                boardingServicesPage === i
+                                  ? 'bg-indigo-600 text-white'
+                                  : 'bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-600'
+                              }`}
+                            >
+                              {i + 1}
+                            </button>
+                          ))}
+                        </div>
+
+                        <button
+                          onClick={() => setBoardingServicesPage(prev => Math.min(totalBoardingPages - 1, prev + 1))}
+                          disabled={boardingServicesPage >= totalBoardingPages - 1}
+                          className="px-3 py-1.5 text-xs font-medium rounded-lg bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                        >
+                          Sau
+                        </button>
+                      </div>
+
+                      <span className="text-xs text-slate-500 dark:text-slate-400">
+                        {boardingServicesPage * BOARDING_SERVICES_PER_PAGE + 1}-{Math.min((boardingServicesPage + 1) * BOARDING_SERVICES_PER_PAGE, boardingServices.length)} của {boardingServices.length}
+                      </span>
+                    </div>
+                  )}
 
                   <div className={`transition-all duration-500 overflow-hidden ${isHotelSelected && boardingService ? 'max-h-[1200px] opacity-100 mt-4' : 'max-h-0 opacity-0'}`}>
                     {boardingService && (
