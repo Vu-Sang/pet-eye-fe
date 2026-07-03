@@ -576,12 +576,12 @@ export default function Payment() {
                 ) : payMethod === 'payos' ? (
                   <>
                     <span className="material-symbols-outlined">qr_code_2</span>
-                    Thanh toán qua PayOS
+                    Xác nhận & Thanh toán
                   </>
                 ) : (
                   <>
                     <span className="material-symbols-outlined">qr_code_2</span>
-                    Đặt cọc qua PayOS để giữ lịch
+                    Xác nhận đặt cọc
                   </>
                 )}
               </button>
