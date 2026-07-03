@@ -182,6 +182,7 @@ export interface BookingResponse {
   customerName?: string;
   customerEmail?: string;
   customerPhone?: string;
+  customerAddress?: string;
   staffId?: number;
   staffName?: string;
   appointmentDatetime: string;
@@ -231,6 +232,7 @@ export interface CustomerItemResponse {
   name: string;
   email: string;
   phone: string;
+  address?: string;
   avatar: string;
   pets: number;
   totalBookings: number;
