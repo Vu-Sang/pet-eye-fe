@@ -8,6 +8,7 @@ export interface AppNotification {
   content: string;
   isRead: boolean;
   createdAt: string;
+  notificationType?: 'GENERAL' | 'PROMOTION' | 'REMINDER' | 'SYSTEM' | 'BOOKING';
 }
 
 // Load thông báo (page, size)

@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
-import { Bell, CheckCheck, Loader2, AlertCircle, RefreshCw, BellOff, Inbox, Trash2 } from 'lucide-react';
+import { Bell, CheckCheck, Loader2, AlertCircle, RefreshCw, BellOff, Inbox, Trash2, ArrowRight } from 'lucide-react';
 import { useNotifications, type AppNotification } from '../../hooks/useNotifications';
 import { format, parseISO, isToday, isYesterday, formatDistanceToNow } from 'date-fns';
 import { vi } from 'date-fns/locale';
+import { useNavigate } from 'react-router-dom';
+import { getNotificationRoute } from '../../utils/notificationRoutes';
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -41,15 +43,22 @@ function groupByDate(notifications: AppNotification[]): { label: string; items: 
 function NotifItem({ 
   notif, 
   onRead, 
-  onDelete 
+  onDelete,
+  onNavigate
 }: { 
   notif: AppNotification; 
   onRead: (id: number) => void;
   onDelete: (id: number) => void;
+  onNavigate: (notif: AppNotification) => void;
 }) {
+  const handleClick = () => {
+    if (!notif.isRead) onRead(notif.id);
+    onNavigate(notif);
+  };
+
   return (
     <div
-      onClick={() => !notif.isRead && onRead(notif.id)}
+      onClick={handleClick}
       className={`w-full text-left flex items-start gap-4 px-5 py-4 rounded-2xl transition-all group relative cursor-pointer
         ${notif.isRead
           ? 'bg-white dark:bg-slate-800/60 hover:bg-slate-50 dark:hover:bg-slate-800'
@@ -67,7 +76,7 @@ function NotifItem({
       </div>
 
       {/* Content */}
-      <div className="flex-1 min-w-0 pr-8">
+      <div className="flex-1 min-w-0 pr-16">
         <div className="flex items-start justify-between gap-2">
           <p className={`text-sm leading-snug ${notif.isRead ? 'font-medium text-slate-700 dark:text-slate-300' : 'font-bold text-slate-900 dark:text-white'}`}>
             {notif.title}
@@ -84,17 +93,22 @@ function NotifItem({
         </p>
       </div>
 
-      {/* Delete button shown on hover */}
-      <button
-        onClick={(e) => {
-          e.stopPropagation();
-          onDelete(notif.id);
-        }}
-        className="absolute right-4 top-1/2 -translate-y-1/2 p-2 rounded-xl text-slate-400 hover:text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-950/30 opacity-0 group-hover:opacity-100 transition-all duration-200"
-        title="Xóa thông báo"
-      >
-        <Trash2 size={16} />
-      </button>
+      {/* Navigate arrow + Delete button */}
+      <div className="absolute right-4 top-1/2 -translate-y-1/2 flex items-center gap-1">
+        <span className="p-1.5 rounded-lg opacity-0 group-hover:opacity-100 transition-all duration-200 text-blue-500">
+          <ArrowRight size={14} />
+        </span>
+        <button
+          onClick={(e) => {
+            e.stopPropagation();
+            onDelete(notif.id);
+          }}
+          className="p-2 rounded-xl text-slate-400 hover:text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-950/30 opacity-0 group-hover:opacity-100 transition-all duration-200"
+          title="Xóa thông báo"
+        >
+          <Trash2 size={16} />
+        </button>
+      </div>
     </div>
   );
 }
@@ -105,8 +119,14 @@ type FilterKey = 'all' | 'unread' | 'read';
 
 export default function ProfileNotifications() {
   const [page, setPage] = useState(1);
+  const navigate = useNavigate();
   const { notifications, totalPages, unreadCount, isLoading, refetch, markRead, markAllRead, deleteRead, deleteSingle } = useNotifications(page);
   const [filter, setFilter] = useState<FilterKey>('all');
+
+  const handleNavigate = (notif: AppNotification) => {
+    const route = getNotificationRoute(notif, 'customer');
+    if (route && route !== '/profile/notifications') navigate(route);
+  };
 
   const filtered = notifications.filter(n => {
     if (filter === 'unread') return !n.isRead;
@@ -230,7 +250,7 @@ export default function ProfileNotifications() {
               {/* Items */}
               <div className="flex flex-col gap-2">
                 {group.items.map(n => (
-                  <NotifItem key={n.id} notif={n} onRead={markRead} onDelete={deleteSingle} />
+                  <NotifItem key={n.id} notif={n} onRead={markRead} onDelete={deleteSingle} onNavigate={handleNavigate} />
                 ))}
               </div>
             </div>

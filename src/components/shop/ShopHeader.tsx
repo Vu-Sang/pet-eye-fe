@@ -6,6 +6,7 @@ import { motion, AnimatePresence } from 'motion/react';
 import { useNotifications } from '../../hooks/useNotifications';
 import { walletService, ShopWalletResponse } from '../../services/wallet.service';
 import { useTheme } from '../../contexts/ThemeContext';
+import { getNotificationRoute } from '../../utils/notificationRoutes';
 
 function useOutsideClick(ref: React.RefObject<HTMLElement | null>, cb: () => void) {
   useEffect(() => {
@@ -114,7 +115,16 @@ export default function ShopHeader() {
                   <div className={`p-8 text-center text-xs italic ${isDark ? 'text-slate-400' : 'text-slate-400'}`}>Không có thông báo mới</div>
                 ) : (
                   notifications.map(n => (
-                    <div key={n.id} className={`p-4 cursor-pointer border-b last:border-0 transition-colors ${isDark ? 'hover:bg-slate-800/80 border-white/10' : 'hover:bg-slate-50 border-slate-50'}`}>
+                    <div
+                      key={n.id}
+                      onClick={() => {
+                        if (!n.isRead) markRead(n.id);
+                        setNotifOpen(false);
+                        const route = getNotificationRoute(n, 'shop');
+                        if (route) navigate(route);
+                      }}
+                      className={`p-4 cursor-pointer border-b last:border-0 transition-colors ${isDark ? 'hover:bg-slate-800/80 border-white/10' : 'hover:bg-slate-50 border-slate-50'}`}
+                    >
                       <p className={`text-[13px] font-bold ${isDark ? 'text-slate-100' : 'text-slate-900'}`}>{n.title}</p>
                       <p className={`text-[12px] mt-1 line-clamp-2 ${isDark ? 'text-slate-300' : 'text-slate-500'}`}>{n.content}</p>
                       <p className={`text-[10px] mt-2 font-medium ${isDark ? 'text-slate-400' : 'text-slate-400'}`}>{new Date(n.createdAt).toLocaleDateString('vi-VN')}</p>
