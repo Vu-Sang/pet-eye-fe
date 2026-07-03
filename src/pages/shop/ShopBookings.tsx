@@ -752,6 +752,19 @@ export default function ShopBookings() {
                                             </p>
                                         </div>
                                     </div>
+                                    {selectedBooking.customerAddress && (
+                                        <div className="flex items-center gap-3 text-left">
+                                            <div className="p-2 bg-white dark:bg-slate-800 rounded-lg shadow-sm text-[#1a2b4c] dark:text-indigo-400">
+                                                <MapPin size={14} />
+                                            </div>
+                                            <div className="min-w-0">
+                                                <p className="text-[8px] font-black text-slate-400 uppercase tracking-widest">Địa chỉ</p>
+                                                <p className="text-xs font-bold text-slate-700 dark:text-slate-300 leading-relaxed">
+                                                    {selectedBooking.customerAddress}
+                                                </p>
+                                            </div>
+                                        </div>
+                                    )}
                                 </div>
                             </div>
 

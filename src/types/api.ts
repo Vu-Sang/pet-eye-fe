@@ -182,6 +182,7 @@ export interface BookingResponse {
   customerName?: string;
   customerEmail?: string;
   customerPhone?: string;
+  customerAddress?: string;
   staffId?: number;
   staffName?: string;
   appointmentDatetime: string;

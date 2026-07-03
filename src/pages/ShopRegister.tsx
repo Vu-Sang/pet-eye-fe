@@ -166,8 +166,10 @@ export default function ShopRegister() {
       return formData.address && formData.city && formData.description;
     }
     if (step === 3) {
-      const licenseValid = formData.licenseNumber.length === 10 || formData.licenseNumber.length === 12 || formData.licenseNumber.length === 13;
-      return formData.password && formData.confirmPassword && licenseValid && formData.licenseImageUrl && formData.agreed;
+      const licenseValid = formData.licenseNumber.length === 10 || 
+                           formData.licenseNumber.length === 12 || 
+                           formData.licenseNumber.length === 13;
+      return formData.password && formData.confirmPassword && licenseValid && formData.agreed;
     }
     return false;
   };
@@ -530,7 +532,7 @@ export default function ShopRegister() {
 
               <div>
                 <label className="block text-sm font-bold text-slate-700 mb-2">
-                  Ảnh chụp giấy phép kinh doanh *
+                  Ảnh chụp giấy phép kinh doanh (Không bắt buộc)
                 </label>
                 <input 
                   type="file"
