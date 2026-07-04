@@ -423,7 +423,7 @@ function AuthNavbar() {
               </Link>
               <Link to="/camera" onClick={() => setMobileOpen(false)}
                 className={`flex items-center px-4 py-4 rounded-2xl text-[16px] font-black transition-all ${active('/camera') ? 'bg-primary text-white shadow-lg shadow-primary/20' : 'text-slate-700 dark:text-slate-300 hover:bg-primary/5 hover:text-primary'}`}>
-                Camera lưu trú
+                Camera giám sát
               </Link>
               {/* Removed Tin nhắn icon from mobile menu as well */}
             </div>
