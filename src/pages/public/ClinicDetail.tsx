@@ -281,6 +281,20 @@ export default function ClinicDetail() {
   const [petTypeFilter, setPetTypeFilter] = useState<'ALL' | 'DOG' | 'CAT' | 'OTHER'>('ALL');
   const [weightFilter, setWeightFilter] = useState<string>('');
 
+  const getServicePriceInfo = (svc: ServiceResponse) => {
+    const numericWeight = Number(weightFilter);
+    let displayPrice = svc.price;
+    let matchedTierLabel = '';
+    if (!isNaN(numericWeight) && numericWeight > 0 && svc.petWeight && svc.petWeight.length > 0 && svc.prices && svc.prices.length > 0) {
+      const matchResult = matchPetWeight(numericWeight, svc.petWeight, svc.prices);
+      if (matchResult) {
+        displayPrice = matchResult.price;
+        matchedTierLabel = `(${matchResult.tier})`;
+      }
+    }
+    return { displayPrice, matchedTierLabel };
+  };
+
   // Derive all active boarding services from API data
   const boardingServices = useMemo(() => {
     return apiServices.filter((s: ServiceResponse) => (s.category === 'BOARDING' || s.category.toUpperCase() === 'HOTEL') && s.active);
@@ -613,7 +627,7 @@ export default function ClinicDetail() {
 
   const totalPrice = selectedServiceIds.reduce((sum, id) => {
     const svc = apiServices.find((s: ServiceResponse) => s.id === id);
-    return sum + (svc ? svc.price : 0);
+    return sum + (svc ? getServicePriceInfo(svc).displayPrice : 0);
   }, 0) + (isHotelSelected
     ? (boardingBasePrice + cameraTierExtraPrice + roomTypeExtraPrice) * boardingDays
     : 0);
@@ -1442,16 +1456,7 @@ export default function ClinicDetail() {
                 <div>
                   <div className="flex flex-col gap-3">
                     {paginatedFeaturedServices.map((svc: ServiceResponse) => {
-                      const numericWeight = Number(weightFilter);
-                      let displayPrice = svc.price;
-                      let matchedTierLabel = '';
-                      if (!isNaN(numericWeight) && numericWeight > 0 && svc.petWeight && svc.petWeight.length > 0 && svc.prices && svc.prices.length > 0) {
-                        const matchResult = matchPetWeight(numericWeight, svc.petWeight, svc.prices);
-                        if (matchResult) {
-                          displayPrice = matchResult.price;
-                          matchedTierLabel = `(${matchResult.tier})`;
-                        }
-                      }
+                      const { displayPrice, matchedTierLabel } = getServicePriceInfo(svc);
 
                       return (
                         <div key={svc.id}>
@@ -2021,7 +2026,9 @@ export default function ClinicDetail() {
                                 <span className={`text-sm font-bold ${isSelected ? 'text-[#1a2b4c] dark:text-teal-400' : 'text-slate-700 dark:text-slate-300'}`}>
                                   {svc.serviceName}
                                 </span>
-                                <span className="text-xs text-slate-500">{svc.price.toLocaleString('vi-VN')}đ • {svc.durationMinutes} phút</span>
+                                <span className="text-xs text-slate-500">
+                                  {getServicePriceInfo(svc).displayPrice.toLocaleString('vi-VN')}đ • {svc.durationMinutes} phút {getServicePriceInfo(svc).matchedTierLabel}
+                                </span>
                               </div>
                               <div className={`w-5 h-5 rounded border-2 flex items-center justify-center transition-all ${isSelected
                                 ? 'bg-[#1a2b4c] border-[#1a2b4c] dark:bg-teal-500 dark:border-teal-500'
@@ -2100,10 +2107,10 @@ export default function ClinicDetail() {
                                       Thời gian: {svc.durationMinutes} phút
                                     </span>
                                   </div>
-                                  <div className="flex items-center gap-1.5 flex-shrink-0">
-                                    <span className="font-bold text-teal-600 dark:text-teal-400 text-xs">
-                                      {svc.price.toLocaleString('vi-VN')}đ
-                                    </span>
+                                    <div className="flex items-center gap-1.5 flex-shrink-0">
+                                      <span className="font-bold text-teal-600 dark:text-teal-400 text-xs">
+                                        {getServicePriceInfo(svc).displayPrice.toLocaleString('vi-VN')}đ {getServicePriceInfo(svc).matchedTierLabel}
+                                      </span>
                                     <button
                                       type="button"
                                       onClick={(e) => {
