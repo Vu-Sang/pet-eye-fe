@@ -44,9 +44,10 @@ interface ServiceForm {
   cameraTierPrices: Record<string, number>;   // custom price per tier
   cameraTierLabels: Record<string, string>;   // custom label per tier
   cameraDescription: string;
-  cageSize: string;
+  petWeight: string;
   roomType: string;
   roomTypePricesStr: string;
+  petType: 'DOG' | 'CAT' | 'OTHER';
 }
 
 const EMPTY_FORM: ServiceForm = {
@@ -64,9 +65,10 @@ const EMPTY_FORM: ServiceForm = {
   cameraTierPrices: {},
   cameraTierLabels: {},
   cameraDescription: '',
-  cageSize: '',
+  petWeight: '',
   roomType: '',
   roomTypePricesStr: '',
+  petType: 'DOG',
 };
 
 // ─── Component ────────────────────────────────────────────────────────────────
@@ -81,6 +83,8 @@ export default function ShopServices() {
 
   const [searchQuery, setSearchQuery] = useState('');
   const [activeCategory, setActiveCategory] = useState('Tất cả');
+  const [activePetTypeTab, setActivePetTypeTab] = useState<'DOG' | 'CAT' | 'OTHER'>('DOG');
+  const [useWeightPricing, setUseWeightPricing] = useState(false);
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('list');
 
   const [showModal, setShowModal] = useState(false);
@@ -140,6 +144,8 @@ export default function ShopServices() {
     setTimeout(() => setError(null), 4000);
   }
 
+  const isWeightPriceEnabled = form.category === 'BOARDING' || useWeightPricing;
+
   // ── Filtering ───────────────────────────────────────────────────────────────
 
   const filtered = services.filter((s) => {
@@ -148,7 +154,8 @@ export default function ShopServices() {
       s.description?.toLowerCase().includes(searchQuery.toLowerCase());
     const matchesCategory =
       activeCategory === 'Tất cả' || s.category === activeCategory;
-    return matchesSearch && matchesCategory;
+    const matchesPetType = (s.petType || 'DOG') === activePetTypeTab;
+    return matchesSearch && matchesCategory && matchesPetType;
   });
 
   // ── Modal helpers ───────────────────────────────────────────────────────────
@@ -159,6 +166,7 @@ export default function ShopServices() {
     setForm(EMPTY_FORM);
     setDynamicCameraTiers([...DEFAULT_CAMERA_TIERS]);
     setImagePreview('');
+    setUseWeightPricing(false);
     setShowModal(true);
   }
 
@@ -207,11 +215,13 @@ export default function ShopServices() {
       cameraTierPrices: service.cameraTierPrices ?? {},
       cameraTierLabels: service.cameraTierLabels ?? {},
       cameraDescription: service.cameraDescription ?? '',
-      cageSize: service.cageSize?.join(', ') ?? '',
+      petWeight: service.petWeight?.join(', ') ?? '',
       roomType: service.roomType?.join(', ') ?? '',
       roomTypePricesStr: service.roomType?.map(rt => service.roomTypePrices?.[rt] || 0).join(', ') ?? '',
+      petType: service.petType || 'DOG',
     });
     setImagePreview(service.imageUrl ?? '');
+    setUseWeightPricing(!!service.petWeight?.length);
     setShowModal(true);
   }
 
@@ -281,21 +291,24 @@ export default function ShopServices() {
         ? form.durationDays * 1440
         : form.durationMinutes;
 
+
       if (modalMode === 'add') {
         const payload: ServiceCreationRequest = {
           serviceName: form.serviceName,
           category: form.category,
-          price: form.category === 'BOARDING' && form.pricesStr ? (Number(form.pricesStr.split(',')[0].trim()) || 0) : form.price,
+          petType: form.petType,
+          price: isWeightPriceEnabled && form.pricesStr ? (Number(form.pricesStr.split(',')[0].trim()) || 0) : form.price,
           durationMinutes,
           description: form.description,
           imageUrl: form.imageUrl || undefined,
+          petWeight: isWeightPriceEnabled && form.petWeight ? form.petWeight.split(',').map(s=>s.trim()).filter(Boolean) : undefined,
+          prices: isWeightPriceEnabled && form.pricesStr ? form.pricesStr.split(',').map(s=>Number(s.trim())).filter(n=>!isNaN(n)) : undefined,
           ...(form.category === 'BOARDING' && {
             cameraEnabled: form.cameraEnabled,
             cameraTiers: form.cameraEnabled ? form.cameraTiers : [],
             cameraTierPrices: form.cameraEnabled ? form.cameraTierPrices : {},
             cameraTierLabels: form.cameraEnabled ? form.cameraTierLabels : {},
             cameraDescription: form.cameraEnabled ? form.cameraDescription : undefined,
-            cageSize: form.cageSize ? form.cageSize.split(',').map(s=>s.trim()).filter(Boolean) : undefined,
             roomType: form.roomType ? form.roomType.split(',').map(s=>s.trim()).filter(Boolean) : undefined,
             roomTypePrices: (() => {
               const rts = form.roomType ? form.roomType.split(',').map(s=>s.trim()).filter(Boolean) : [];
@@ -304,7 +317,6 @@ export default function ShopServices() {
               rts.forEach((rt, i) => map[rt] = prices[i] || 0);
               return map;
             })(),
-            prices: form.pricesStr ? form.pricesStr.split(',').map(s=>Number(s.trim())).filter(n=>!isNaN(n)) : undefined,
           }),
         };
         const created = await serviceService.createService(payload);
@@ -315,18 +327,20 @@ export default function ShopServices() {
         const payload: ServiceUpdateRequest = {
           serviceName: form.serviceName,
           category: form.category,
-          price: form.category === 'BOARDING' && form.pricesStr ? (Number(form.pricesStr.split(',')[0].trim()) || 0) : form.price,
+          petType: form.petType,
+          price: isWeightPriceEnabled && form.pricesStr ? (Number(form.pricesStr.split(',')[0].trim()) || 0) : form.price,
           durationMinutes,
           description: form.description,
           imageUrl: form.imageUrl || undefined,
           active: form.active,
+          petWeight: isWeightPriceEnabled ? (form.petWeight ? form.petWeight.split(',').map(s=>s.trim()).filter(Boolean) : []) : undefined,
+          prices: isWeightPriceEnabled ? (form.pricesStr ? form.pricesStr.split(',').map(s=>Number(s.trim())).filter(n=>!isNaN(n)) : []) : undefined,
           ...(form.category === 'BOARDING' && {
             cameraEnabled: form.cameraEnabled,
             cameraTiers: form.cameraEnabled ? form.cameraTiers : [],
             cameraTierPrices: form.cameraEnabled ? form.cameraTierPrices : {},
             cameraTierLabels: form.cameraEnabled ? form.cameraTierLabels : {},
             cameraDescription: form.cameraEnabled ? form.cameraDescription : undefined,
-            cageSize: form.cageSize ? form.cageSize.split(',').map(s=>s.trim()).filter(Boolean) : undefined,
             roomType: form.roomType ? form.roomType.split(',').map(s=>s.trim()).filter(Boolean) : undefined,
             roomTypePrices: (() => {
               const rts = form.roomType ? form.roomType.split(',').map(s=>s.trim()).filter(Boolean) : [];
@@ -335,7 +349,6 @@ export default function ShopServices() {
               rts.forEach((rt, i) => map[rt] = prices[i] || 0);
               return map;
             })(),
-            prices: form.pricesStr ? form.pricesStr.split(',').map(s=>Number(s.trim())).filter(n=>!isNaN(n)) : undefined,
           }),
         };
         const updated = await serviceService.updateService(editingId, payload);
@@ -444,6 +457,28 @@ export default function ShopServices() {
               {s.value} <span className={`text-xs font-medium ml-1 ${isDark ? 'text-slate-500' : 'text-slate-400'}`}>dịch vụ</span>
             </h3>
           </div>
+        ))}
+      </div>
+
+      {/* Pet Type Tabs */}
+      <div className="flex border-b border-slate-200 dark:border-slate-800 mb-6 gap-6">
+        {[
+          { key: 'DOG', label: 'Dịch vụ cho Chó', icon: '🐶' },
+          { key: 'CAT', label: 'Dịch vụ cho Mèo', icon: '🐱' },
+          { key: 'OTHER', label: 'Dịch vụ Khác', icon: '🐰' }
+        ].map((tab) => (
+          <button
+            key={tab.key}
+            onClick={() => setActivePetTypeTab(tab.key as any)}
+            className={`pb-4 px-2 font-bold text-sm flex items-center gap-2 border-b-2 transition-all cursor-pointer ${
+              activePetTypeTab === tab.key
+                ? (isDark ? 'border-indigo-500 text-indigo-400 font-extrabold' : 'border-blue-600 text-blue-600 font-extrabold')
+                : 'border-transparent text-slate-400 hover:text-slate-600 dark:hover:text-slate-300'
+            }`}
+          >
+            <span>{tab.icon}</span>
+            {tab.label}
+          </button>
         ))}
       </div>
 
@@ -820,13 +855,48 @@ export default function ShopServices() {
                 </div>
               </div>
 
+              {/* Pet Type */}
+              <div className="mb-4">
+                <label className={`block text-sm font-bold mb-2 ${isDark ? 'text-slate-300' : 'text-slate-700'}`}>Loại thú cưng hỗ trợ *</label>
+                <select
+                  value={form.petType}
+                  onChange={(e) => setForm((prev) => ({ ...prev, petType: e.target.value as any }))}
+                  className={`w-full px-4 py-2.5 border rounded-lg focus:ring-2 outline-none transition-all ${isDark ? 'bg-[#0b1121] border-white/10 text-white focus:ring-indigo-500/50 focus:border-indigo-500' : 'bg-white border-slate-200 text-slate-900 focus:ring-indigo-500/20 focus:border-indigo-500'}`}
+                >
+                  <option value="DOG">Chó 🐶</option>
+                  <option value="CAT">Mèo 🐱</option>
+                  <option value="OTHER">Khác 🐰</option>
+                </select>
+              </div>
+
+              {/* Weight Pricing Checkbox (for non-BOARDING) */}
+              {form.category !== 'BOARDING' && (
+                <div className="flex items-center gap-2 mb-4">
+                  <input
+                    type="checkbox"
+                    id="useWeightPricing"
+                    checked={useWeightPricing}
+                    onChange={(e) => {
+                      setUseWeightPricing(e.target.checked);
+                      if (!e.target.checked) {
+                        setForm(prev => ({ ...prev, petWeight: '', pricesStr: '' }));
+                      }
+                    }}
+                    className="w-4 h-4 rounded border-slate-300 text-indigo-600 focus:ring-indigo-500"
+                  />
+                  <label htmlFor="useWeightPricing" className={`text-sm font-bold cursor-pointer ${isDark ? 'text-slate-300' : 'text-slate-700'}`}>
+                    Thiết lập giá khác nhau theo cân nặng của Pet
+                  </label>
+                </div>
+              )}
+
               {/* Price & Duration */}
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <label className={`block text-sm font-bold mb-2 ${isDark ? 'text-slate-300' : 'text-slate-700'}`}>
-                    Giá (đ) * <span className="font-normal text-slate-500">{form.category === 'BOARDING' ? '/ngày (phân cách bởi dấu phẩy nếu nhiều giá)' : '/lần'}</span>
+                    Giá (đ) * <span className="font-normal text-slate-500">{isWeightPriceEnabled ? '(phân cách bởi dấu phẩy nếu nhiều giá)' : '/lần'}</span>
                   </label>
-                  {form.category === 'BOARDING' ? (
+                  {isWeightPriceEnabled ? (
                     <input
                       type="text"
                       value={form.pricesStr}
@@ -892,6 +962,23 @@ export default function ShopServices() {
                 </div>
               </div>
 
+              {/* Pet Weight config if weight pricing enabled (for non-BOARDING) */}
+              {form.category !== 'BOARDING' && useWeightPricing && (
+                <div className="mb-4">
+                  <label className={`block text-sm font-bold mb-2 ${isDark ? 'text-slate-300' : 'text-slate-700'}`}>
+                    Cân nặng của Pet <span className="font-normal text-xs text-slate-500">(ngăn cách bởi dấu phẩy tương ứng với các mức giá ở trên)</span>
+                  </label>
+                  <input
+                    type="text"
+                    value={form.petWeight}
+                    onChange={(e) => setForm((prev) => ({ ...prev, petWeight: e.target.value }))}
+                    className={`w-full px-4 py-2 border rounded-lg focus:ring-2 outline-none transition-all ${isDark ? 'bg-[#0b1121] border-white/10 text-white focus:ring-indigo-500/50 focus:border-indigo-500 placeholder-slate-500' : 'bg-white border-slate-200 text-slate-900 focus:ring-indigo-500/20 focus:border-indigo-500 placeholder-slate-400'}`}
+                    placeholder="VD: Dưới 5kg, 5-10kg, Trên 10kg"
+                    required
+                  />
+                </div>
+              )}
+
               {/* Description */}
               <div>
                 <label className={`block text-sm font-bold mb-2 ${isDark ? 'text-slate-300' : 'text-slate-700'}`}>Mô tả ( Tối thiểu 30 từ )</label>
@@ -909,14 +996,14 @@ export default function ShopServices() {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
                     <label className={`block text-sm font-bold mb-2 ${isDark ? 'text-slate-300' : 'text-slate-700'}`}>
-                      Kích thước chuồng <span className="font-normal text-xs text-slate-500">(ngăn cách bởi dấu phẩy nếu có nhiều lựa chọn)</span>
+                      Cân nặng của Pet <span className="font-normal text-xs text-slate-500">(ngăn cách bởi dấu phẩy nếu có nhiều lựa chọn)</span>
                     </label>
                     <input
                       type="text"
-                      value={form.cageSize}
-                      onChange={(e) => setForm((prev) => ({ ...prev, cageSize: e.target.value }))}
+                      value={form.petWeight}
+                      onChange={(e) => setForm((prev) => ({ ...prev, petWeight: e.target.value }))}
                       className={`w-full px-4 py-2 border rounded-lg focus:ring-2 outline-none transition-all ${isDark ? 'bg-[#0b1121] border-white/10 text-white focus:ring-indigo-500/50 focus:border-indigo-500 placeholder-slate-500' : 'bg-white border-slate-200 text-slate-900 focus:ring-indigo-500/20 focus:border-indigo-500 placeholder-slate-400'}`}
-                      placeholder="VD: Nhỏ, Vừa, Lớn"
+                      placeholder="VD: Dưới 5kg, Trên 5kg"
                     />
                   </div>
                   <div>

@@ -40,7 +40,7 @@ export default function Payment() {
     checkOut?: string;
     date: string;
     time: string;
-    cageSize?: string;
+    petWeight?: string;
     roomType?: string;
   } | null;
 
@@ -176,7 +176,7 @@ export default function Payment() {
             checkIn: booking.checkIn,
             checkOut: booking.checkOut,
             note: combinedNote,
-            cageSize: booking.cageSize || '',
+            petWeight: booking.petWeight || '',
             roomType: booking.roomType,
             paymentMethod: "CASH"
           });
@@ -205,7 +205,7 @@ export default function Payment() {
           checkOut: booking.checkOut,
           note: combinedNote,
           paymentMethod: payMethod === 'cash' ? "CASH" : "PAYOS",
-          cageSize: booking.cageSize || '',
+          petWeight: booking.petWeight || '',
           roomType: booking.roomType,
         });
         if (result.checkoutUrl) {
@@ -236,7 +236,7 @@ export default function Payment() {
           checkIn: booking.checkIn,
           checkOut: booking.checkOut,
           note: combinedNote,
-          cageSize: booking.cageSize,
+          petWeight: booking.petWeight,
           roomType: booking.roomType,
           userVoucherId: payMethod === 'payos' && selectedVoucherId ? selectedVoucherId : undefined,
           paymentMethod: "PAYOS"
@@ -264,7 +264,7 @@ export default function Payment() {
         checkIn: booking.checkIn,
         checkOut: booking.checkOut,
         note: combinedNote,
-        cageSize: booking.cageSize,
+        petWeight: booking.petWeight,
         roomType: booking.roomType,
         userVoucherId: payMethod === 'payos' && selectedVoucherId ? selectedVoucherId : undefined,
       });
@@ -616,7 +616,7 @@ export default function Payment() {
                           ? (booking.petNote ? `${booking.petNote}\n—\nGhi chú thêm: ${bookingNote.trim()}` : bookingNote.trim())
                           : (booking.petNote || ''),
                         paymentMethod: (payMethod === 'cash' ? 'CASH' : 'PAYOS') as "PAYOS" | "CASH",
-                        cageSize: booking.cageSize,
+                        petWeight: booking.petWeight,
                         roomType: booking.roomType,
                         userVoucherId: payMethod === 'payos' && selectedVoucherId ? selectedVoucherId : undefined,
                       };

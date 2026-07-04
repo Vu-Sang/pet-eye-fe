@@ -21,7 +21,7 @@ export const bookingService = {
     checkIn?: string;
     checkOut?: string;
     note?: string;
-    cageSize?: string;
+    petWeight?: string;
     roomType?: string;
     userVoucherId?: number;
   }): Promise<InitiatePaymentResponse> => {

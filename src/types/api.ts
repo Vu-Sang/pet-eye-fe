@@ -64,6 +64,7 @@ export interface ServiceResponse {
   shopName: string;
   serviceName: string;
   category: string;
+  petType: 'DOG' | 'CAT' | 'OTHER';
   price: number;
   durationMinutes: number;
   description: string;
@@ -79,7 +80,7 @@ export interface ServiceResponse {
   /** Custom display labels per tier, e.g. {"BASIC":"Tiêu chuẩn","HD":"Nét cao"} */
   cameraTierLabels?: Record<string, string>;
   cameraDescription?: string;
-  cageSize?: string[];
+  petWeight?: string[];
   roomType?: string[];
   roomTypePrices?: Record<string, number>;
   prices?: number[];
@@ -88,6 +89,7 @@ export interface ServiceResponse {
 export interface ServiceCreationRequest {
   serviceName: string;
   category: string;
+  petType: 'DOG' | 'CAT' | 'OTHER';
   price: number;
   durationMinutes: number;
   description: string;
@@ -98,7 +100,7 @@ export interface ServiceCreationRequest {
   cameraTierPrices?: Record<string, number>;
   cameraTierLabels?: Record<string, string>;
   cameraDescription?: string;
-  cageSize?: string[];
+  petWeight?: string[];
   roomType?: string[];
   roomTypePrices?: Record<string, number>;
   prices?: number[];
@@ -107,6 +109,7 @@ export interface ServiceCreationRequest {
 export interface ServiceUpdateRequest {
   serviceName?: string;
   category?: string;
+  petType?: 'DOG' | 'CAT' | 'OTHER';
   price?: number;
   durationMinutes?: number;
   description?: string;
@@ -118,7 +121,7 @@ export interface ServiceUpdateRequest {
   cameraTierPrices?: Record<string, number>;
   cameraTierLabels?: Record<string, string>;
   cameraDescription?: string;
-  cageSize?: string[];
+  petWeight?: string[];
   roomType?: string[];
   roomTypePrices?: Record<string, number>;
   prices?: number[];
@@ -156,7 +159,7 @@ export interface BookingRequest {
   checkOut?: string;
   note?: string;
   paymentMethod?: 'PAYOS' | 'CASH';
-  cageSize?: string;
+  petWeight?: string;
   roomType?: string;
   userVoucherId?: number;
 }
@@ -207,7 +210,7 @@ export interface BookingResponse {
   cameraConfiguredAt?: string;
   serviceStartDatetime?: string;
   serviceEndDatetime?: string;
-  cageSize?: string;
+  petWeight?: string;
   roomType?: string;
   category?: string;
 }

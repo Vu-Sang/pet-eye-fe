@@ -54,6 +54,42 @@ function tierLabel(tierId: string, tierLabels?: Record<string, string>): string 
   return CAMERA_TIER_META[tierId]?.label ?? tierId;
 }
 
+function matchPetWeight(numericWeight: number, weightTiers?: string[], prices?: number[]): { tier: string; price: number } | null {
+  if (!weightTiers || !prices || weightTiers.length === 0 || prices.length === 0) return null;
+  
+  const thresholds = weightTiers.map(tier => {
+    const num = parseFloat(tier.replace(/[^0-9.]/g, ''));
+    return isNaN(num) ? 0 : num;
+  });
+  
+  let idx = 0;
+  if (numericWeight < thresholds[0]) {
+    idx = 0;
+  } else {
+    for (let i = 0; i < thresholds.length; i++) {
+      if (numericWeight >= thresholds[i]) {
+        idx = i;
+      }
+    }
+  }
+  
+  const price = prices[idx] ?? prices[prices.length - 1];
+  const tier = weightTiers[idx];
+  
+  let friendlyLabel = tier;
+  if (thresholds.length >= 2) {
+    if (idx === 0) {
+      friendlyLabel = `Dưới ${thresholds[0]}kg`;
+    } else if (idx === thresholds.length - 1 && numericWeight >= thresholds[idx]) {
+      friendlyLabel = `Trên ${thresholds[idx - 1]}kg`;
+    } else {
+      friendlyLabel = `${thresholds[idx - 1]} - ${thresholds[idx]}kg`;
+    }
+  }
+  
+  return { tier: friendlyLabel, price };
+}
+
 const today = new Date();
 
 function StarRating({ rating, size = 'text-base' }: { rating: number; size?: string }) {
@@ -240,8 +276,10 @@ export default function ClinicDetail() {
   const [selectedServiceIds, setSelectedServiceIds] = useState<number[]>(editBooking ? editBooking.services?.map((s: any) => s.serviceId) || [] : []);
   const [isHotelSelected, setIsHotelSelected] = useState(editBooking?.services?.some((s: any) => s.category?.toUpperCase() === 'BOARDING' || s.category?.toUpperCase() === 'HOTEL') || false);
   const [selectedCameraTier, setSelectedCameraTier] = useState<string>('BASIC');
-  const [selectedCageSize, setSelectedCageSize] = useState<string>(editBooking?.cageSize || '');
+  const [selectedCageSize, setSelectedCageSize] = useState<string>(editBooking?.petWeight || '');
   const [selectedRoomType, setSelectedRoomType] = useState<string>(editBooking?.roomType || '');
+  const [petTypeFilter, setPetTypeFilter] = useState<'ALL' | 'DOG' | 'CAT' | 'OTHER'>('ALL');
+  const [weightFilter, setWeightFilter] = useState<string>('');
 
   // Derive all active boarding services from API data
   const boardingServices = useMemo(() => {
@@ -277,14 +315,19 @@ export default function ClinicDetail() {
 
   // Non-boarding services for "Dịch vụ nổi bật"
   const nonBoardingServices = useMemo(() => {
-    return apiServices.filter((s: ServiceResponse) => s.category !== 'BOARDING' && s.category.toUpperCase() !== 'HOTEL');
-  }, [apiServices]);
+    return apiServices.filter((s: ServiceResponse) => {
+      const isNormal = s.category !== 'BOARDING' && s.category.toUpperCase() !== 'HOTEL';
+      if (!isNormal || !s.active) return false;
+      if (petTypeFilter !== 'ALL' && s.petType !== petTypeFilter) return false;
+      return true;
+    });
+  }, [apiServices, petTypeFilter]);
 
   useEffect(() => {
     if (boardingService) {
-      const validCage = boardingService.cageSize?.includes(selectedCageSize);
-      if (!validCage && boardingService.cageSize?.length) {
-        setSelectedCageSize(boardingService.cageSize[0]);
+      const validCage = boardingService.petWeight?.includes(selectedCageSize);
+      if (!validCage && boardingService.petWeight?.length) {
+        setSelectedCageSize(boardingService.petWeight[0]);
       }
       const validRoom = boardingService.roomType?.includes(selectedRoomType);
       if (!validRoom && boardingService.roomType?.length) {
@@ -300,8 +343,8 @@ export default function ClinicDetail() {
 
   const boardingBasePrice = useMemo(() => {
     if (!boardingService) return 0;
-    if (boardingService.cageSize?.length && boardingService.prices?.length) {
-      const idx = boardingService.cageSize.indexOf(selectedCageSize);
+    if (boardingService.petWeight?.length && boardingService.prices?.length) {
+      const idx = boardingService.petWeight.indexOf(selectedCageSize);
       if (idx !== -1 && typeof boardingService.prices[idx] === 'number') {
         return boardingService.prices[idx];
       }
@@ -690,9 +733,19 @@ export default function ClinicDetail() {
     setShowPetModal(false);
 
     // Tập hợp tất cả services đã chọn (thường + boarding)
+    let matchedPetWeightOption: string | undefined = undefined;
+
     const selectedServices = selectedServiceIds.map((id) => {
       const svc = apiServices.find((s: ServiceResponse) => s.id === id)!;
-      return { id: svc.id, name: svc.serviceName, price: svc.price, durationMinutes: svc.durationMinutes, category: svc.category, cameraEnabled: svc.cameraEnabled };
+      let effectivePrice = svc.price;
+      if (selectedPet && selectedPet.weight && svc.petWeight && svc.petWeight.length > 0 && svc.prices && svc.prices.length > 0) {
+        const matchResult = matchPetWeight(selectedPet.weight, svc.petWeight, svc.prices);
+        if (matchResult) {
+          effectivePrice = matchResult.price;
+          matchedPetWeightOption = matchResult.tier;
+        }
+      }
+      return { id: svc.id, name: svc.serviceName, price: effectivePrice, durationMinutes: svc.durationMinutes, category: svc.category, cameraEnabled: svc.cameraEnabled };
     });
 
     if (isHotelSelected && boardingService) {
@@ -760,7 +813,7 @@ export default function ClinicDetail() {
         normalServiceNames: hasNormalServices
           ? selectedServiceIds.map(id => apiServices.find((s: ServiceResponse) => s.id === id)?.serviceName).filter(Boolean).join(', ')
           : undefined,
-        cageSize: isHotelSelected ? selectedCageSize : undefined,
+        petWeight: matchedPetWeightOption || (isHotelSelected ? selectedCageSize : undefined),
         roomType: isHotelSelected ? selectedRoomType : undefined,
       }
     });
@@ -1100,7 +1153,7 @@ export default function ClinicDetail() {
                                 <div className="flex flex-col items-end mt-0.5 gap-0.5">
                                   {itemCageExtra > 0 && (
                                     <span className="text-[10px] text-indigo-500 font-medium bg-indigo-50 dark:bg-indigo-500/10 px-1.5 py-0.5 rounded">
-                                      + {itemCageExtra.toLocaleString('vi-VN')}đ (chuồng {selectedCageSize})
+                                      + {itemCageExtra.toLocaleString('vi-VN')}đ (cân nặng {selectedCageSize})
                                     </span>
                                   )}
                                   {itemRoomExtra > 0 && (
@@ -1164,7 +1217,7 @@ export default function ClinicDetail() {
                         })()}
 
                         {/* Additional Boarding info (Cage, Room) */}
-                        {(boardingService.roomType?.length > 0 || boardingService.cageSize?.length > 0) && (
+                        {(boardingService.roomType?.length > 0 || boardingService.petWeight?.length > 0) && (
                           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-4 border-t border-slate-100 dark:border-slate-700/50 pt-4">
                             {boardingService.roomType?.length > 0 && (
                               <div className="flex flex-col">
@@ -1190,21 +1243,21 @@ export default function ClinicDetail() {
                                 )}
                               </div>
                             )}
-                            {boardingService.cageSize?.length > 0 && (
+                            {boardingService.petWeight?.length > 0 && (
                               <div className="flex flex-col">
-                                <span className="text-[10px] font-black uppercase text-slate-400 mb-1">Kích thước chuồng</span>
-                                {boardingService.cageSize.length > 1 ? (
+                                <span className="text-[10px] font-black uppercase text-slate-400 mb-1">Cân nặng của Pet</span>
+                                {boardingService.petWeight.length > 1 ? (
                                   <select
                                     value={selectedCageSize}
                                     onChange={(e) => setSelectedCageSize(e.target.value)}
                                     className="px-3 py-1.5 border border-slate-200 dark:border-slate-700 rounded-lg text-sm font-semibold text-slate-800 dark:text-slate-200 bg-white dark:bg-slate-800 focus:ring-2 focus:ring-[#1a2b4c] outline-none"
                                   >
-                                    {boardingService.cageSize.map((c: string) => (
+                                    {boardingService.petWeight.map((c: string) => (
                                       <option key={c} value={c}>{c}</option>
                                     ))}
                                   </select>
                                 ) : (
-                                  <span className="text-sm font-semibold text-slate-800 dark:text-slate-200">{boardingService.cageSize[0]}</span>
+                                  <span className="text-sm font-semibold text-slate-800 dark:text-slate-200">{boardingService.petWeight[0]}</span>
                                 )}
                               </div>
                             )}
@@ -1277,13 +1330,64 @@ export default function ClinicDetail() {
                 </div>
               )}
 
-              {!servicesLoading && apiServices.length === 0 && (
-                <p className="text-slate-400 text-sm py-4">Cơ sở này chưa có dịch vụ nào.</p>
+              {/* Pet Type & Weight Filters */}
+              <div className="bg-slate-50 dark:bg-slate-800/40 border border-slate-100 dark:border-slate-700/50 rounded-2xl p-4 mb-6 flex flex-col sm:flex-row gap-4 items-center justify-between">
+                <div className="flex flex-col gap-1 w-full sm:w-auto">
+                  <label className="text-xs font-bold text-slate-500 dark:text-slate-400">Xem dịch vụ cho</label>
+                  <div className="flex gap-2 bg-slate-200/50 dark:bg-slate-900/40 p-1 rounded-xl">
+                    {[
+                      { key: 'ALL', label: 'Tất cả' },
+                      { key: 'DOG', label: 'Chó 🐶' },
+                      { key: 'CAT', label: 'Mèo 🐱' },
+                      { key: 'OTHER', label: 'Khác 🐰' }
+                    ].map((btn) => (
+                      <button
+                        key={btn.key}
+                        onClick={() => setPetTypeFilter(btn.key as any)}
+                        className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+                          petTypeFilter === btn.key
+                            ? 'bg-white dark:bg-slate-800 text-slate-800 dark:text-white shadow-sm'
+                            : 'text-slate-400 hover:text-slate-600 dark:hover:text-slate-300'
+                        }`}
+                      >
+                        {btn.label}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="flex flex-col gap-1 w-full sm:w-60">
+                  <label className="text-xs font-bold text-slate-500 dark:text-slate-400">Nhập cân nặng của thú cưng (kg)</label>
+                  <input
+                    type="number"
+                    min={0.1}
+                    step={0.1}
+                    value={weightFilter}
+                    onChange={(e) => setWeightFilter(e.target.value)}
+                    placeholder="VD: 5.5"
+                    className="w-full px-3 py-2 border border-slate-200 dark:border-slate-700 rounded-xl text-sm font-semibold text-slate-800 dark:text-slate-200 bg-white dark:bg-slate-900 outline-none focus:ring-2 focus:ring-[#1a2b4c]/50"
+                  />
+                </div>
+              </div>
+
+              {!servicesLoading && nonBoardingServices.length === 0 && (
+                <p className="text-slate-400 text-sm py-4">Không tìm thấy dịch vụ nào phù hợp.</p>
               )}
 
-              {!servicesLoading && apiServices.length > 0 && (
+              {!servicesLoading && nonBoardingServices.length > 0 && (
                 <div className="flex flex-col gap-3">
-                  {apiServices.map((svc: ServiceResponse) => {
+                  {nonBoardingServices.map((svc: ServiceResponse) => {
+                    const numericWeight = Number(weightFilter);
+                    let displayPrice = svc.price;
+                    let matchedTierLabel = '';
+                    if (!isNaN(numericWeight) && numericWeight > 0 && svc.petWeight && svc.petWeight.length > 0 && svc.prices && svc.prices.length > 0) {
+                      const matchResult = matchPetWeight(numericWeight, svc.petWeight, svc.prices);
+                      if (matchResult) {
+                        displayPrice = matchResult.price;
+                        matchedTierLabel = `(${matchResult.tier})`;
+                      }
+                    }
+
                     return (
                       <div key={svc.id}>
                         <div
@@ -1328,15 +1432,20 @@ export default function ClinicDetail() {
                           </div>
 
                           {/* Price */}
-                          <div className="text-right shrink-0 flex flex-col items-end gap-2">
+                          <div className="text-right shrink-0 flex flex-col items-end gap-1">
                             <div className="flex items-baseline gap-1">
                               <span className="font-bold text-slate-900 dark:text-slate-100 text-sm">
-                                {svc.price.toLocaleString('vi-VN')}đ
+                                {displayPrice.toLocaleString('vi-VN')}đ
                               </span>
                               <span className="text-xs text-slate-400">
                                 {svc.category === 'BOARDING' || svc.category.toUpperCase() === 'HOTEL' ? '/ngày' : '/lần'}
                               </span>
                             </div>
+                            {matchedTierLabel && (
+                              <span className="text-[10px] text-teal-600 font-bold dark:text-teal-400">
+                                {matchedTierLabel}
+                              </span>
+                            )}
                           </div>
                         </div>
                       </div>
@@ -1433,7 +1542,7 @@ export default function ClinicDetail() {
                                 <div className="flex flex-col items-end mt-0.5 gap-0.5">
                                   {itemCageExtra > 0 && (
                                     <span className="text-[10px] text-indigo-500 font-medium bg-indigo-50 dark:bg-indigo-500/10 px-1.5 py-0.5 rounded">
-                                      + {itemCageExtra.toLocaleString('vi-VN')}đ (chuồng {selectedCageSize})
+                                      + {itemCageExtra.toLocaleString('vi-VN')}đ (cân nặng {selectedCageSize})
                                     </span>
                                   )}
                                   {itemRoomExtra > 0 && (
@@ -1497,7 +1606,7 @@ export default function ClinicDetail() {
                         })()}
 
                         {/* Additional Boarding info (Cage, Room) */}
-                        {(boardingService.roomType?.length > 0 || boardingService.cageSize?.length > 0) && (
+                        {(boardingService.roomType?.length > 0 || boardingService.petWeight?.length > 0) && (
                           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-4 border-t border-slate-100 dark:border-slate-700/50 pt-4">
                             {boardingService.roomType?.length > 0 && (
                               <div className="flex flex-col">
@@ -1523,21 +1632,21 @@ export default function ClinicDetail() {
                                 )}
                               </div>
                             )}
-                            {boardingService.cageSize?.length > 0 && (
+                            {boardingService.petWeight?.length > 0 && (
                               <div className="flex flex-col">
-                                <span className="text-[10px] font-black uppercase text-slate-400 mb-1">Kích thước chuồng</span>
-                                {boardingService.cageSize.length > 1 ? (
+                                <span className="text-[10px] font-black uppercase text-slate-400 mb-1">Cân nặng của Pet</span>
+                                {boardingService.petWeight.length > 1 ? (
                                   <select
                                     value={selectedCageSize}
                                     onChange={(e) => setSelectedCageSize(e.target.value)}
                                     className="px-3 py-1.5 border border-slate-200 dark:border-slate-700 rounded-lg text-sm font-semibold text-slate-800 dark:text-slate-200 bg-white dark:bg-slate-800 focus:ring-2 focus:ring-[#1a2b4c] outline-none"
                                   >
-                                    {boardingService.cageSize.map((c: string) => (
+                                    {boardingService.petWeight.map((c: string) => (
                                       <option key={c} value={c}>{c}</option>
                                     ))}
                                   </select>
                                 ) : (
-                                  <span className="text-sm font-semibold text-slate-800 dark:text-slate-200">{boardingService.cageSize[0]}</span>
+                                  <span className="text-sm font-semibold text-slate-800 dark:text-slate-200">{boardingService.petWeight[0]}</span>
                                 )}
                               </div>
                             )}

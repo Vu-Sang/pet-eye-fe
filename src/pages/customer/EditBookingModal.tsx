@@ -9,6 +9,42 @@ import toast from 'react-hot-toast';
 import type { BookingResponse, ServiceResponse } from '../../types/api';
 import { motion, AnimatePresence } from 'motion/react';
 
+function matchPetWeight(numericWeight: number, weightTiers?: string[], prices?: number[]): { tier: string; price: number } | null {
+  if (!weightTiers || !prices || weightTiers.length === 0 || prices.length === 0) return null;
+  
+  const thresholds = weightTiers.map(tier => {
+    const num = parseFloat(tier.replace(/[^0-9.]/g, ''));
+    return isNaN(num) ? 0 : num;
+  });
+  
+  let idx = 0;
+  if (numericWeight < thresholds[0]) {
+    idx = 0;
+  } else {
+    for (let i = 0; i < thresholds.length; i++) {
+      if (numericWeight >= thresholds[i]) {
+        idx = i;
+      }
+    }
+  }
+  
+  const price = prices[idx] ?? prices[prices.length - 1];
+  const tier = weightTiers[idx];
+  
+  let friendlyLabel = tier;
+  if (thresholds.length >= 2) {
+    if (idx === 0) {
+      friendlyLabel = `Dưới ${thresholds[0]}kg`;
+    } else if (idx === thresholds.length - 1 && numericWeight >= thresholds[idx]) {
+      friendlyLabel = `Trên ${thresholds[idx - 1]}kg`;
+    } else {
+      friendlyLabel = `${thresholds[idx - 1]} - ${thresholds[idx]}kg`;
+    }
+  }
+  
+  return { tier: friendlyLabel, price };
+}
+
 interface EditBookingModalProps {
   booking: BookingResponse;
   onClose: () => void;
@@ -29,7 +65,7 @@ export default function EditBookingModal({ booking, onClose, onSuccess }: EditBo
   const [isHotelSelected, setIsHotelSelected] = useState(
     booking.services?.some(s => s.category?.toUpperCase() === 'BOARDING' || s.category?.toUpperCase() === 'HOTEL') || false
   );
-  const [selectedCageSize, setSelectedCageSize] = useState<string>(booking.cageSize || '');
+  const [selectedCageSize, setSelectedCageSize] = useState<string>(booking.petWeight || '');
   const [selectedRoomType, setSelectedRoomType] = useState<string>(booking.roomType || '');
   const [checkInDate, setCheckInDate] = useState(booking.checkIn ? booking.checkIn.substring(0, 10) : today.toISOString().split('T')[0]);
   const [checkOutDate, setCheckOutDate] = useState(() => {
@@ -127,8 +163,8 @@ export default function EditBookingModal({ booking, onClose, onSuccess }: EditBo
 
   const boardingBasePrice = React.useMemo(() => {
     if (!boardingService) return 0;
-    if (boardingService.cageSize?.length && boardingService.prices?.length) {
-      const idx = boardingService.cageSize.indexOf(selectedCageSize);
+    if (boardingService.petWeight?.length && boardingService.prices?.length) {
+      const idx = boardingService.petWeight.indexOf(selectedCageSize);
       if (idx !== -1 && typeof boardingService.prices[idx] === 'number') {
         return boardingService.prices[idx];
       }
@@ -136,20 +172,30 @@ export default function EditBookingModal({ booking, onClose, onSuccess }: EditBo
     return boardingService.price ?? 0;
   }, [boardingService, selectedCageSize]);
 
+  const selectedPet = myPets.find((p: any) => p.id === selectedPetId);
+
   const newTotalPrice = React.useMemo(() => {
     let total = 0;
     if (hasNormalServices) {
       total += selectedServiceIds.reduce((sum, id) => {
         if (id === boardingService?.id) return sum;
         const s = apiServices.find((x: ServiceResponse) => x.id === id);
-        return sum + (s?.price || 0);
+        if (!s) return sum;
+        let effectivePrice = s.price;
+        if (selectedPet?.weight && s.petWeight?.length && s.prices?.length) {
+          const matchResult = matchPetWeight(selectedPet.weight, s.petWeight, s.prices);
+          if (matchResult) {
+            effectivePrice = matchResult.price;
+          }
+        }
+        return sum + (effectivePrice || 0);
       }, 0);
     }
     if (isHotelSelected) {
       total += boardingBasePrice * boardingDays;
     }
     return total;
-  }, [hasNormalServices, isHotelSelected, selectedServiceIds, boardingService, apiServices, boardingBasePrice, boardingDays]);
+  }, [hasNormalServices, isHotelSelected, selectedServiceIds, boardingService, apiServices, boardingBasePrice, boardingDays, selectedPet, myPets]);
 
   const oldTotalPrice = booking.services?.length 
     ? booking.services.reduce((sum, s) => sum + s.servicePrice, 0)
@@ -183,6 +229,20 @@ export default function EditBookingModal({ booking, onClose, onSuccess }: EditBo
       setIsSubmitting(true);
       const primaryServiceId = hasNormalServices ? selectedServiceIds.find(id => id !== boardingService?.id) : boardingService?.id;
       
+      let matchedPetWeightOption: string | undefined = undefined;
+      if (selectedPet?.weight) {
+        for (const id of selectedServiceIds) {
+          const s = apiServices.find((x: ServiceResponse) => x.id === id);
+          if (s && s.petWeight && s.petWeight.length > 0 && s.prices && s.prices.length > 0) {
+            const matchResult = matchPetWeight(selectedPet.weight, s.petWeight, s.prices);
+            if (matchResult) {
+              matchedPetWeightOption = matchResult.tier;
+              break;
+            }
+          }
+        }
+      }
+
       const requestPayload = {
         shopId: booking.shopId,
         serviceId: primaryServiceId,
@@ -193,7 +253,7 @@ export default function EditBookingModal({ booking, onClose, onSuccess }: EditBo
         checkIn: isHotelSelected ? checkInDate : undefined,
         checkOut: isHotelSelected ? checkOutDate : undefined,
         note: booking.note,
-        cageSize: selectedCageSize || undefined,
+        petWeight: matchedPetWeightOption || selectedCageSize || undefined,
         roomType: selectedRoomType || undefined,
         paymentMethod: payDifferenceMethod,
       };
@@ -322,11 +382,11 @@ export default function EditBookingModal({ booking, onClose, onSuccess }: EditBo
               </div>
               
               {/* Cage Size - dynamic mapping */}
-              {boardingService.cageSize?.length > 0 && (
+              {boardingService.petWeight?.length > 0 && (
                 <div>
-                  <label className="text-[10px] font-bold text-slate-500 uppercase mb-2 block">Kích thước lồng</label>
+                  <label className="text-[10px] font-bold text-slate-500 uppercase mb-2 block">Cân nặng của Pet</label>
                   <div className="flex flex-wrap gap-2">
-                    {boardingService.cageSize.map((size: string, idx: number) => (
+                    {boardingService.petWeight.map((size: string, idx: number) => (
                       <button
                         key={size}
                         onClick={() => setSelectedCageSize(size)}

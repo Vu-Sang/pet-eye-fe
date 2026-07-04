@@ -22,7 +22,7 @@ export interface TaskResponse {
   checkOutDatetime?: string;
   serviceStartDatetime?: string;
   serviceEndDatetime?: string;
-  cageSize?: string;
+  petWeight?: string;
   roomType?: string;
   status: 'CONFIRMED' | 'IN_PROGRESS' | 'COMPLETED' | 'CANCELLED' | 'PENDING_PAYMENT' | 'CANCEL_REQUESTED' | 'WAITING_REFUND';
   note: string | null;

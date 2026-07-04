@@ -1400,9 +1400,9 @@ export default function StaffDashboard() {
                                                         </div>
                                                         <div className="p-4 bg-slate-50 rounded-2xl border border-slate-100">
                                                             <div className="flex items-center gap-2 mb-2 text-primary font-bold text-sm">
-                                                                <ClipboardList size={16} /> Kích thước
+                                                                <ClipboardList size={16} /> Cân nặng Pet
                                                             </div>
-                                                            <p className="font-semibold text-slate-800">{selectedTask.cageSize || 'Tiêu chuẩn'}</p>
+                                                            <p className="font-semibold text-slate-800">{selectedTask.petWeight || 'Tiêu chuẩn'}</p>
                                                         </div>
                                                         <div className="p-4 bg-slate-50 rounded-2xl border border-slate-100">
                                                             <div className="flex items-center gap-2 mb-2 text-primary font-bold text-sm">
@@ -1796,8 +1796,8 @@ export default function StaffDashboard() {
                                             </div>
 
                                             <div className="bg-slate-800/50 p-4 rounded-2xl border border-slate-800">
-                                                <p className="text-slate-500 mb-1.5 text-[9px] font-black uppercase tracking-widest">Kích thước chuồng</p>
-                                                <p className="font-bold text-slate-200">{selectedTask.cageSize || 'Tiêu chuẩn'}</p>
+                                                <p className="text-slate-500 mb-1.5 text-[9px] font-black uppercase tracking-widest">Cân nặng Pet</p>
+                                                <p className="font-bold text-slate-200">{selectedTask.petWeight || 'Tiêu chuẩn'}</p>
                                             </div>
                                             <div className="bg-slate-800/50 p-4 rounded-2xl border border-slate-800">
                                                 <p className="text-slate-500 mb-1.5 text-[9px] font-black uppercase tracking-widest">Loại phòng</p>
