@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { User, Mail, Phone, Calendar, Search, Filter, TrendingUp, X, ChevronRight, Clock, ChevronLeft, CreditCard, Heart, Package, Shield, Star, Gift, Rocket, Check, Award, ChevronDown, ChevronUp } from 'lucide-react';
+import { User, Mail, Phone, Calendar, Search, Filter, TrendingUp, X, ChevronRight, Clock, ChevronLeft, CreditCard, Heart, Package, Shield, Star, Gift, Rocket, Check, Award, ChevronDown, ChevronUp, MapPin } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
@@ -239,6 +239,14 @@ export default function ShopCustomers() {
                       </div>
                       <span className={isDark ? 'text-slate-300' : 'text-slate-600'}>{customer.phone}</span>
                     </div>
+                    {customer.address && (
+                      <div className="flex items-center gap-2 text-xs">
+                        <div className={`w-6 h-6 rounded flex items-center justify-center ${isDark ? 'bg-orange-500/20 text-orange-400' : 'bg-orange-100 text-orange-600'}`}>
+                          <MapPin size={14} />
+                        </div>
+                        <span className={`truncate ${isDark ? 'text-slate-300' : 'text-slate-600'}`} title={customer.address}>{customer.address}</span>
+                      </div>
+                    )}
                   </div>
 
                   {/* Stats */}
@@ -373,6 +381,14 @@ export default function ShopCustomers() {
                                 </div>
                                 <span className={`text-xs font-bold ${isDark ? 'text-emerald-100' : 'text-slate-600'}`}>{selectedCustomer.phone}</span>
                             </div>
+                            {selectedCustomer.address && (
+                                <div className={`flex items-center gap-3 p-3 rounded-2xl border transition-all ${isDark ? 'bg-white/5 border-white/10 hover:bg-white/10' : 'bg-white border-slate-100 hover:bg-slate-50'}`}>
+                                    <div className={`w-8 h-8 rounded-lg flex items-center justify-center ${isDark ? 'bg-orange-500/20 text-orange-400' : 'bg-orange-50 text-orange-600'}`}>
+                                        <MapPin size={16} />
+                                    </div>
+                                    <span className={`text-xs font-bold leading-relaxed ${isDark ? 'text-orange-100' : 'text-slate-600'}`}>{selectedCustomer.address}</span>
+                                </div>
+                            )}
                         </div>
 
                         <div className="mt-auto pt-8 w-full">

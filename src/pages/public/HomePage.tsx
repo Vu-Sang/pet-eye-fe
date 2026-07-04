@@ -772,7 +772,7 @@ export default function HomePage() {
                                             <span className="material-symbols-outlined text-[16px] mr-1">star</span>
                                             {shop.ratingAvg || 5.0}
                                         </div>
-                                        <span className="text-[10px] font-black uppercase tracking-widest bg-slate-100 dark:bg-slate-700 text-slate-500 dark:text-slate-400 px-3 py-1 rounded-lg">{shop.shopType}</span>
+                                        <span className="text-[10px] font-black uppercase tracking-widest bg-slate-100 dark:bg-slate-700 text-slate-500 dark:text-slate-400 px-3 py-1 rounded-lg">{shop.shopType?.split(',').map((t: string) => t.trim()).join(' + ')}</span>
                                     </div>
                                     <div className="flex items-center gap-1 text-slate-400">
                                         <span className="material-symbols-outlined text-[14px]">location_on</span>

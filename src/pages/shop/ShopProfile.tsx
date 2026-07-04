@@ -83,9 +83,16 @@ export default function ShopProfile() {
   const galleryInputRef = React.useRef<HTMLInputElement>(null);
   const [uploadingGallery, setUploadingGallery] = useState(false);
 
+  const SHOP_TYPES = [
+    { value: 'CLINIC', label: 'Phòng khám thú y' },
+    { value: 'SPA', label: 'Spa & Grooming' },
+    { value: 'HOTEL', label: 'Khách sạn thú cưng' },
+    { value: 'MIXED', label: 'Dịch vụ tổng hợp' }
+  ];
+
   const [shopInfo, setShopInfo] = useState({
     name: '',
-    type: '',
+    type: [] as string[],
     email: '',
     phone: '',
     address: '',
@@ -119,7 +126,7 @@ export default function ShopProfile() {
       setShopInfo(prev => ({
         ...prev,
         name: data.shopName || prev.name,
-        type: data.shopType || prev.type,
+        type: data.shopType ? data.shopType.split(',').filter(Boolean) : prev.type,
         email: data.email || prev.email,
         phone: data.phone || prev.phone,
         address: data.address || prev.address,
@@ -151,7 +158,7 @@ export default function ShopProfile() {
       setError(null);
       const updateData = {
         shopName: shopInfo.name,
-        shopType: shopInfo.type,
+        shopType: shopInfo.type.join(','),
         email: shopInfo.email,
         phone: shopInfo.phone,
         address: shopInfo.address,
@@ -173,7 +180,7 @@ export default function ShopProfile() {
       setShopInfo(prev => ({
         ...prev,
         name: data.shopName || prev.name,
-        type: data.shopType || prev.type,
+        type: data.shopType ? data.shopType.split(',').filter(Boolean) : prev.type,
         email: data.email || prev.email,
         phone: data.phone || prev.phone,
         address: data.address || prev.address,
@@ -237,7 +244,7 @@ export default function ShopProfile() {
       // Auto-save
       const updateData = {
         shopName: updatedInfo.name,
-        shopType: updatedInfo.type,
+        shopType: updatedInfo.type.join(','),
         email: updatedInfo.email,
         phone: updatedInfo.phone,
         address: updatedInfo.address,
@@ -274,7 +281,7 @@ export default function ShopProfile() {
     try {
       const updateData = {
         shopName: updatedInfo.name,
-        shopType: updatedInfo.type,
+        shopType: updatedInfo.type.join(','),
         email: updatedInfo.email,
         phone: updatedInfo.phone,
         address: updatedInfo.address,
@@ -480,7 +487,7 @@ export default function ShopProfile() {
                       {shopInfo.name || 'Tên cửa hàng'}
                     </h2>
                     <p className={`text-sm font-medium mt-1 ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>
-                      {shopInfo.type || 'Chưa cập nhật loại hình'} • {shopInfo.city || 'Chưa cập nhật địa chỉ'}
+                      {shopInfo.type.length > 0 ? shopInfo.type.map(t => SHOP_TYPES.find(st => st.value === t)?.label || t).join(' + ') : 'Chưa cập nhật loại hình'} • {shopInfo.city || 'Chưa cập nhật địa chỉ'}
                     </p>
                   </div>
                 </div>
@@ -627,16 +634,49 @@ export default function ShopProfile() {
                 <label className={`block text-sm font-bold mb-2 ${isDark ? 'text-slate-300' : 'text-slate-700'}`}>
                   Loại hình *
                 </label>
-                <select
-                  value={shopInfo.type}
-                  onChange={(e) => setShopInfo({ ...shopInfo, type: e.target.value })}
-                  className={`w-full px-4 py-2 border rounded-lg focus:ring-2 outline-none transition-all ${isDark ? 'bg-slate-800/50 border-slate-700 text-white focus:ring-indigo-500/50 focus:border-indigo-500' : 'bg-white border-slate-200 text-slate-900 focus:ring-indigo-500/20 focus:border-indigo-500'}`}
-                >
-                  <option value="CLINIC" className={isDark ? 'bg-slate-800 text-white' : ''}>Phòng khám thú y</option>
-                  <option value="SPA" className={isDark ? 'bg-slate-800 text-white' : ''}>Spa & Grooming</option>
-                  <option value="HOTEL" className={isDark ? 'bg-slate-800 text-white' : ''}>Khách sạn thú cưng</option>
-                  <option value="MIXED" className={isDark ? 'bg-slate-800 text-white' : ''}>Dịch vụ tổng hợp</option>
-                </select>
+                <div className="flex flex-wrap gap-2">
+                  {SHOP_TYPES.map((st) => {
+                    const isSelected = shopInfo.type.includes(st.value);
+                    const concreteSelected = shopInfo.type.filter(v => v !== 'MIXED');
+                    const isMixedDisabled = st.value === 'MIXED' && concreteSelected.length >= 2;
+                    return (
+                      <button
+                        key={st.value}
+                        type="button"
+                        disabled={isMixedDisabled}
+                        onClick={() => {
+                          setShopInfo(prev => {
+                            if (st.value === 'MIXED') {
+                              return { ...prev, type: ['MIXED'] };
+                            }
+                            if (prev.type.includes('MIXED')) {
+                              return { ...prev, type: [st.value] };
+                            }
+                            if (prev.type.includes(st.value)) {
+                              return { ...prev, type: prev.type.filter(v => v !== st.value) };
+                            }
+                            if (prev.type.length >= 2) {
+                              return prev;
+                            }
+                            return { ...prev, type: [...prev.type, st.value] };
+                          });
+                        }}
+                        className={`px-4 py-2 rounded-lg text-sm font-semibold border transition-all ${
+                          isMixedDisabled
+                            ? (isDark ? 'border-slate-700 text-slate-600 cursor-not-allowed bg-slate-800/30' : 'border-slate-200 text-slate-300 cursor-not-allowed bg-slate-50')
+                            : isSelected
+                            ? (isDark ? 'border-indigo-500 bg-indigo-600 text-white shadow-lg shadow-indigo-500/20' : 'border-[#1a2b4c] bg-[#1a2b4c] text-white shadow-md')
+                            : (isDark ? 'border-slate-600 text-slate-300 hover:border-indigo-500 hover:bg-indigo-500/10' : 'border-slate-200 text-slate-700 hover:border-[#1a2b4c] hover:bg-slate-50')
+                        }`}
+                      >
+                        {st.label}
+                      </button>
+                    );
+                  })}
+                </div>
+                <p className={`text-xs mt-2 ${isDark ? 'text-slate-500' : 'text-slate-400'}`}>
+                  Chọn tối đa 2 loại hình. "Dịch vụ tổng hợp" = cả 3 loại.
+                </p>
               </div>
 
               <div>

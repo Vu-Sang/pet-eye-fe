@@ -176,7 +176,7 @@ export default function ShopMap({
           new goongjs.Popup({ offset: 25 }).setHTML(`
             <div style="padding:8px; min-width:160px;">
               <h3 style="font-weight:bold; font-size:14px; margin-bottom:4px;">${shop.shopName}</h3>
-              <p style="font-size:12px; color:#64748b; margin-bottom:2px;">${shop.shopType}</p>
+              <p style="font-size:12px; color:#64748b; margin-bottom:2px;">${shop.shopType?.split(',').map((t: string) => t.trim()).join(' + ')}</p>
               <p style="font-size:12px;">📍 ${shop.distanceKm.toFixed(1)} km</p>
               <p style="font-size:12px;">⭐ ${shop.ratingAvg.toFixed(1)}</p>
             </div>

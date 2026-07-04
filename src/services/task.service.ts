@@ -13,6 +13,7 @@ export interface TaskResponse {
   customerName: string;
   customerEmail?: string;
   customerPhone?: string;
+  customerAddress?: string;
   serviceId: number;
   serviceName: string;
   servicePrice: number;
