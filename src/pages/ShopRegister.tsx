@@ -136,7 +136,7 @@ export default function ShopRegister() {
       const selectedTypes = formData.shopType;
       const request = {
         shopName: formData.shopName,
-        shopType: selectedTypes.includes('MIXED') || selectedTypes.length >= 2 ? 'MIXED' : (selectedTypes[0] || ''),
+        shopType: selectedTypes.join(','),
         email: formData.email,
         phone: formData.phone,
         address: formData.address,

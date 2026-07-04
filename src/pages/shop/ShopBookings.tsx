@@ -99,6 +99,15 @@ function BookingListItem({
                                     <p className="text-xs font-bold text-slate-700 dark:text-slate-300">{booking.customerName}</p>
                                 </div>
                             </div>
+                            {booking.customerAddress && (
+                                <div className="flex items-center gap-3">
+                                    <div className="w-8 h-8 rounded-lg bg-slate-50 dark:bg-slate-900 flex items-center justify-center text-slate-400"><MapPin size={14} /></div>
+                                    <div className="min-w-0">
+                                        <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Địa chỉ</p>
+                                        <p className="text-xs font-bold text-slate-700 dark:text-slate-300 truncate" title={booking.customerAddress}>{booking.customerAddress}</p>
+                                    </div>
+                                </div>
+                            )}
                             <div className="flex items-center gap-3">
                                 <div className="w-8 h-8 rounded-lg bg-slate-50 dark:bg-slate-900 flex items-center justify-center text-slate-400"><Clock size={14} /></div>
                                 <div>

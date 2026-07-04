@@ -239,6 +239,14 @@ export default function ShopCustomers() {
                     </div>
                     <span className={isDark ? 'text-slate-300' : 'text-slate-600'}>{customer.phone}</span>
                   </div>
+                  {customer.address && (
+                    <div className="flex items-center gap-2 text-xs">
+                      <div className={`w-6 h-6 rounded flex items-center justify-center ${isDark ? 'bg-orange-500/20 text-orange-400' : 'bg-orange-100 text-orange-600'}`}>
+                        <MapPin size={14} />
+                      </div>
+                      <span className={`truncate ${isDark ? 'text-slate-300' : 'text-slate-600'}`} title={customer.address}>{customer.address}</span>
+                    </div>
+                  )}
                 </div>
 
                 {/* Stats */}

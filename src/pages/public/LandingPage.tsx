@@ -389,8 +389,10 @@ export default function Home() {
                     ) : (
                       <img src={spaImage} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" alt="Placeholder" />
                     )}
-                    <div className="absolute top-4 left-4 flex gap-2">
-                      <span className="bg-white/95 dark:bg-slate-950/80 backdrop-blur text-primary dark:text-blue-400 border border-slate-100 dark:border-slate-800 shadow-sm px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest">{shop.shopType}</span>
+                    <div className="absolute top-4 left-4 flex gap-2 flex-wrap">
+                      {shop.shopType?.split(',').map((t: string, i: number) => (
+                        <span key={i} className="bg-white/95 dark:bg-slate-950/80 backdrop-blur text-primary dark:text-blue-400 border border-slate-100 dark:border-slate-800 shadow-sm px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest">{t.trim()}</span>
+                      ))}
                     </div>
                     {shop.ratingAvg > 0 && (
                       <div className="absolute top-4 right-4 bg-yellow-400 text-yellow-900 px-2 py-1 rounded-xl text-xs font-black flex items-center gap-1 shadow-lg">
@@ -560,7 +562,7 @@ export default function Home() {
                               </div>
                             </div>
                             <div className="p-4 md:p-5 flex-1 flex flex-col">
-                              <p className="text-[10px] font-black text-primary uppercase tracking-widest mb-1">{shop.shopType}</p>
+                              <p className="text-[10px] font-black text-primary uppercase tracking-widest mb-1">{shop.shopType?.split(',').map((t: string) => t.trim()).join(' + ')}</p>
                               <h4 className="text-lg font-black text-slate-900 dark:text-white truncate">{shop.shopName}</h4>
                               <p className="text-sm text-slate-500 mt-2 line-clamp-2">{shop.address}, {shop.city}</p>
                             </div>

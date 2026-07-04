@@ -34,6 +34,10 @@ const SHOP_TYPE_TABS = [
 ];
 const getShopTypeLabel = (type: string | undefined) => {
   if (!type) return '';
+  // Handle comma-separated types
+  if (type.includes(',')) {
+    return type.split(',').map(t => getShopTypeLabel(t.trim())).filter(Boolean).join(' + ');
+  }
   const upper = type.toUpperCase();
   if (upper.includes('CLINIC') || upper.includes('KHÁM') || upper.includes('BỆNH VIỆN')) return 'Khám thú y';
   if (upper.includes('SPA') || upper.includes('GROOMING')) return 'Spa & Grooming';

@@ -61,7 +61,7 @@ export default function NearbyShops({ shops, loading }: NearbyShopsProps) {
               </Link>
               
               <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 line-clamp-1">
-                {shop.shopType}
+                {shop.shopType?.split(',').map((t: string) => t.trim()).join(' + ')}
               </p>
 
               <div className="flex items-center gap-3 mt-2">
