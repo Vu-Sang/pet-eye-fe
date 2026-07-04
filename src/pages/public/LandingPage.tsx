@@ -10,6 +10,7 @@ import { motion, AnimatePresence } from 'motion/react';
 import { useAuth } from '../../contexts/AuthContext';
 import { useTheme } from '../../contexts/ThemeContext';
 import { trackHeroSearch, trackClickFeaturedShop, trackUseGpsNearby, trackClickCta } from '../../lib/analytics';
+import { translateShopType, getShopTypeLabel } from '../../utils/shopHelper';
 
 // Import assets
 import heroDogImage from '../../assets/landing/hero_dog_v2.png';
@@ -138,7 +139,7 @@ export default function Home() {
       </div>
 
       {/* ─── Hero Section ────────────────────────────────────────────── */}
-      <section className="relative min-h-fit md:min-h-[80vh] xl:min-h-[85vh] flex items-center justify-center pt-32 pb-6 md:pt-32 md:pb-8 xl:pt-40 xl:pb-12 px-4 sm:px-6 overflow-hidden bg-transparent">
+      <section className="relative min-h-fit md:min-h-[80vh] xl:min-h-[85vh] flex items-center justify-center pt-32 pb-6 md:pt-32 md:pb-8 xl:pt-40 xl:pb-12 px-4 sm:px-6 bg-transparent">
         <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none">
           {/* Falling Paw Prints (Optimized with hardware acceleration) */}
           {[...Array(5)].map((_, i) => (
@@ -391,7 +392,7 @@ export default function Home() {
                     )}
                     <div className="absolute top-4 left-4 flex gap-2 flex-wrap">
                       {shop.shopType?.split(',').map((t: string, i: number) => (
-                        <span key={i} className="bg-white/95 dark:bg-slate-950/80 backdrop-blur text-primary dark:text-blue-400 border border-slate-100 dark:border-slate-800 shadow-sm px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest">{t.trim()}</span>
+                        <span key={i} className="bg-white/95 dark:bg-slate-950/80 backdrop-blur text-primary dark:text-blue-400 border border-slate-100 dark:border-slate-800 shadow-sm px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest">{translateShopType(t)}</span>
                       ))}
                     </div>
                     {shop.ratingAvg > 0 && (
@@ -562,7 +563,7 @@ export default function Home() {
                               </div>
                             </div>
                             <div className="p-4 md:p-5 flex-1 flex flex-col">
-                              <p className="text-[10px] font-black text-primary uppercase tracking-widest mb-1">{shop.shopType?.split(',').map((t: string) => t.trim()).join(' + ')}</p>
+                              <p className="text-[10px] font-black text-primary uppercase tracking-widest mb-1">{getShopTypeLabel(shop.shopType)}</p>
                               <h4 className="text-lg font-black text-slate-900 dark:text-white truncate">{shop.shopName}</h4>
                               <p className="text-sm text-slate-500 mt-2 line-clamp-2">{shop.address}, {shop.city}</p>
                             </div>
