@@ -14,6 +14,9 @@ export interface ShopPublicResponse {
   logoUrl?: string;
   bannerUrl?: string;
   galleryUrls?: string;
+  galleryLayout?: string;
+  customGalleryConfig?: string;
+  useBannerInGallery?: boolean;
   isVerified: boolean;
   ratingAvg: number;
   ownerId: number;
@@ -71,6 +74,9 @@ export interface ShopUpdateRequest {
   logoUrl?: string;
   bannerUrl?: string;
   galleryUrls?: string;
+  galleryLayout?: string;
+  customGalleryConfig?: string;
+  useBannerInGallery?: boolean;
   assignmentMode?: 'MANUAL' | 'OPEN_POOL' | 'AUTO';
   lateGracePeriod?: number;
 }

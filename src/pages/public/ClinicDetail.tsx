@@ -113,6 +113,8 @@ export default function ClinicDetail() {
   const { user } = useAuth();
   const queryClient = useQueryClient();
   const [showFullDesc, setShowFullDesc] = useState(false);
+  const [showGallery, setShowGallery] = useState(false);
+  const [activeImageIndex, setActiveImageIndex] = useState(0);
 
   // ── Real data from API ──────────────────────────────────────────────────────
   const { data: shop, isLoading: shopLoading } = useQuery({
@@ -858,7 +860,7 @@ export default function ClinicDetail() {
   // Derive gallery images from banner and galleryUrls
   const galleryImages = React.useMemo(() => {
     const images = [];
-    if (shop?.bannerUrl) images.push(shop.bannerUrl);
+    if (shop?.bannerUrl && shop?.useBannerInGallery !== false) images.push(shop.bannerUrl);
     if (shop?.galleryUrls) {
       images.push(...shop.galleryUrls.split(',').filter(Boolean));
     }
@@ -869,7 +871,22 @@ export default function ClinicDetail() {
     }
 
     return images;
-  }, [shop?.bannerUrl, shop?.galleryUrls]);
+  }, [shop?.bannerUrl, shop?.galleryUrls, shop?.galleryLayout, shop?.customGalleryUrls, shop?.useBannerInGallery]);
+
+  // Determine effective layout count based on shop preference
+  const effectiveLayoutCount = React.useMemo(() => {
+    if (!shop?.galleryLayout || shop.galleryLayout === 'AUTO') {
+      return galleryImages.length;
+    }
+    const maxAvailable = galleryImages.length;
+    switch (shop.galleryLayout) {
+      case 'LAYOUT_1': return Math.min(1, maxAvailable);
+      case 'LAYOUT_2': return Math.min(2, maxAvailable);
+      case 'LAYOUT_3': return Math.min(3, maxAvailable);
+      case 'LAYOUT_5_PLUS': return Math.max(Math.min(5, maxAvailable), maxAvailable >= 5 ? 5 : maxAvailable);
+      default: return maxAvailable;
+    }
+  }, [shop?.galleryLayout, galleryImages.length]);
 
   const dayName = today.toLocaleDateString('vi-VN', { weekday: 'long' });
   const dateStr = today.toLocaleDateString('vi-VN', { day: '2-digit', month: '2-digit' });
@@ -1010,35 +1027,79 @@ export default function ClinicDetail() {
           </div>
 
           {/* Desktop Hero Image Grid (Only on >= lg) */}
-          <div className={`hidden lg:order-none w-full h-[460px] gap-2 overflow-hidden rounded-2xl mb-8 ${galleryImages.length === 1 ? 'lg:flex' :
-            galleryImages.length === 2 ? 'lg:grid lg:grid-cols-2' :
-              galleryImages.length === 3 ? 'lg:grid lg:grid-cols-3' :
-                galleryImages.length === 4 ? 'lg:grid lg:grid-cols-3 lg:grid-rows-2' :
+          {shop?.galleryLayout === 'CUSTOM' ? (
+            <div className="hidden lg:grid grid-cols-4 md:grid-cols-6 auto-rows-[140px] lg:auto-rows-[180px] grid-flow-dense gap-2 w-full mb-8 rounded-2xl overflow-hidden relative">
+              {(() => {
+                try {
+                  const blocks = JSON.parse(shop.customGalleryConfig || '[]');
+                  if (blocks.length === 0) return null;
+                  
+                  return blocks.map((block: any, i: number) => {
+                    let spanClass = "col-span-1 row-span-1";
+                    if (block.type === '1x2') spanClass = "col-span-1 row-span-2";
+                    else if (block.type === '2x1') spanClass = "col-span-2 row-span-1";
+                    else if (block.type === '2x2') spanClass = "col-span-2 row-span-2";
+                    else if (block.type === '3x2') spanClass = "col-span-3 row-span-2";
+
+                    return (
+                      <div 
+                        key={block.id || i} 
+                        onClick={() => { setActiveImageIndex(0); setShowGallery(true); }}
+                        className={`${spanClass} bg-center bg-no-repeat bg-cover hover:brightness-95 transition-all cursor-pointer relative rounded-lg overflow-hidden border border-black/5 shadow-sm`} 
+                        style={{ backgroundImage: `url(${block.url || 'https://images.unsplash.com/photo-1548199973-03cce0bbc87b?auto=format&fit=crop&w=1200&q=80'})` }}
+                      >
+                        <div className="absolute inset-0 bg-black/10 hover:bg-transparent transition-colors" />
+                      </div>
+                    );
+                  });
+                } catch {
+                  return null;
+                }
+              })()}
+              <button onClick={() => { setActiveImageIndex(0); setShowGallery(true); }} className="absolute bottom-3 right-3 bg-white dark:bg-slate-900 text-slate-900 dark:text-white px-3 py-1.5 rounded-lg text-xs font-bold shadow-lg flex items-center gap-1.5 hover:scale-105 transition-transform z-10">
+                <span className="material-symbols-outlined text-sm">grid_view</span>
+                Xem tất cả ảnh
+              </button>
+            </div>
+          ) : (
+            <div className={`hidden lg:order-none w-full h-[460px] gap-2 overflow-hidden rounded-2xl mb-8 ${effectiveLayoutCount === 1 ? 'lg:flex' :
+              effectiveLayoutCount === 2 ? 'lg:grid lg:grid-cols-2' :
+                effectiveLayoutCount === 3 ? 'lg:grid lg:grid-cols-3' :
                   'lg:grid lg:grid-cols-4 lg:grid-rows-2'
-            }`}>
+              }`}>
           {/* Layout for 1 image */}
-          {galleryImages.length === 1 && (
+          {effectiveLayoutCount === 1 && (
             <div
               className="w-full h-full bg-center bg-no-repeat bg-cover hover:brightness-95 transition-all cursor-pointer relative"
               style={{ backgroundImage: `url(${galleryImages[0]})` }}
             >
               <div className="absolute inset-0 bg-black/10 hover:bg-transparent transition-colors" />
+              <button onClick={() => { setActiveImageIndex(0); setShowGallery(true); }} className="absolute bottom-3 right-3 bg-white dark:bg-slate-900 text-slate-900 dark:text-white px-3 py-1.5 rounded-lg text-xs font-bold shadow-lg flex items-center gap-1.5 hover:scale-105 transition-transform">
+                <span className="material-symbols-outlined text-sm">grid_view</span>
+                Xem tất cả ảnh
+              </button>
             </div>
           )}
 
           {/* Layout for 2 images */}
-          {galleryImages.length === 2 && galleryImages.map((img, i) => (
+          {effectiveLayoutCount === 2 && galleryImages.slice(0, 2).map((img, i) => (
             <div
               key={i}
               className="w-full h-full bg-center bg-no-repeat bg-cover hover:brightness-95 transition-all cursor-pointer relative"
               style={{ backgroundImage: `url(${img})` }}
             >
               <div className="absolute inset-0 bg-black/10 hover:bg-transparent transition-colors" />
+              {i === 1 && (
+                <button onClick={() => { setActiveImageIndex(0); setShowGallery(true); }} className="absolute bottom-3 right-3 bg-white dark:bg-slate-900 text-slate-900 dark:text-white px-3 py-1.5 rounded-lg text-xs font-bold shadow-lg flex items-center gap-1.5 hover:scale-105 transition-transform">
+                  <span className="material-symbols-outlined text-sm">grid_view</span>
+                  Xem tất cả ảnh
+                </button>
+              )}
             </div>
           ))}
 
           {/* Layout for 3 images */}
-          {galleryImages.length === 3 && (
+          {effectiveLayoutCount === 3 && (
             <>
               <div
                 className="col-span-2 row-span-1 bg-center bg-no-repeat bg-cover hover:brightness-95 transition-all cursor-pointer relative"
@@ -1054,43 +1115,20 @@ export default function ClinicDetail() {
                     style={{ backgroundImage: `url(${img})` }}
                   >
                     <div className="absolute inset-0 bg-black/10 hover:bg-transparent transition-colors" />
+                    {i === 1 && (
+                      <button onClick={() => { setActiveImageIndex(0); setShowGallery(true); }} className="absolute bottom-3 right-3 bg-white dark:bg-slate-900 text-slate-900 dark:text-white px-3 py-1.5 rounded-lg text-xs font-bold shadow-lg flex items-center gap-1.5 hover:scale-105 transition-transform">
+                        <span className="material-symbols-outlined text-sm">grid_view</span>
+                        Xem tất cả ảnh
+                      </button>
+                    )}
                   </div>
                 ))}
-              </div>
-            </>
-          )}
-
-          {/* Layout for 4 images */}
-          {galleryImages.length === 4 && (
-            <>
-              <div
-                className="col-span-2 row-span-2 bg-center bg-no-repeat bg-cover hover:brightness-95 transition-all cursor-pointer relative"
-                style={{ backgroundImage: `url(${galleryImages[0]})` }}
-              >
-                <div className="absolute inset-0 bg-black/10 hover:bg-transparent transition-colors" />
-              </div>
-              <div className="col-span-1 row-span-2 flex flex-col gap-2">
-                {galleryImages.slice(1, 3).map((img, i) => (
-                  <div
-                    key={i}
-                    className="flex-1 bg-center bg-no-repeat bg-cover hover:brightness-95 transition-all cursor-pointer relative"
-                    style={{ backgroundImage: `url(${img})` }}
-                  >
-                    <div className="absolute inset-0 bg-black/10 hover:bg-transparent transition-colors" />
-                  </div>
-                ))}
-              </div>
-              <div
-                className="col-span-1 row-span-2 bg-center bg-no-repeat bg-cover hover:brightness-95 transition-all cursor-pointer relative"
-                style={{ backgroundImage: `url(${galleryImages[3]})` }}
-              >
-                <div className="absolute inset-0 bg-black/10 hover:bg-transparent transition-colors" />
               </div>
             </>
           )}
 
           {/* Layout for 5+ images */}
-          {galleryImages.length >= 5 && (
+          {effectiveLayoutCount >= 5 && (
             <>
               <div
                 className="col-span-2 row-span-2 bg-center bg-no-repeat bg-cover hover:brightness-95 transition-all cursor-pointer relative"
@@ -1112,16 +1150,15 @@ export default function ClinicDetail() {
                 style={{ backgroundImage: `url(${galleryImages[4]})` }}
               >
                 <div className="absolute inset-0 bg-black/10 hover:bg-transparent transition-colors" />
-                {galleryImages.length > 5 && (
-                  <button className="absolute bottom-3 right-3 bg-white dark:bg-slate-900 text-slate-900 dark:text-white px-3 py-1.5 rounded-lg text-xs font-bold shadow-lg flex items-center gap-1.5 hover:scale-105 transition-transform">
-                    <span className="material-symbols-outlined text-sm">grid_view</span>
-                    Xem tất cả ảnh
-                  </button>
-                )}
+                <button onClick={() => { setActiveImageIndex(0); setShowGallery(true); }} className="absolute bottom-3 right-3 bg-white dark:bg-slate-900 text-slate-900 dark:text-white px-3 py-1.5 rounded-lg text-xs font-bold shadow-lg flex items-center gap-1.5 hover:scale-105 transition-transform">
+                  <span className="material-symbols-outlined text-sm">grid_view</span>
+                  Xem tất cả ảnh
+                </button>
               </div>
             </>
           )}
         </div>
+          )}
         </div>
 
         {/* Map & Directions Section - Đã chuyển xuống dạng Modal ở cuối file */}
@@ -3436,6 +3473,71 @@ export default function ClinicDetail() {
                 </div>
               </div>
             </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Fullscreen Image Gallery Modal */}
+      <AnimatePresence>
+        {showGallery && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-50 bg-black/95 flex flex-col"
+          >
+            {/* Header */}
+            <div className="flex justify-between items-center p-4 text-white absolute top-0 left-0 right-0 z-10 bg-gradient-to-b from-black/60 to-transparent">
+              <div className="font-medium text-sm">
+                {activeImageIndex + 1} / {galleryImages.length}
+              </div>
+              <button
+                onClick={() => setShowGallery(false)}
+                className="p-2 bg-white/10 hover:bg-white/20 rounded-full backdrop-blur-sm transition-colors"
+              >
+                <span className="material-symbols-outlined">close</span>
+              </button>
+            </div>
+
+            {/* Main Image View */}
+            <div className="flex-1 flex items-center justify-center relative overflow-hidden">
+              <button
+                onClick={() => setActiveImageIndex(prev => prev > 0 ? prev - 1 : galleryImages.length - 1)}
+                className="absolute left-4 z-10 p-3 bg-white/10 hover:bg-white/20 rounded-full text-white backdrop-blur-sm transition-colors"
+              >
+                <span className="material-symbols-outlined">chevron_left</span>
+              </button>
+              
+              <motion.img
+                key={activeImageIndex}
+                initial={{ opacity: 0, x: 20 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: -20 }}
+                src={galleryImages[activeImageIndex]}
+                alt={`Gallery ${activeImageIndex}`}
+                className="max-h-full max-w-full object-contain"
+              />
+
+              <button
+                onClick={() => setActiveImageIndex(prev => prev < galleryImages.length - 1 ? prev + 1 : 0)}
+                className="absolute right-4 z-10 p-3 bg-white/10 hover:bg-white/20 rounded-full text-white backdrop-blur-sm transition-colors"
+              >
+                <span className="material-symbols-outlined">chevron_right</span>
+              </button>
+            </div>
+
+            {/* Thumbnails */}
+            <div className="h-24 bg-black/50 p-2 flex items-center gap-2 overflow-x-auto hide-scrollbar border-t border-white/10">
+              {galleryImages.map((img, idx) => (
+                <button
+                  key={idx}
+                  onClick={() => setActiveImageIndex(idx)}
+                  className={`flex-shrink-0 h-full aspect-square rounded-md overflow-hidden border-2 transition-all ${activeImageIndex === idx ? 'border-amber-500 scale-95 opacity-100' : 'border-transparent opacity-50 hover:opacity-100'}`}
+                >
+                  <img src={img} alt={`Thumb ${idx}`} className="w-full h-full object-cover" />
+                </button>
+              ))}
+            </div>
           </motion.div>
         )}
       </AnimatePresence>

@@ -5,6 +5,12 @@ import { fileService } from '../../services/file.service';
 import toast from 'react-hot-toast';
 import { useTheme } from '../../contexts/ThemeContext';
 
+export interface CustomGalleryBlock {
+  id: string;
+  type: '1x1' | '1x2' | '2x1' | '2x2' | '3x2';
+  url: string;
+}
+
 export default function ShopProfile() {
   const { isDark } = useTheme();
   const [loading, setLoading] = useState(true);
@@ -105,6 +111,9 @@ export default function ShopProfile() {
     logoUrl: '',
     bannerUrl: '',
     galleryUrls: '',
+    galleryLayout: 'AUTO',
+    customGalleryConfig: '[]',
+    useBannerInGallery: true,
     isVerified: false,
     lateGracePeriod: 15,
   });
@@ -139,6 +148,9 @@ export default function ShopProfile() {
         logoUrl: data.logoUrl || prev.logoUrl,
         bannerUrl: data.bannerUrl || prev.bannerUrl,
         galleryUrls: data.galleryUrls || prev.galleryUrls,
+        galleryLayout: data.galleryLayout || 'AUTO',
+        customGalleryConfig: data.customGalleryConfig || '[]',
+        useBannerInGallery: data.useBannerInGallery ?? true,
         isVerified: data.isVerified,
         lateGracePeriod: data.lateGracePeriod ?? prev.lateGracePeriod,
       }));
@@ -171,6 +183,9 @@ export default function ShopProfile() {
         logoUrl: shopInfo.logoUrl,
         bannerUrl: shopInfo.bannerUrl,
         galleryUrls: shopInfo.galleryUrls,
+        galleryLayout: shopInfo.galleryLayout,
+        customGalleryConfig: shopInfo.customGalleryConfig,
+        useBannerInGallery: shopInfo.useBannerInGallery,
         lateGracePeriod: shopInfo.lateGracePeriod,
       };
       console.log('Sending update request with data:', updateData);
@@ -193,6 +208,9 @@ export default function ShopProfile() {
         logoUrl: data.logoUrl || prev.logoUrl,
         bannerUrl: data.bannerUrl || prev.bannerUrl,
         galleryUrls: data.galleryUrls || prev.galleryUrls,
+        galleryLayout: data.galleryLayout || prev.galleryLayout,
+        customGalleryConfig: data.customGalleryConfig || prev.customGalleryConfig,
+        useBannerInGallery: data.useBannerInGallery ?? prev.useBannerInGallery,
         isVerified: data.isVerified,
         lateGracePeriod: data.lateGracePeriod ?? prev.lateGracePeriod,
       }));
@@ -269,6 +287,50 @@ export default function ShopProfile() {
       if (type === 'logo') setUploadingLogo(false);
       else if (type === 'banner') setUploadingBanner(false);
       else setUploadingGallery(false);
+    }
+  };
+
+  const moveGalleryImage = async (index: number, direction: 'left' | 'right') => {
+    const currentUrls = shopInfo.galleryUrls.split(',').filter(Boolean);
+    if (direction === 'left' && index > 0) {
+      const temp = currentUrls[index];
+      currentUrls[index] = currentUrls[index - 1];
+      currentUrls[index - 1] = temp;
+    } else if (direction === 'right' && index < currentUrls.length - 1) {
+      const temp = currentUrls[index];
+      currentUrls[index] = currentUrls[index + 1];
+      currentUrls[index + 1] = temp;
+    } else {
+      return; // No movement possible
+    }
+    
+    const updatedUrls = currentUrls.join(',');
+    const updatedInfo = { ...shopInfo, galleryUrls: updatedUrls };
+    setShopInfo(updatedInfo);
+    
+    try {
+      await shopService.updateMyShop({ galleryUrls: updatedUrls });
+    } catch (err) {
+      console.error('Failed to update gallery order:', err);
+      toast.error('Lỗi khi sắp xếp ảnh');
+    }
+  };
+
+  const setAsCoverImage = async (index: number) => {
+    if (index === 0) return;
+    const currentUrls = shopInfo.galleryUrls.split(',').filter(Boolean);
+    const coverUrl = currentUrls.splice(index, 1)[0];
+    currentUrls.unshift(coverUrl); // put at index 0
+    
+    const updatedUrls = currentUrls.join(',');
+    const updatedInfo = { ...shopInfo, galleryUrls: updatedUrls };
+    setShopInfo(updatedInfo);
+    
+    try {
+      await shopService.updateMyShop({ galleryUrls: updatedUrls });
+    } catch (err) {
+      console.error('Failed to set cover image:', err);
+      toast.error('Lỗi khi đặt ảnh bìa');
     }
   };
 
@@ -496,22 +558,73 @@ export default function ShopProfile() {
 
             {/* Photo Gallery */}
             <div className={`rounded-2xl p-8 shadow-sm border transition-all ${isDark ? 'admin-glass-card bg-slate-900/40 border-white/10' : 'bg-white border-slate-100'}`}>
-              <h3 className={`font-bold text-lg mb-6 flex items-center gap-2 ${isDark ? 'text-white' : 'text-slate-900'}`}>
-                <ImageIcon size={20} className={isDark ? 'text-indigo-400' : 'text-primary'} />
-                Thư viện ảnh
+              <h3 className={`font-bold text-lg mb-6 flex items-center justify-between gap-2 ${isDark ? 'text-white' : 'text-slate-900'}`}>
+                <div className="flex items-center gap-2">
+                  <ImageIcon size={20} className={isDark ? 'text-indigo-400' : 'text-primary'} />
+                  Thư viện ảnh
+                </div>
+                
+                <label className="flex items-center cursor-pointer">
+                  <div className="relative">
+                    <input 
+                      type="checkbox" 
+                      className="sr-only" 
+                      checked={shopInfo.useBannerInGallery !== false} 
+                      onChange={(e) => {
+                        const val = e.target.checked;
+                        setShopInfo(prev => ({ ...prev, useBannerInGallery: val }));
+                        shopService.updateMyShop({ useBannerInGallery: val }).catch(() => toast.error('Lỗi khi lưu cài đặt ảnh bìa'));
+                      }} 
+                    />
+                    <div className={`block w-10 h-6 rounded-full transition-colors ${shopInfo.useBannerInGallery !== false ? 'bg-amber-500' : (isDark ? 'bg-slate-700' : 'bg-slate-300')}`}></div>
+                    <div className={`dot absolute left-1 top-1 bg-white w-4 h-4 rounded-full transition-transform ${shopInfo.useBannerInGallery !== false ? 'transform translate-x-4' : ''}`}></div>
+                  </div>
+                  <div className={`ml-2 text-xs font-medium ${isDark ? 'text-slate-300' : 'text-slate-600'}`}>
+                    Hiển thị ảnh bìa
+                  </div>
+                </label>
               </h3>
 
               <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
-                {shopInfo.galleryUrls.split(',').filter(Boolean).map((url, index) => (
+                {shopInfo.galleryUrls.split(',').filter(Boolean).map((url, index, arr) => (
                   <div key={index} className={`relative group aspect-square rounded-xl overflow-hidden border ${isDark ? 'bg-slate-800 border-white/10' : 'bg-slate-100 border-slate-200'}`}>
                     <img src={url} alt={`Gallery ${index}`} className="w-full h-full object-cover transition-transform group-hover:scale-110" />
-                    <button
-                      type="button"
-                      onClick={() => removeGalleryImage(url)}
-                      className="absolute top-2 right-2 p-1.5 bg-red-500 text-white rounded-lg opacity-0 group-hover:opacity-100 transition-opacity shadow-lg hover:bg-red-600"
-                    >
-                      <span className="material-symbols-outlined text-sm">delete</span>
-                    </button>
+
+                    {/* Actions overlay */}
+                    <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col justify-between p-2">
+                      <div className="flex justify-end">
+                        <button
+                          type="button"
+                          onClick={() => removeGalleryImage(url)}
+                          className="p-1.5 bg-red-500 text-white rounded-lg shadow-lg hover:bg-red-600 transition-colors"
+                          title="Xóa ảnh"
+                        >
+                          <span className="material-symbols-outlined text-sm">delete</span>
+                        </button>
+                      </div>
+                      
+                      <div className="flex justify-between items-center gap-1">
+                        <button
+                          type="button"
+                          onClick={() => moveGalleryImage(index, 'left')}
+                          disabled={index === 0}
+                          className="p-1 bg-white/20 hover:bg-white/40 disabled:opacity-30 disabled:cursor-not-allowed text-white rounded backdrop-blur-sm transition-colors"
+                          title="Sang trái"
+                        >
+                          <span className="material-symbols-outlined text-sm">chevron_left</span>
+                        </button>
+
+                        <button
+                          type="button"
+                          onClick={() => moveGalleryImage(index, 'right')}
+                          disabled={index === arr.length - 1}
+                          className="p-1 bg-white/20 hover:bg-white/40 disabled:opacity-30 disabled:cursor-not-allowed text-white rounded backdrop-blur-sm transition-colors"
+                          title="Sang phải"
+                        >
+                          <span className="material-symbols-outlined text-sm">chevron_right</span>
+                        </button>
+                      </div>
+                    </div>
                   </div>
                 ))}
                 
@@ -550,67 +663,251 @@ export default function ShopProfile() {
               />
               <div className={`mt-6 border rounded-xl p-4 ${isDark ? 'bg-indigo-900/20 border-indigo-500/20' : 'bg-blue-50/50 border-blue-100'}`}>
                 <h4 className={`text-sm font-bold mb-2 flex items-center gap-2 ${isDark ? 'text-indigo-300' : 'text-blue-900'}`}>
-                  <span className={`material-symbols-outlined text-lg ${isDark ? 'text-indigo-400' : 'text-blue-600'}`}>info</span>
-                  Hướng dẫn hiển thị thư viện ảnh
+                  <span className={`material-symbols-outlined text-lg ${isDark ? 'text-indigo-400' : 'text-blue-600'}`}>view_quilt</span>
+                  Tùy chọn bố cục thư viện ảnh
                 </h4>
                 <p className={`text-xs mb-3 leading-relaxed ${isDark ? 'text-indigo-200/70' : 'text-blue-800/80'}`}>
-                  Bố cục ảnh trên trang chi tiết cửa hàng sẽ tự động điều chỉnh dựa trên số lượng ảnh bạn tải lên:
+                  Bạn có thể chọn bố cục ảnh cố định hoặc để hệ thống tự động sắp xếp dựa trên số lượng ảnh. Ảnh bìa của cửa hàng (Hình ảnh cửa hàng) sẽ luôn hiển thị lớn nhất ở vị trí chính.
                 </p>
-                <div className="grid grid-cols-2 md:grid-cols-5 gap-4 mt-4">
-                  {/* 1 Image */}
-                  <div className="flex flex-col gap-2 items-center">
-                    <div className="w-full aspect-[4/3] bg-blue-100/50 rounded-lg border border-blue-200"></div>
-                    <span className="text-[10px] font-bold text-blue-900">1 ảnh</span>
-                  </div>
-                  {/* 2 Images */}
-                  <div className="flex flex-col gap-2 items-center">
-                    <div className="w-full aspect-[4/3] grid grid-cols-2 gap-1">
-                      <div className="bg-blue-100/50 rounded-l-lg border border-blue-200"></div>
-                      <div className="bg-blue-100/50 rounded-r-lg border border-blue-200"></div>
-                    </div>
-                    <span className="text-[10px] font-bold text-blue-900">2 ảnh</span>
-                  </div>
-                  {/* 3 Images */}
-                  <div className="flex flex-col gap-2 items-center">
-                    <div className="w-full aspect-[4/3] grid grid-cols-3 gap-1">
-                      <div className="col-span-2 bg-blue-100/50 rounded-l-lg border border-blue-200"></div>
-                      <div className="col-span-1 grid grid-rows-2 gap-1">
-                        <div className="bg-blue-100/50 rounded-tr-lg border border-blue-200"></div>
-                        <div className="bg-blue-100/50 rounded-br-lg border border-blue-200"></div>
+                <div className="grid grid-cols-2 md:grid-cols-6 gap-4 mt-4">
+                  {[
+                    { id: 'AUTO', label: 'Tự động' },
+                    { id: 'LAYOUT_1', label: '1 ảnh' },
+                    { id: 'LAYOUT_2', label: '2 ảnh' },
+                    { id: 'LAYOUT_3', label: '3 ảnh' },
+                    { id: 'LAYOUT_5_PLUS', label: '5+ ảnh' },
+                    { id: 'CUSTOM', label: 'Tự thiết kế' }
+                  ].map((layout) => {
+                    const isSelected = (shopInfo.galleryLayout || 'AUTO') === layout.id;
+                    return (
+                      <div 
+                        key={layout.id} 
+                        onClick={() => {
+                          const newLayout = layout.id;
+                          setShopInfo(prev => ({ ...prev, galleryLayout: newLayout }));
+                          shopService.updateMyShop({ galleryLayout: newLayout }).catch(() => toast.error('Lỗi khi lưu bố cục'));
+                        }}
+                        className={`flex flex-col gap-2 items-center cursor-pointer transition-all p-2 rounded-xl border-2 ${isSelected ? 'border-amber-500 bg-amber-50' : 'border-transparent hover:border-blue-200'}`}
+                      >
+                        <div className="w-full aspect-[4/3] relative">
+                          {layout.id === 'AUTO' && (
+                            <div className={`w-full h-full flex flex-col items-center justify-center rounded-lg border ${isDark ? 'bg-slate-800/50 border-slate-700 text-slate-500' : 'bg-slate-100/50 border-slate-300 text-slate-400'}`}>
+                              <span className="material-symbols-outlined text-3xl mb-1">auto_awesome</span>
+                            </div>
+                          )}
+                          {layout.id === 'LAYOUT_1' && (
+                            <div className="w-full h-full bg-blue-100/50 rounded-lg border border-blue-200"></div>
+                          )}
+                          {layout.id === 'LAYOUT_2' && (
+                            <div className="w-full h-full grid grid-cols-2 gap-1">
+                              <div className="bg-blue-100/50 rounded-l-lg border border-blue-200"></div>
+                              <div className="bg-blue-100/50 rounded-r-lg border border-blue-200"></div>
+                            </div>
+                          )}
+                          {layout.id === 'LAYOUT_3' && (
+                            <div className="w-full h-full grid grid-cols-3 gap-1">
+                              <div className="col-span-2 bg-blue-100/50 rounded-l-lg border border-blue-200"></div>
+                              <div className="col-span-1 grid grid-rows-2 gap-1">
+                                <div className="bg-blue-100/50 rounded-tr-lg border border-blue-200"></div>
+                                <div className="bg-blue-100/50 rounded-br-lg border border-blue-200"></div>
+                              </div>
+                            </div>
+                          )}
+                          {layout.id === 'LAYOUT_5_PLUS' && (
+                            <div className="w-full h-full grid grid-cols-4 grid-rows-2 gap-1">
+                              <div className="col-span-2 row-span-2 bg-blue-100/50 rounded-l-lg border border-blue-200"></div>
+                              <div className="col-span-1 row-span-1 bg-blue-100/50 border border-blue-200"></div>
+                              <div className="col-span-1 row-span-1 bg-blue-100/50 rounded-tr-lg border border-blue-200"></div>
+                              <div className="col-span-1 row-span-1 bg-blue-100/50 border border-blue-200"></div>
+                              <div className="col-span-1 row-span-1 flex items-center justify-center bg-blue-100/50 rounded-br-lg border border-blue-200 relative">
+                                <span className="absolute text-[10px] font-bold text-blue-600">+</span>
+                              </div>
+                            </div>
+                          )}
+                        </div>
+                        <span className={`text-[10px] font-bold ${isSelected ? 'text-amber-600' : (isDark ? 'text-indigo-300' : 'text-blue-900')}`}>{layout.label}</span>
                       </div>
-                    </div>
-                    <span className="text-[10px] font-bold text-blue-900">3 ảnh</span>
-                  </div>
-                  {/* 4 Images */}
-                  <div className="flex flex-col gap-2 items-center">
-                    <div className="w-full aspect-[4/3] grid grid-cols-3 grid-rows-2 gap-1">
-                      <div className="col-span-2 row-span-2 bg-blue-100/50 rounded-l-lg border border-blue-200"></div>
-                      <div className="col-span-1 row-span-1 bg-blue-100/50 rounded-tr-lg border border-blue-200"></div>
-                      <div className="col-span-1 row-span-1 bg-blue-100/50 rounded-br-lg border border-blue-200"></div>
-                    </div>
-                    <span className="text-[10px] font-bold text-blue-900">4 ảnh</span>
-                  </div>
-                  {/* 5+ Images */}
-                  <div className="flex flex-col gap-2 items-center relative">
-                    <div className="absolute -top-2 -right-2 bg-orange-500 text-white text-[8px] font-bold px-1.5 py-0.5 rounded-full shadow-sm z-10">
-                      Nên dùng
-                    </div>
-                    <div className="w-full aspect-[4/3] grid grid-cols-4 grid-rows-2 gap-1">
-                      <div className="col-span-2 row-span-2 bg-blue-500/20 rounded-l-lg border border-blue-300"></div>
-                      <div className="col-span-1 row-span-1 bg-blue-500/20 border border-blue-300"></div>
-                      <div className="col-span-1 row-span-1 bg-blue-500/20 rounded-tr-lg border border-blue-300"></div>
-                      <div className="col-span-1 row-span-1 bg-blue-500/20 border border-blue-300"></div>
-                      <div className="col-span-1 row-span-1 bg-blue-500/20 rounded-br-lg border border-blue-300 flex items-center justify-center">
-                        <span className="text-[8px] font-bold text-blue-700 opacity-60">+</span>
-                      </div>
-                    </div>
-                    <span className="text-[10px] font-bold text-blue-900">5+ ảnh</span>
-                  </div>
+                    );
+                  })}
                 </div>
+                {shopInfo.galleryLayout === 'CUSTOM' && (
+                  <div className={`mt-6 p-4 rounded-xl border ${isDark ? 'bg-slate-900 border-indigo-500/30' : 'bg-white border-blue-200'}`}>
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-4 gap-2">
+                      <h5 className={`font-bold text-sm ${isDark ? 'text-indigo-300' : 'text-blue-900'}`}>Tự do xếp ô (Kéo thả ảnh)</h5>
+                      <div className="flex gap-2 flex-wrap">
+                        {[
+                          { type: '1x1', label: 'Vuông nhỏ', icon: 'crop_square' },
+                          { type: '2x1', label: 'Chữ nhật ngang', icon: 'crop_7_5' },
+                          { type: '1x2', label: 'Chữ nhật dọc', icon: 'crop_5_4' },
+                          { type: '2x2', label: 'Vuông lớn', icon: 'crop_din' },
+                          { type: '3x2', label: 'Chữ nhật siêu lớn', icon: 'view_agenda' },
+                        ].map((btn) => (
+                          <button
+                            key={btn.type}
+                            onClick={() => {
+                              try {
+                                const parsed = JSON.parse(shopInfo.customGalleryConfig || '[]');
+                                const currentBlocks = Array.isArray(parsed) ? parsed : [];
+                                const newBlock: CustomGalleryBlock = { id: Date.now().toString(), type: btn.type as any, url: '' };
+                                setShopInfo(prev => ({ ...prev, customGalleryConfig: JSON.stringify([...currentBlocks, newBlock]) }));
+                              } catch {
+                                setShopInfo(prev => ({ ...prev, customGalleryConfig: JSON.stringify([{ id: Date.now().toString(), type: btn.type, url: '' }]) }));
+                              }
+                            }}
+                            className={`flex items-center gap-1 px-3 py-1.5 text-xs font-bold rounded-lg transition-colors border ${isDark ? 'bg-slate-800 border-slate-700 text-slate-300 hover:bg-slate-700' : 'bg-white border-slate-200 text-slate-700 hover:bg-slate-50'}`}
+                          >
+                            <span className="material-symbols-outlined text-[14px]">{btn.icon}</span> {btn.label}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                    
+                    <div className="flex flex-col md:flex-row gap-6">
+                      <div className="w-full md:w-1/3">
+                        <h6 className={`text-xs font-bold mb-2 ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>Kho ảnh (Kéo từ đây)</h6>
+                        <div className="grid grid-cols-3 gap-2 overflow-y-auto max-h-[400px] p-1">
+                          {[shopInfo.bannerUrl, ...(shopInfo.galleryUrls ? shopInfo.galleryUrls.split(',') : [])].filter(Boolean).map((url, i) => (
+                            <img
+                              key={i}
+                              src={url}
+                              draggable
+                              onDragStart={(e) => e.dataTransfer.setData('text/plain', url)}
+                              className="w-full aspect-square object-cover rounded cursor-grab hover:opacity-80 border border-slate-200 shadow-sm"
+                              alt="Source"
+                            />
+                          ))}
+                        </div>
+                      </div>
+
+                      <div className="w-full md:w-2/3">
+                        <h6 className={`text-xs font-bold mb-2 flex items-center justify-between ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>
+                          <span>Khung thiết kế (Tự động khít)</span>
+                          <span className="text-[10px] font-normal italic opacity-70">Có thể kéo thả từng khối để đổi thứ tự</span>
+                        </h6>
+                        <div className={`grid grid-cols-4 md:grid-cols-6 auto-rows-[60px] sm:auto-rows-[80px] md:auto-rows-[100px] grid-flow-dense gap-2 min-h-[200px] p-3 rounded-xl border-2 border-dashed ${isDark ? 'border-slate-700 bg-slate-800/30' : 'border-slate-200 bg-slate-50/50'}`}>
+                          {(() => {
+                            let customBlocks: CustomGalleryBlock[] = [];
+                            try {
+                              const parsed = JSON.parse(shopInfo.customGalleryConfig || '[]');
+                              customBlocks = Array.isArray(parsed) ? parsed : [];
+                            } catch {}
+
+                            if (customBlocks.length === 0) {
+                              return (
+                                <div className="col-span-full flex flex-col items-center justify-center h-40 opacity-50">
+                                  <span className="material-symbols-outlined text-4xl mb-2">grid_view</span>
+                                  <span className="text-xs font-bold">Chưa có khối ảnh nào. Hãy thêm khối ở trên.</span>
+                                </div>
+                              );
+                            }
+
+                            return customBlocks.map((block, index) => {
+                              let spanClass = "col-span-1 row-span-1"; // 1x1 default
+                              if (block.type === '1x2') spanClass = "col-span-1 row-span-2";
+                              else if (block.type === '2x1') spanClass = "col-span-2 row-span-1";
+                              else if (block.type === '2x2') spanClass = "col-span-2 row-span-2";
+                              else if (block.type === '3x2') spanClass = "col-span-3 row-span-2";
+
+                              return (
+                                <div 
+                                  key={block.id} 
+                                  draggable
+                                  className={`relative group ${spanClass} flex items-center justify-center overflow-hidden rounded-lg transition-colors border-2 border-dashed cursor-move ${isDark ? 'border-slate-600 bg-slate-800 hover:bg-slate-700' : 'border-slate-300 bg-white hover:bg-blue-50/50'}`}
+                                  onDragStart={(e) => {
+                                    // Set block index for block reordering
+                                    e.dataTransfer.setData('source-block-index', index.toString());
+                                  }}
+                                  onDragOver={(e) => e.preventDefault()}
+                                  onDrop={(e) => {
+                                    e.preventDefault();
+                                    const url = e.dataTransfer.getData('text/plain');
+                                    const sourceIndexStr = e.dataTransfer.getData('source-block-index');
+                                    
+                                    if (url) {
+                                      const newBlocks = [...customBlocks];
+                                      newBlocks[index].url = url;
+                                      setShopInfo(prev => ({ ...prev, customGalleryConfig: JSON.stringify(newBlocks) }));
+                                    } else if (sourceIndexStr) {
+                                      const sourceIndex = parseInt(sourceIndexStr, 10);
+                                      if (!isNaN(sourceIndex) && sourceIndex !== index) {
+                                        const newBlocks = [...customBlocks];
+                                        const [movedBlock] = newBlocks.splice(sourceIndex, 1);
+                                        newBlocks.splice(index, 0, movedBlock);
+                                        setShopInfo(prev => ({ ...prev, customGalleryConfig: JSON.stringify(newBlocks) }));
+                                      }
+                                    }
+                                  }}
+                                >
+                                  {/* Delete btn */}
+                                  <button
+                                    onClick={() => {
+                                      const newBlocks = [...customBlocks];
+                                      newBlocks.splice(index, 1);
+                                      setShopInfo(prev => ({ ...prev, customGalleryConfig: JSON.stringify(newBlocks) }));
+                                    }}
+                                    className="absolute -top-1 -right-1 bg-red-500 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity z-20 shadow-sm"
+                                  >
+                                    <X size={12} />
+                                  </button>
+
+                                  {/* Reorder btns */}
+                                  <div className="absolute bottom-1 left-1/2 -translate-x-1/2 flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity z-20">
+                                    <button
+                                      disabled={index === 0}
+                                      onClick={() => {
+                                        if (index > 0) {
+                                          const newBlocks = [...customBlocks];
+                                          [newBlocks[index - 1], newBlocks[index]] = [newBlocks[index], newBlocks[index - 1]];
+                                          setShopInfo(prev => ({ ...prev, customGalleryConfig: JSON.stringify(newBlocks) }));
+                                        }
+                                      }}
+                                      className="bg-slate-900/60 hover:bg-slate-900 text-white rounded p-0.5 disabled:opacity-30"
+                                    >
+                                      <span className="material-symbols-outlined text-[14px]">arrow_back</span>
+                                    </button>
+                                    <button
+                                      disabled={index === customBlocks.length - 1}
+                                      onClick={() => {
+                                        if (index < customBlocks.length - 1) {
+                                          const newBlocks = [...customBlocks];
+                                          [newBlocks[index + 1], newBlocks[index]] = [newBlocks[index], newBlocks[index + 1]];
+                                          setShopInfo(prev => ({ ...prev, customGalleryConfig: JSON.stringify(newBlocks) }));
+                                        }
+                                      }}
+                                      className="bg-slate-900/60 hover:bg-slate-900 text-white rounded p-0.5 disabled:opacity-30"
+                                    >
+                                      <span className="material-symbols-outlined text-[14px]">arrow_forward</span>
+                                    </button>
+                                  </div>
+
+                                  {block.url ? (
+                                    <>
+                                      <img src={block.url} className="w-full h-full object-cover pointer-events-none" alt="Block" />
+                                      <button
+                                        onClick={() => {
+                                          const newBlocks = [...customBlocks];
+                                          newBlocks[index].url = '';
+                                          setShopInfo(prev => ({ ...prev, customGalleryConfig: JSON.stringify(newBlocks) }));
+                                        }}
+                                        className="absolute top-2 left-2 bg-slate-900/60 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity z-10"
+                                      >
+                                        <span className="material-symbols-outlined text-[14px]">delete</span>
+                                      </button>
+                                    </>
+                                  ) : (
+                                    <span className="material-symbols-outlined text-slate-300 text-2xl">add_photo_alternate</span>
+                                  )}
+                                </div>
+                              );
+                            });
+                          })()}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                )}
               </div>
             </div>
-
-          {/* Basic Info */}
           {/* Basic Info */}
           <div className={`rounded-xl p-6 shadow-sm border transition-all ${isDark ? 'admin-glass-card bg-slate-900/40 border-white/10' : 'bg-white border-slate-100'}`}>
             <h3 className={`font-bold text-lg mb-4 ${isDark ? 'text-white' : 'text-slate-900'}`}>Thông tin cơ bản</h3>
