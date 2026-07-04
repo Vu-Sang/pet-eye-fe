@@ -10,7 +10,7 @@ export default function ShopRegister() {
   const [step, setStep] = React.useState(1);
   const [formData, setFormData] = React.useState({
     shopName: '',
-    shopType: '',
+    shopType: [] as string[],
     email: '',
     phone: '',
     address: '',
@@ -133,9 +133,10 @@ export default function ShopRegister() {
       setLoading(true);
       setError('');
       
+      const selectedTypes = formData.shopType;
       const request = {
         shopName: formData.shopName,
-        shopType: formData.shopType,
+        shopType: selectedTypes.includes('MIXED') || selectedTypes.length >= 2 ? 'MIXED' : (selectedTypes[0] || ''),
         email: formData.email,
         phone: formData.phone,
         address: formData.address,
@@ -160,14 +161,16 @@ export default function ShopRegister() {
 
   const isStepValid = () => {
     if (step === 1) {
-      return formData.shopName && formData.shopType && formData.email && formData.phone;
+      return formData.shopName && formData.shopType.length > 0 && formData.email && formData.phone;
     }
     if (step === 2) {
       return formData.address && formData.city && formData.description;
     }
     if (step === 3) {
-      const licenseValid = formData.licenseNumber.length === 10 || formData.licenseNumber.length === 12 || formData.licenseNumber.length === 13;
-      return formData.password && formData.confirmPassword && licenseValid && formData.licenseImageUrl && formData.agreed;
+      const licenseValid = formData.licenseNumber.length === 10 || 
+                           formData.licenseNumber.length === 12 || 
+                           formData.licenseNumber.length === 13;
+      return formData.password && formData.confirmPassword && licenseValid && formData.agreed;
     }
     return false;
   };
@@ -259,8 +262,16 @@ export default function ShopRegister() {
                   onClick={() => setIsOpenType(!isOpenType)}
                   className="w-full px-4 py-3 rounded-xl border-2 border-slate-200 bg-white hover:border-[#1a2b4c] focus:border-[#1a2b4c] outline-none flex items-center justify-between text-left transition-colors"
                 >
-                  <span className={formData.shopType ? 'text-slate-900 font-medium' : 'text-slate-400'}>
-                    {formData.shopType ? (shopTypes.find(t => t.value === formData.shopType)?.label) : 'Chọn loại hình'}
+                  <span className={formData.shopType.length > 0 ? 'text-slate-900 font-medium' : 'text-slate-400'}>
+                    {formData.shopType.length === 0
+                      ? 'Chọn loại hình'
+                      : formData.shopType.includes('MIXED')
+                      ? shopTypes.find(t => t.value === 'MIXED')?.label
+                      : formData.shopType
+                          .map(value => shopTypes.find(t => t.value === value)?.label)
+                          .filter(Boolean)
+                          .join(' + ')
+                    }
                   </span>
                   <span className={`material-symbols-outlined text-slate-400 transition-transform duration-200 ${isOpenType ? 'rotate-180' : ''}`} style={{ fontSize: '20px' }}>
                     expand_more
@@ -274,17 +285,40 @@ export default function ShopRegister() {
                     className="absolute z-30 w-full mt-2 bg-white rounded-xl border border-slate-200 shadow-xl overflow-hidden py-1.5"
                   >
                     {shopTypes.map((type) => {
-                      const isSelected = formData.shopType === type.value;
+                      const isSelected = formData.shopType.includes(type.value);
+                      const concreteSelected = formData.shopType.filter(v => v !== 'MIXED');
+                      const isMixedDisabled = type.value === 'MIXED' && concreteSelected.length >= 2;
                       return (
                         <button
                           key={type.value}
                           type="button"
                           onClick={() => {
-                            setFormData({ ...formData, shopType: type.value });
+                            setFormData((prev) => {
+                              if (type.value === 'MIXED') {
+                                return { ...prev, shopType: ['MIXED'] };
+                              }
+
+                              if (prev.shopType.includes('MIXED')) {
+                                return { ...prev, shopType: [type.value] };
+                              }
+
+                              if (prev.shopType.includes(type.value)) {
+                                return { ...prev, shopType: prev.shopType.filter((value) => value !== type.value) };
+                              }
+
+                              if (prev.shopType.length >= 2) {
+                                return prev;
+                              }
+
+                              return { ...prev, shopType: [...prev.shopType, type.value] };
+                            });
                             setIsOpenType(false);
                           }}
+                          disabled={isMixedDisabled}
                           className={`w-full px-4 py-2.5 text-left text-sm font-medium flex items-center justify-between transition-colors ${
-                            isSelected
+                            isMixedDisabled
+                              ? 'text-slate-300 cursor-not-allowed bg-slate-50'
+                              : isSelected
                               ? 'bg-[#1a2b4c]/5 text-[#1a2b4c]'
                               : 'hover:bg-slate-50 text-slate-700'
                           }`}
@@ -299,6 +333,19 @@ export default function ShopRegister() {
                       );
                     })}
                   </motion.div>
+                )}
+                <p className="text-xs text-slate-500 mt-2">
+                  Chọn tối đa 2 loại hình. Nếu chọn Dịch vụ tổng hợp thì sẽ tương đương cả 3 loại hình trên.
+                </p>
+                {formData.shopType.includes('MIXED') && (
+                  <p className="text-xs text-slate-500 mt-1">
+                    Dịch vụ tổng hợp = Phòng khám thú y + Spa & Grooming + Khách sạn thú cưng.
+                  </p>
+                )}
+                {formData.shopType.filter((value) => value !== 'MIXED').length >= 2 && (
+                  <p className="text-xs text-slate-500 mt-1">
+                    Đã chọn 2 loại hình, nên không thể chọn Dịch vụ tổng hợp.
+                  </p>
                 )}
               </div>
 
@@ -530,7 +577,7 @@ export default function ShopRegister() {
 
               <div>
                 <label className="block text-sm font-bold text-slate-700 mb-2">
-                  Ảnh chụp giấy phép kinh doanh *
+                  Ảnh chụp giấy phép kinh doanh (Không bắt buộc)
                 </label>
                 <input 
                   type="file"
