@@ -13,6 +13,7 @@ import type { NearbyShopResponse } from '../../services/clinic.service';
 import ShopMap from '../../components/ShopMap';
 import NearbyShops from '../../components/NearbyShops';
 import { trackSearch, trackFilterChange } from '../../lib/analytics';
+import { getShopTypeLabel } from '../../utils/shopHelper';
 
 function calculateDistance(lat1: number, lon1: number, lat2: number, lon2: number): number {
   const R = 6371; // km
@@ -32,21 +33,6 @@ const SHOP_TYPE_TABS = [
   { value: 'HOTEL', label: 'Lưu trú', icon: <Home size={16} /> },
   { value: 'MIXED', label: 'Tổng hợp', icon: <Store size={16} /> },
 ];
-const getShopTypeLabel = (type: string | undefined) => {
-  if (!type) return '';
-  // Handle comma-separated types
-  if (type.includes(',')) {
-    return type.split(',').map(t => getShopTypeLabel(t.trim())).filter(Boolean).join(' + ');
-  }
-  const upper = type.toUpperCase();
-  if (upper.includes('CLINIC') || upper.includes('KHÁM') || upper.includes('BỆNH VIỆN')) return 'Khám thú y';
-  if (upper.includes('SPA') || upper.includes('GROOMING')) return 'Spa & Grooming';
-  if (upper.includes('HOTEL') || upper.includes('BOARDING') || upper.includes('LƯU TRÚ')) return 'Lưu trú';
-  if (upper.includes('MIXED') || upper.includes('TỔNG HỢP')) return 'Tổng hợp';
-  
-  const found = SHOP_TYPE_TABS.find(t => t.value === type || t.value.toUpperCase() === upper);
-  return found ? found.label : type;
-};
 
 const SORT_OPTIONS = ['Đánh giá cao nhất', 'Gần nhất', 'Mới nhất'];
 
