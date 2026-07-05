@@ -310,6 +310,9 @@ function BookingItem({ booking, onCancel, cancelling, onReview, onUpdateBank, on
                                                     <div>
                                                         <p className="text-sm font-bold text-slate-800 dark:text-slate-200">{svc.serviceName}</p>
                                                         {svc.durationMinutes > 0 && <p className="text-[10px] font-bold text-slate-400 mt-0.5">⏱ Thời gian làm: {svc.durationMinutes} phút</p>}
+                                                        {booking.petWeight && (
+                                                            <p className="text-[10px] font-bold text-teal-600 dark:text-teal-400 mt-0.5">⚖️ Mức giá cho thú cưng {booking.petWeight.toLowerCase()}</p>
+                                                        )}
                                                     </div>
                                                     <span className="font-bold text-sm text-slate-700 dark:text-slate-300">{formatVND(svc.servicePrice)}</span>
                                                 </div>
@@ -317,7 +320,12 @@ function BookingItem({ booking, onCancel, cancelling, onReview, onUpdateBank, on
                                         </div>
                                     ) : (
                                         <div className="flex justify-between items-center bg-white dark:bg-slate-800 p-3 rounded-2xl border border-slate-100 dark:border-slate-700/50">
-                                            <p className="text-sm font-bold text-slate-800 dark:text-slate-200">{booking.serviceName}</p>
+                                            <div>
+                                                <p className="text-sm font-bold text-slate-800 dark:text-slate-200">{booking.serviceName}</p>
+                                                {booking.petWeight && (
+                                                    <p className="text-[10px] font-bold text-teal-600 dark:text-teal-400 mt-0.5">⚖️ Mức giá cho thú cưng {booking.petWeight.toLowerCase()}</p>
+                                                )}
+                                            </div>
                                             <span className="font-bold text-sm text-slate-700 dark:text-slate-300">{formatVND(booking.servicePrice)}</span>
                                         </div>
                                     )}

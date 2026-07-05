@@ -69,10 +69,10 @@ export default function AdminMembers() {
       STAFF: 'bg-indigo-500/10 text-indigo-400 border-indigo-500/20',
       ADMIN: 'bg-red-500/10 text-red-400 border-red-500/20',
     } : {
-      USER: 'bg-slate-100 text-slate-600',
-      SHOP_OWNER: 'bg-blue-100 text-blue-700',
-      STAFF: 'bg-indigo-100 text-indigo-700',
-      ADMIN: 'bg-red-100 text-red-700',
+      USER: 'bg-slate-100 text-slate-600 border-slate-200',
+      SHOP_OWNER: 'bg-blue-100 text-blue-700 border-blue-200',
+      STAFF: 'bg-indigo-100 text-indigo-700 border-indigo-200',
+      ADMIN: 'bg-red-100 text-red-700 border-red-200',
     };
     return colors[role] ?? colors.USER;
   };
@@ -152,8 +152,8 @@ export default function AdminMembers() {
                       </td>
                       <td className={`px-6 py-4 hidden md:table-cell ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>{m.email}</td>
                       <td className={`px-6 py-4 hidden lg:table-cell ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>{m.phone || '—'}</td>
-                      <td className="px-6 py-4">
-                        <span className={`px-2.5 py-1 rounded-full text-xs font-semibold border ${roleBadge(role)}`}>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <span className={`inline-flex items-center justify-center px-2.5 py-1 rounded-full text-xs font-semibold border whitespace-nowrap ${roleBadge(role)}`}>
                           {ROLE_LABEL[role] ?? role}
                         </span>
                       </td>
@@ -166,11 +166,11 @@ export default function AdminMembers() {
                           <span className={`text-xs ${isDark ? 'text-slate-600' : 'text-slate-400'}`}>—</span>
                         )}
                       </td>
-                      <td className="px-6 py-4">
-                        <span className={`px-2.5 py-1 rounded-full text-xs font-semibold border ${
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <span className={`inline-flex items-center justify-center px-2.5 py-1 rounded-full text-xs font-semibold border whitespace-nowrap ${
                           isActive
-                            ? (isDark ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20' : 'bg-green-100 text-green-700')
-                            : (isDark ? 'bg-red-500/10 text-red-400 border-red-500/20' : 'bg-red-100 text-red-700')
+                            ? (isDark ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20' : 'bg-green-100 text-green-700 border-green-200')
+                            : (isDark ? 'bg-red-500/10 text-red-400 border-red-500/20' : 'bg-red-100 text-red-700 border-red-200')
                         }`}>
                           {isActive ? 'Hoạt động' : 'Đã khóa'}
                         </span>

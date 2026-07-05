@@ -208,7 +208,8 @@ export default function EditBookingModal({ booking, onClose, onSuccess }: EditBo
     ? Math.max(0, (newTotalPrice * 0.1) - alreadyPaid) 
     : Math.max(0, newTotalPrice - alreadyPaid);
 
-  const hasPriceDifference = newTotalPrice > oldTotalPrice;
+  const hasPriceDifference = newTotalPrice !== oldTotalPrice;
+  const hasUnpaidBalance = alreadyPaid < newTotalPrice;
   // Assume all slots available unless backend says otherwise. For edit modal simplicity, just use all slots.
   // Real logic would be similar to ClinicDetail.tsx, but simplified here.
   const availableSlots = allTimeSlots;
@@ -478,11 +479,17 @@ export default function EditBookingModal({ booking, onClose, onSuccess }: EditBo
         {/* Footer */}
         <div className="p-6 border-t border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-900">
           
-          {hasPriceDifference && (
+          {hasUnpaidBalance && (
             <div className="mb-6 p-4 bg-yellow-50 dark:bg-yellow-900/20 rounded-2xl border border-yellow-200 dark:border-yellow-800/50 space-y-4">
               <div>
-                <p className="text-sm font-bold text-slate-800 dark:text-slate-200">Phát sinh chênh lệch giá</p>
-                <p className="text-xs text-slate-500 mt-1">Dịch vụ bạn chọn có giá cao hơn dịch vụ cũ. Vui lòng thanh toán phần chênh lệch.</p>
+                <p className="text-sm font-bold text-slate-800 dark:text-slate-200">
+                  {hasPriceDifference ? "Phát sinh chênh lệch giá" : "Thanh toán số dư"}
+                </p>
+                <p className="text-xs text-slate-500 mt-1">
+                  {hasPriceDifference 
+                    ? "Dịch vụ bạn chọn có giá thay đổi. Vui lòng chọn phương thức thanh toán."
+                    : "Lịch hẹn này chưa được thanh toán toàn bộ. Bạn có thể thanh toán phần còn lại ngay bây giờ."}
+                </p>
               </div>
               
               <div className="flex flex-col gap-2">
