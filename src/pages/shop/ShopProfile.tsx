@@ -115,6 +115,7 @@ export default function ShopProfile() {
     customGalleryConfig: '[]',
     useBannerInGallery: true,
     isVerified: false,
+    socialLinks: '[]',
     lateGracePeriod: 15,
   });
 
@@ -151,6 +152,7 @@ export default function ShopProfile() {
         galleryLayout: data.galleryLayout || 'AUTO',
         customGalleryConfig: data.customGalleryConfig || '[]',
         useBannerInGallery: data.useBannerInGallery ?? true,
+        socialLinks: data.socialLinks || '[]',
         isVerified: data.isVerified,
         lateGracePeriod: data.lateGracePeriod ?? prev.lateGracePeriod,
       }));
@@ -186,6 +188,7 @@ export default function ShopProfile() {
         galleryLayout: shopInfo.galleryLayout,
         customGalleryConfig: shopInfo.customGalleryConfig,
         useBannerInGallery: shopInfo.useBannerInGallery,
+        socialLinks: shopInfo.socialLinks,
         lateGracePeriod: shopInfo.lateGracePeriod,
       };
       console.log('Sending update request with data:', updateData);
@@ -211,6 +214,7 @@ export default function ShopProfile() {
         galleryLayout: data.galleryLayout || prev.galleryLayout,
         customGalleryConfig: data.customGalleryConfig || prev.customGalleryConfig,
         useBannerInGallery: data.useBannerInGallery ?? prev.useBannerInGallery,
+        socialLinks: data.socialLinks || prev.socialLinks,
         isVerified: data.isVerified,
         lateGracePeriod: data.lateGracePeriod ?? prev.lateGracePeriod,
       }));
@@ -275,6 +279,8 @@ export default function ShopProfile() {
         logoUrl: updatedInfo.logoUrl,
         bannerUrl: updatedInfo.bannerUrl,
         galleryUrls: updatedInfo.galleryUrls,
+        facebookUrl: updatedInfo.facebookUrl,
+        websiteUrl: updatedInfo.websiteUrl,
         lateGracePeriod: updatedInfo.lateGracePeriod,
       };
       await shopService.updateMyShop(updateData);
@@ -1005,6 +1011,107 @@ export default function ShopProfile() {
                   placeholder="Ví dụ: 0912345678"
                   required
                 />
+              </div>
+
+              <div className="md:col-span-2">
+                <div className={`flex items-center justify-between mb-4`}>
+                  <label className={`block text-sm font-bold ${isDark ? 'text-slate-300' : 'text-slate-700'}`}>
+                    Liên kết mạng xã hội
+                  </label>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      try {
+                        const links = JSON.parse(shopInfo.socialLinks || '[]');
+                        links.push({ id: Date.now().toString(), type: 'FACEBOOK', url: '', label: '' });
+                        setShopInfo({ ...shopInfo, socialLinks: JSON.stringify(links) });
+                      } catch {
+                        setShopInfo({ ...shopInfo, socialLinks: JSON.stringify([{ id: Date.now().toString(), type: 'FACEBOOK', url: '', label: '' }]) });
+                      }
+                    }}
+                    className={`flex items-center gap-1 px-3 py-1.5 text-xs font-bold rounded-lg transition-colors border ${isDark ? 'bg-indigo-600 border-indigo-500 text-white hover:bg-indigo-700' : 'bg-[#1a2b4c] border-[#1a2b4c] text-white hover:bg-[#1a2b4c]/90'}`}
+                  >
+                    <Plus size={14} /> Thêm liên kết
+                  </button>
+                </div>
+                
+                <div className="space-y-3">
+                  {(() => {
+                    let links: any[] = [];
+                    try {
+                      links = JSON.parse(shopInfo.socialLinks || '[]');
+                    } catch {}
+                    
+                    if (links.length === 0) {
+                      return (
+                        <div className={`p-4 rounded-xl border border-dashed text-center ${isDark ? 'border-slate-700 bg-slate-800/30 text-slate-500' : 'border-slate-300 bg-slate-50 text-slate-500'}`}>
+                          <p className="text-sm font-medium">Chưa có liên kết nào. Bấm "Thêm liên kết" để tạo mới.</p>
+                        </div>
+                      );
+                    }
+                    
+                    return links.map((link, index) => (
+                      <div key={link.id} className={`flex flex-col sm:flex-row items-start sm:items-center gap-3 p-3 rounded-xl border ${isDark ? 'bg-slate-800/50 border-slate-700' : 'bg-white border-slate-200'}`}>
+                        <select
+                          value={link.type}
+                          onChange={(e) => {
+                            const newLinks = [...links];
+                            newLinks[index].type = e.target.value;
+                            setShopInfo({ ...shopInfo, socialLinks: JSON.stringify(newLinks) });
+                          }}
+                          className={`w-full sm:w-40 px-3 py-2 text-sm border rounded-lg focus:ring-2 outline-none transition-all ${isDark ? 'bg-slate-900 border-slate-700 text-white focus:ring-indigo-500/50' : 'bg-slate-50 border-slate-200 text-slate-900 focus:ring-indigo-500/20'}`}
+                        >
+                          <option value="FACEBOOK">Facebook</option>
+                          <option value="INSTAGRAM">Instagram</option>
+                          <option value="TIKTOK">TikTok</option>
+                          <option value="WEBSITE">Website</option>
+                          <option value="YOUTUBE">YouTube</option>
+                          <option value="ZALO">Zalo</option>
+                          <option value="OTHER">Khác</option>
+                        </select>
+                        
+                        {link.type === 'OTHER' && (
+                          <input
+                            type="text"
+                            value={link.label || ''}
+                            onChange={(e) => {
+                              const newLinks = [...links];
+                              newLinks[index].label = e.target.value;
+                              setShopInfo({ ...shopInfo, socialLinks: JSON.stringify(newLinks) });
+                            }}
+                            placeholder="Tên hiển thị"
+                            className={`w-full sm:w-40 px-3 py-2 text-sm border rounded-lg focus:ring-2 outline-none transition-all ${isDark ? 'bg-slate-900 border-slate-700 text-white focus:ring-indigo-500/50' : 'bg-white border-slate-200 text-slate-900 focus:ring-indigo-500/20'}`}
+                          />
+                        )}
+                        
+                        <input
+                          type="url"
+                          value={link.url}
+                          onChange={(e) => {
+                            const newLinks = [...links];
+                            newLinks[index].url = e.target.value;
+                            setShopInfo({ ...shopInfo, socialLinks: JSON.stringify(newLinks) });
+                          }}
+                          placeholder="Nhập đường dẫn (https://...)"
+                          required
+                          className={`flex-1 w-full px-3 py-2 text-sm border rounded-lg focus:ring-2 outline-none transition-all ${isDark ? 'bg-slate-900 border-slate-700 text-white focus:ring-indigo-500/50' : 'bg-white border-slate-200 text-slate-900 focus:ring-indigo-500/20'}`}
+                        />
+                        
+                        <button
+                          type="button"
+                          onClick={() => {
+                            const newLinks = [...links];
+                            newLinks.splice(index, 1);
+                            setShopInfo({ ...shopInfo, socialLinks: JSON.stringify(newLinks) });
+                          }}
+                          className={`p-2 rounded-lg text-red-500 hover:bg-red-50 dark:hover:bg-red-500/10 transition-colors shrink-0`}
+                        >
+                          <X size={18} />
+                        </button>
+                      </div>
+                    ));
+                  })()}
+                </div>
               </div>
 
               <div>

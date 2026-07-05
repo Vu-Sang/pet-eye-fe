@@ -1,6 +1,13 @@
 import apiClient from './apiClient';
 import type { ApiResponse, ServiceResponse, ShopDashboardResponse } from '../types/api';
 
+export interface SocialLink {
+  id: string;
+  type: string;
+  url: string;
+  label?: string;
+}
+
 export interface ShopPublicResponse {
   id: number;
   shopName: string;
@@ -17,6 +24,7 @@ export interface ShopPublicResponse {
   galleryLayout?: string;
   customGalleryConfig?: string;
   useBannerInGallery?: boolean;
+  socialLinks?: string;
   isVerified: boolean;
   ratingAvg: number;
   ownerId: number;
@@ -78,6 +86,7 @@ export interface ShopUpdateRequest {
   customGalleryConfig?: string;
   useBannerInGallery?: boolean;
   assignmentMode?: 'MANUAL' | 'OPEN_POOL' | 'AUTO';
+  socialLinks?: string;
   lateGracePeriod?: number;
 }
 

@@ -67,6 +67,11 @@ export function useClinics() {
 
   const shopTypeParam = activeService === 'Tất cả' ? undefined : activeService;
 
+  // Reset page when search parameters change
+  useEffect(() => {
+    setPage(0);
+  }, [debouncedSearch, debouncedCity, shopTypeParam]);
+
   const { data: pagedData, isLoading, error } = useQuery({
     queryKey: ['shops-public', debouncedSearch, debouncedCity, shopTypeParam, page],
     queryFn: () => shopService.searchPublicPaged({
