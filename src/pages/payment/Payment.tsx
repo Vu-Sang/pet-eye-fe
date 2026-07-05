@@ -514,6 +514,11 @@ export default function Payment() {
                     {svc.durationMinutes ? (
                       <span className="text-xs text-slate-400 mt-0.5">⏱ Thời gian: {svc.durationMinutes} phút</span>
                     ) : null}
+                    {booking.petWeight && (
+                      <span className="text-xs text-teal-600 dark:text-teal-400 mt-0.5 font-medium">
+                        ⚖️ Mức giá cho thú cưng {booking.petWeight.toLowerCase()}
+                      </span>
+                    )}
                     {payMethod === 'cash' && (
                       <span className="text-xs text-amber-600 dark:text-amber-400 mt-0.5 font-medium">
                         • Cọc trước {rate * 100}%

@@ -13,7 +13,7 @@ import type { Pet } from '../../types';
 import type { DirectionsResponse } from '../../services/clinic.service';
 import ShopMap from '../../components/ShopMap';
 import { trackBookingStep1_ServiceSelection, trackBookingStep2_TimeSelection, trackBookingStep3_PetSelection, trackUseGpsNearby } from '../../lib/analytics';
-
+import { formatPetWeightLabel } from '../../utils/shopHelper';
 
 // Camera tier metadata — default fallbacks (shop can override via cameraTierLabels/cameraTierPrices)
 const CAMERA_TIER_META: Record<string, { label: string; desc: string; icon: string; defaultPrice: number }> = {
@@ -63,12 +63,10 @@ function matchPetWeight(numericWeight: number, weightTiers?: string[], prices?: 
   });
   
   let idx = 0;
-  if (numericWeight < thresholds[0]) {
-    idx = 0;
-  } else {
-    for (let i = 0; i < thresholds.length; i++) {
+  if (numericWeight >= thresholds[0]) {
+    for (let i = 0; i < thresholds.length - 1; i++) {
       if (numericWeight >= thresholds[i]) {
-        idx = i;
+        idx = i + 1;
       }
     }
   }
@@ -81,7 +79,7 @@ function matchPetWeight(numericWeight: number, weightTiers?: string[], prices?: 
     if (idx === 0) {
       friendlyLabel = `Dưới ${thresholds[0]}kg`;
     } else if (idx === thresholds.length - 1 && numericWeight >= thresholds[idx]) {
-      friendlyLabel = `Trên ${thresholds[idx - 1]}kg`;
+      friendlyLabel = `Trên ${thresholds[idx]}kg`;
     } else {
       friendlyLabel = `${thresholds[idx - 1]} - ${thresholds[idx]}kg`;
     }
@@ -1369,11 +1367,11 @@ export default function ClinicDetail() {
                                     className="px-3 py-1.5 border border-slate-200 dark:border-slate-700 rounded-lg text-sm font-semibold text-slate-800 dark:text-slate-200 bg-white dark:bg-slate-800 focus:ring-2 focus:ring-[#1a2b4c] outline-none"
                                   >
                                     {boardingService.petWeight.map((c: string) => (
-                                      <option key={c} value={c}>{c}</option>
+                                      <option key={c} value={c}>{formatPetWeightLabel(c, boardingService.petWeight)}</option>
                                     ))}
                                   </select>
                                 ) : (
-                                  <span className="text-sm font-semibold text-slate-800 dark:text-slate-200">{boardingService.petWeight[0]}</span>
+                                  <span className="text-sm font-semibold text-slate-800 dark:text-slate-200">{formatPetWeightLabel(boardingService.petWeight[0], boardingService.petWeight)}</span>
                                 )}
                               </div>
                             )}
@@ -1835,11 +1833,11 @@ export default function ClinicDetail() {
                                     className="px-3 py-1.5 border border-slate-200 dark:border-slate-700 rounded-lg text-sm font-semibold text-slate-800 dark:text-slate-200 bg-white dark:bg-slate-800 focus:ring-2 focus:ring-[#1a2b4c] outline-none"
                                   >
                                     {boardingService.petWeight.map((c: string) => (
-                                      <option key={c} value={c}>{c}</option>
+                                      <option key={c} value={c}>{formatPetWeightLabel(c, boardingService.petWeight)}</option>
                                     ))}
                                   </select>
                                 ) : (
-                                  <span className="text-sm font-semibold text-slate-800 dark:text-slate-200">{boardingService.petWeight[0]}</span>
+                                  <span className="text-sm font-semibold text-slate-800 dark:text-slate-200">{formatPetWeightLabel(boardingService.petWeight[0], boardingService.petWeight)}</span>
                                 )}
                               </div>
                             )}

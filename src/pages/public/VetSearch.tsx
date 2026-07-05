@@ -370,7 +370,7 @@ export default function VetSearch() {
                 <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-primary dark:text-white w-4 h-4 md:w-5 md:h-5" />
                 <input
                   type="text"
-                  placeholder="Tìm cơ sở, khu vực..."
+                  placeholder="Tìm cơ sở..."
                   className="w-full pl-11 pr-4 py-3 md:py-5 bg-transparent border-none focus:ring-0 text-slate-900 dark:text-white font-bold placeholder:text-slate-400 text-sm md:text-base rounded-t-xl md:rounded-l-full md:rounded-tr-none"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
@@ -412,11 +412,10 @@ export default function VetSearch() {
                   <button
                     key={tab.value}
                     onClick={() => setActiveService(tab.value)}
-                    className={`relative flex items-center gap-1.5 md:gap-2 px-4 md:px-5 py-2 md:py-2.5 rounded-full text-[13px] md:text-sm font-bold whitespace-nowrap transition-all z-10 snap-start ${
-                      isActive
-                        ? 'text-white shadow-lg shadow-primary/30 border border-transparent'
-                        : 'bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 text-slate-500 hover:text-slate-900 dark:hover:text-white hover:bg-slate-50 dark:hover:bg-slate-800 shadow-[0_2px_15px_-3px_rgba(6,81,237,0.08)]'
-                    }`}
+                    className={`relative flex items-center gap-1.5 md:gap-2 px-4 md:px-5 py-2 md:py-2.5 rounded-full text-[13px] md:text-sm font-bold whitespace-nowrap transition-all z-10 snap-start ${isActive
+                      ? 'text-white shadow-lg shadow-primary/30 border border-transparent'
+                      : 'bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 text-slate-500 hover:text-slate-900 dark:hover:text-white hover:bg-slate-50 dark:hover:bg-slate-800 shadow-[0_2px_15px_-3px_rgba(6,81,237,0.08)]'
+                      }`}
                   >
                     {isActive && (
                       <motion.div
@@ -638,8 +637,8 @@ export default function VetSearch() {
                         key={i}
                         onClick={() => setPage(i)}
                         className={`w-8 h-8 md:w-10 md:h-10 rounded-lg md:rounded-xl text-[11px] md:text-xs font-black transition-all ${i === page
-                            ? 'bg-primary text-white shadow-lg shadow-primary/25'
-                            : 'glass dark:glass-dark text-slate-600 dark:text-white hover:border-primary/50'
+                          ? 'bg-primary text-white shadow-lg shadow-primary/25'
+                          : 'glass dark:glass-dark text-slate-600 dark:text-white hover:border-primary/50'
                           }`}
                       >
                         {i + 1}

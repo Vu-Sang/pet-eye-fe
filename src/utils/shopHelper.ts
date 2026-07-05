@@ -23,3 +23,24 @@ export const getShopTypeLabel = (type: string | undefined): string => {
   }
   return translateShopType(type);
 };
+
+export const formatPetWeightLabel = (tierId: string, allTiers?: string[]): string => {
+  if (!allTiers || allTiers.length === 0) return tierId;
+  const idx = allTiers.indexOf(tierId);
+  if (idx === -1) return tierId;
+
+  const thresholds = allTiers.map(t => {
+    const num = parseFloat(t.replace(/[^0-9.]/g, ''));
+    return isNaN(num) ? 0 : num;
+  });
+
+  if (thresholds.length >= 2) {
+    if (idx === 0) {
+      return `< ${thresholds[0]} kg`;
+    } else {
+      return `${thresholds[idx - 1]} - ${thresholds[idx]} kg`;
+    }
+  }
+  
+  return tierId;
+};
