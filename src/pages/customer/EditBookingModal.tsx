@@ -46,6 +46,16 @@ function matchPetWeight(numericWeight: number, weightTiers?: string[], prices?: 
   return { tier: friendlyLabel, price };
 }
 
+function isPetCompatibleWithService(petSpecies: string, svcPetType: 'DOG' | 'CAT' | 'OTHER'): boolean {
+  const normSpecies = (petSpecies || '').trim().toUpperCase();
+  const isDog = normSpecies === 'CHÓ' || normSpecies === 'DOG';
+  const isCat = normSpecies === 'MÈO' || normSpecies === 'CAT';
+
+  if (svcPetType === 'DOG' && !isDog) return false;
+  if (svcPetType === 'CAT' && !isCat) return false;
+  return true;
+}
+
 interface EditBookingModalProps {
   booking: BookingResponse;
   onClose: () => void;
@@ -242,6 +252,24 @@ export default function EditBookingModal({ booking, onClose, onSuccess }: EditBo
   const handleSubmit = async () => {
     if (!selectedPetId) return toast.error('Vui lòng chọn thú cưng');
     if (selectedServiceIds.length === 0) return toast.error('Vui lòng chọn ít nhất 1 dịch vụ');
+
+    if (selectedPet) {
+      const incompatibleServices = selectedServiceIds
+        .map(id => apiServices.find((s: ServiceResponse) => s.id === id))
+        .filter((svc): svc is ServiceResponse => !!svc)
+        .filter(svc => !isPetCompatibleWithService(selectedPet.species, svc.petType));
+
+      if (incompatibleServices.length > 0) {
+        const invalidNames = incompatibleServices.map(s => s.serviceName).join(', ');
+        return toast.error(`Thú cưng ${selectedPet.name} (${selectedPet.species}) không phù hợp với các dịch vụ đã chọn: ${invalidNames}. Vui lòng chọn bé khác hoặc kiểm tra lại dịch vụ!`);
+      }
+
+      if (isHotelSelected && boardingService) {
+        if (!isPetCompatibleWithService(selectedPet.species, boardingService.petType)) {
+          return toast.error(`Thú cưng ${selectedPet.name} (${selectedPet.species}) không phù hợp với dịch vụ lưu trú đã chọn.`);
+        }
+      }
+    }
     
     if (hasNormalServices) {
       if (!selectedDate || !selectedTime) return toast.error('Vui lòng chọn ngày giờ hẹn cho dịch vụ thường');
