@@ -35,6 +35,7 @@ interface ServiceForm {
   durationMinutes: number;   // for BOARDING: stored as days in UI, converted to minutes on save
   durationDays: number;      // UI-only field for BOARDING
   description: string;
+  notes: string;
   imageUrl: string;
   category: string;
   active: boolean;
@@ -57,6 +58,7 @@ const EMPTY_FORM: ServiceForm = {
   durationMinutes: 1440,  // 1 day default for BOARDING
   durationDays: 1,
   description: '',
+  notes: '',
   imageUrl: '',
   category: 'GROOMING',
   active: true,
@@ -206,13 +208,19 @@ export default function ShopServices() {
     });
     setDynamicCameraTiers(loadedTiers);
 
+    const rawDescription = service.description ?? '';
+    const descParts = rawDescription.split('<!--SERVICE_NOTE_SEPARATOR-->');
+    const mainDesc = descParts[0] || '';
+    const notes = descParts[1] || '';
+
     setForm({
       serviceName: service.serviceName,
       price: service.price,
       pricesStr: service.prices?.join(', ') ?? (service.category === 'BOARDING' && service.price > 0 ? String(service.price) : ''),
       durationMinutes: service.durationMinutes,
       durationDays,
-      description: service.description ?? '',
+      description: mainDesc,
+      notes: notes,
       imageUrl: service.imageUrl ?? '',
       category: service.category,
       active: service.active,
@@ -298,6 +306,10 @@ export default function ShopServices() {
         : form.durationMinutes;
 
 
+      const fullDescription = form.notes 
+        ? `${form.description}<!--SERVICE_NOTE_SEPARATOR-->${form.notes}`
+        : form.description;
+
       if (modalMode === 'add') {
         const payload: ServiceCreationRequest = {
           serviceName: form.serviceName,
@@ -305,7 +317,7 @@ export default function ShopServices() {
           petType: form.petType,
           price: isWeightPriceEnabled && form.pricesStr ? (Number(form.pricesStr.split(',')[0].trim()) || 0) : form.price,
           durationMinutes,
-          description: form.description,
+          description: fullDescription,
           imageUrl: form.imageUrl || undefined,
           petWeight: isWeightPriceEnabled && form.petWeight ? form.petWeight.split(',').map(s=>s.trim()).filter(Boolean) : undefined,
           prices: isWeightPriceEnabled && form.pricesStr ? form.pricesStr.split(',').map(s=>Number(s.trim())).filter(n=>!isNaN(n)) : undefined,
@@ -336,7 +348,7 @@ export default function ShopServices() {
           petType: form.petType,
           price: isWeightPriceEnabled && form.pricesStr ? (Number(form.pricesStr.split(',')[0].trim()) || 0) : form.price,
           durationMinutes,
-          description: form.description,
+          description: fullDescription,
           imageUrl: form.imageUrl || undefined,
           active: form.active,
           petWeight: isWeightPriceEnabled ? (form.petWeight ? form.petWeight.split(',').map(s=>s.trim()).filter(Boolean) : []) : undefined,
@@ -661,7 +673,17 @@ export default function ShopServices() {
                 {/* Content */}
                 <div className="p-5 flex-1 flex flex-col">
                   <h3 className={`font-bold text-lg mb-1 truncate ${isDark ? 'text-white' : 'text-slate-900'}`}>{service.serviceName}</h3>
-                  <p className={`text-sm mb-4 line-clamp-2 ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>{service.description || 'Chưa có mô tả cho dịch vụ này.'}</p>
+                  {(() => {
+                    const [desc, notes] = (service.description || '').split('<!--SERVICE_NOTE_SEPARATOR-->');
+                    return (
+                      <>
+                        <p className={`text-sm mb-1 line-clamp-2 ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>{desc || 'Chưa có mô tả cho dịch vụ này.'}</p>
+                        {notes && (
+                          <p className="text-xs text-slate-500 dark:text-slate-400 italic mb-3">Lưu ý: {notes}</p>
+                        )}
+                      </>
+                    );
+                  })()}
 
                   <div className="flex flex-wrap items-center gap-3 mb-5 mt-auto">
                     <div className="flex items-center text-sm">
@@ -752,7 +774,17 @@ export default function ShopServices() {
                       {service.active ? 'Hoạt động' : 'Tạm dừng'}
                     </span>
                   </div>
-                  <p className={`text-xs line-clamp-1 mb-3 ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>{service.description || 'Chưa có mô tả cho dịch vụ này.'}</p>
+                  {(() => {
+                    const [desc, notes] = (service.description || '').split('<!--SERVICE_NOTE_SEPARATOR-->');
+                    return (
+                      <>
+                        <p className={`text-xs line-clamp-1 mb-1 ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>{desc || 'Chưa có mô tả cho dịch vụ này.'}</p>
+                        {notes && (
+                          <p className="text-[11px] text-slate-500 dark:text-slate-400 italic mb-2">Lưu ý: {notes}</p>
+                        )}
+                      </>
+                    );
+                  })()}
                   <div className="flex flex-wrap items-center gap-3">
                     <span className={`text-sm font-black px-2 py-0.5 rounded-lg ${isDark ? 'text-indigo-300 bg-indigo-500/10' : 'text-[#1a2b4c] bg-[#1a2b4c]/5'}`}>
                       {service.price.toLocaleString('vi-VN')}đ
@@ -1071,6 +1103,20 @@ export default function ShopServices() {
                   rows={4}
                   className={`w-full px-4 py-2 border rounded-lg focus:ring-2 outline-none resize-none transition-all ${isDark ? 'bg-[#0b1121] border-white/10 text-white focus:ring-indigo-500/50 focus:border-indigo-500 placeholder-slate-500' : 'bg-white border-slate-200 text-slate-900 focus:ring-indigo-500/20 focus:border-indigo-500 placeholder-slate-400'}`}
                   placeholder="Mô tả chi tiết về dịch vụ..."
+                />
+              </div>
+
+              {/* Service Notes */}
+              <div>
+                <label className={`block text-sm font-bold mb-2 ${isDark ? 'text-slate-300' : 'text-slate-700'}`}>
+                  Lưu ý dịch vụ <span className={`font-normal text-xs ${isDark ? 'text-slate-500' : 'text-slate-400'}`}>(hiển thị màu đỏ nổi bật, VD: phụ thu gỡ rối, thú dữ)</span>
+                </label>
+                <textarea
+                  value={form.notes}
+                  onChange={(e) => setForm((prev) => ({ ...prev, notes: e.target.value }))}
+                  rows={2}
+                  className={`w-full px-4 py-2 border rounded-lg focus:ring-2 outline-none resize-none transition-all ${isDark ? 'bg-[#0b1121] border-white/10 text-white focus:ring-indigo-500/50 focus:border-indigo-500 placeholder-slate-500' : 'bg-white border-slate-200 text-slate-900 focus:ring-indigo-500/20 focus:border-indigo-500 placeholder-slate-400'}`}
+                  placeholder="Ví dụ: Phụ thu gỡ rối 20k - 500k, phụ thu Gâu Gâu dữ 50k - 100k..."
                 />
               </div>
 

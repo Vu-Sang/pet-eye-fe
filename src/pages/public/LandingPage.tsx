@@ -1109,7 +1109,7 @@ export default function Home() {
               <button onClick={() => window.open('https://web.facebook.com/profile.php?id=61590306674838', '_blank')} className="w-full sm:w-auto bg-[#1877F2] hover:bg-[#166FE5] text-white px-8 py-3.5 rounded-full font-black text-sm shadow-xl shadow-blue-500/10 hover:-translate-y-0.5 transition-all active:scale-95">
                 Tham gia Facebook
               </button>
-              <button onClick={() => window.open('https://tiktok.com', '_blank')} className="w-full sm:w-auto bg-white hover:bg-slate-50 text-slate-900 border border-slate-200 dark:border-slate-700 dark:bg-slate-800 dark:text-white dark:hover:bg-slate-700 px-8 py-3.5 rounded-full font-black text-sm shadow-lg shadow-slate-200/50 dark:shadow-none hover:-translate-y-0.5 transition-all active:scale-95">
+              <button onClick={() => window.open('https://www.tiktok.com/@peteye26?_r=1&_t=ZS-97Fg67GwKf7', '_blank')} className="w-full sm:w-auto bg-white hover:bg-slate-50 text-slate-900 border border-slate-200 dark:border-slate-700 dark:bg-slate-800 dark:text-white dark:hover:bg-slate-700 px-8 py-3.5 rounded-full font-black text-sm shadow-lg shadow-slate-200/50 dark:shadow-none hover:-translate-y-0.5 transition-all active:scale-95">
                 Theo dõi TikTok
               </button>
             </div>

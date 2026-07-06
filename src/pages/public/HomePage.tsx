@@ -579,7 +579,10 @@ export default function HomePage() {
                                                     {service.shopName}
                                                 </div>
                                                 <p className="text-xs text-slate-500 dark:text-slate-400 line-clamp-2 leading-relaxed font-medium">
-                                                    {service.description || "Dịch vụ chăm sóc thú cưng chuyên nghiệp với đội ngũ bác sĩ tận tâm."}
+                                                    {(() => {
+                                                        const [desc] = (service.description || '').split('<!--SERVICE_NOTE_SEPARATOR-->');
+                                                        return desc || "Dịch vụ chăm sóc thú cưng chuyên nghiệp với đội ngũ bác sĩ tận tâm.";
+                                                    })()}
                                                 </p>
                                             </div>
                                             <div className="mt-6 pt-6 border-t border-slate-50 dark:border-slate-700 flex items-center justify-between">

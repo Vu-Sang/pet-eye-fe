@@ -81,6 +81,7 @@ export interface ServiceResponse {
   cameraTierLabels?: Record<string, string>;
   cameraDescription?: string;
   petWeight?: string[];
+  cageSize?: string[];
   roomType?: string[];
   roomTypePrices?: Record<string, number>;
   prices?: number[];
@@ -160,6 +161,7 @@ export interface BookingRequest {
   note?: string;
   paymentMethod?: 'PAYOS' | 'CASH';
   petWeight?: string;
+  cageSize?: string;
   roomType?: string;
   userVoucherId?: number;
 }
@@ -211,6 +213,7 @@ export interface BookingResponse {
   serviceStartDatetime?: string;
   serviceEndDatetime?: string;
   petWeight?: string;
+  cageSize?: string;
   roomType?: string;
   category?: string;
 }
