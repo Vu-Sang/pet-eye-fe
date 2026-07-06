@@ -13,7 +13,7 @@ import type { Pet } from '../../types';
 import type { DirectionsResponse } from '../../services/clinic.service';
 import ShopMap from '../../components/ShopMap';
 import { trackBookingStep1_ServiceSelection, trackBookingStep2_TimeSelection, trackBookingStep3_PetSelection, trackUseGpsNearby } from '../../lib/analytics';
-import { formatPetWeightLabel, formatWorkingDays } from '../../utils/shopHelper';
+import { formatPetWeightLabel, formatWorkingDays, formatServiceDuration } from '../../utils/shopHelper';
 
 // Camera tier metadata — default fallbacks (shop can override via cameraTierLabels/cameraTierPrices)
 const CAMERA_TIER_META: Record<string, { label: string; desc: string; icon: string; defaultPrice: number }> = {
@@ -1442,12 +1442,12 @@ export default function ClinicDetail() {
                       const itemCageExtra = isThisSelected ? cageSizeExtraPrice : 0;
                       return (
                         <div key={item.id} className={`flex items-center justify-between p-4 rounded-2xl border transition-all ${isCurrentSelected ? 'bg-indigo-50/30 border-indigo-100 dark:bg-indigo-950/15 dark:border-indigo-900/50' : 'bg-slate-50 dark:bg-slate-800/20 border-transparent hover:border-slate-200 dark:hover:border-slate-700'}`}>
-                          <div className="flex items-center gap-3">
+                          <div className="flex items-center gap-3 min-w-0">
                             <div className="w-12 h-12 bg-indigo-50 dark:bg-indigo-900/30 rounded-2xl flex items-center justify-center text-indigo-600 dark:text-indigo-400 shadow-sm border border-indigo-100 dark:border-indigo-800 shrink-0">
                               <span className="material-symbols-outlined text-2xl">hotel</span>
                             </div>
-                            <div>
-                              <h2 className="text-base font-bold text-slate-900 dark:text-slate-100">{item.serviceName}</h2>
+                            <div className="min-w-0">
+                              <h2 className="text-base font-bold text-slate-900 dark:text-slate-100 truncate">{item.serviceName}</h2>
                               {(() => {
                                 const [desc, notes] = (item.description || '').split('<!--SERVICE_NOTE_SEPARATOR-->');
                                 return (
@@ -1461,7 +1461,7 @@ export default function ClinicDetail() {
                               })()}
                             </div>
                           </div>
-                          <div className="flex items-center gap-2">
+                          <div className="flex items-center gap-2 shrink-0">
                             <div className="flex flex-col items-end">
                               <div className="flex items-center gap-1">
                                 <span className="text-sm font-bold text-slate-900 dark:text-white">{(itemBasePrice + itemRoomExtra).toLocaleString('vi-VN')}đ</span>
@@ -1500,49 +1500,6 @@ export default function ClinicDetail() {
                       );
                     })}
                   </div>
-
-                  {/* Pagination Controls for Boarding Services */}
-                  {totalBoardingPages > 1 && (
-                    <div className="flex items-center justify-between mb-5">
-                      <div className="flex items-center gap-2">
-                        <button
-                          onClick={() => setBoardingServicesPage(prev => Math.max(0, prev - 1))}
-                          disabled={boardingServicesPage === 0}
-                          className="px-3 py-1.5 text-xs font-medium rounded-lg bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-                        >
-                          Trước
-                        </button>
-                        
-                        <div className="flex items-center gap-1">
-                          {Array.from({ length: totalBoardingPages }, (_, i) => (
-                            <button
-                              key={i}
-                              onClick={() => setBoardingServicesPage(i)}
-                              className={`w-8 h-8 text-xs font-medium rounded-lg transition-colors ${
-                                boardingServicesPage === i
-                                  ? 'bg-indigo-600 text-white'
-                                  : 'bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-600'
-                              }`}
-                            >
-                              {i + 1}
-                            </button>
-                          ))}
-                        </div>
-
-                        <button
-                          onClick={() => setBoardingServicesPage(prev => Math.min(totalBoardingPages - 1, prev + 1))}
-                          disabled={boardingServicesPage >= totalBoardingPages - 1}
-                          className="px-3 py-1.5 text-xs font-medium rounded-lg bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-                        >
-                          Sau
-                        </button>
-                      </div>
-
-                      <span className="text-xs text-slate-500 dark:text-slate-400">
-                        {boardingServicesPage * BOARDING_SERVICES_PER_PAGE + 1}-{Math.min((boardingServicesPage + 1) * BOARDING_SERVICES_PER_PAGE, boardingServices.length)} của {boardingServices.length}
-                      </span>
-                    </div>
-                  )}
 
                   <div className={`transition-all duration-500 overflow-hidden ${isHotelSelected && boardingService ? 'max-h-[1200px] opacity-100 mt-4' : 'max-h-0 opacity-0'}`}>
                     {boardingService && (
@@ -1677,7 +1634,51 @@ export default function ClinicDetail() {
                     )}
                   </div>
                 )}
+
                 </div>
+
+                {/* Pagination Controls for Boarding Services */}
+                {totalBoardingPages > 1 && (
+                  <div className="flex items-center justify-between mt-6">
+                    <div className="flex items-center gap-2">
+                      <button
+                        onClick={() => setBoardingServicesPage(prev => Math.max(0, prev - 1))}
+                        disabled={boardingServicesPage === 0}
+                        className="px-3 py-1.5 text-xs font-medium rounded-lg bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                      >
+                        Trước
+                      </button>
+                      
+                      <div className="flex items-center gap-1">
+                        {Array.from({ length: totalBoardingPages }, (_, i) => (
+                          <button
+                            key={i}
+                            onClick={() => setBoardingServicesPage(i)}
+                            className={`w-8 h-8 text-xs font-medium rounded-lg transition-colors ${
+                              boardingServicesPage === i
+                                ? 'bg-indigo-600 text-white'
+                                : 'bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-600'
+                            }`}
+                          >
+                            {i + 1}
+                          </button>
+                        ))}
+                      </div>
+
+                      <button
+                        onClick={() => setBoardingServicesPage(prev => Math.min(totalBoardingPages - 1, prev + 1))}
+                        disabled={boardingServicesPage >= totalBoardingPages - 1}
+                        className="px-3 py-1.5 text-xs font-medium rounded-lg bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                      >
+                        Sau
+                      </button>
+                    </div>
+
+                    <span className="text-xs text-slate-500 dark:text-slate-400">
+                      {boardingServicesPage * BOARDING_SERVICES_PER_PAGE + 1}-{Math.min((boardingServicesPage + 1) * BOARDING_SERVICES_PER_PAGE, boardingServices.length)} của {boardingServices.length}
+                    </span>
+                  </div>
+                )}
               </section>
               </div>
             )} {/* end BOARDING conditional (Desktop) */}
@@ -1787,7 +1788,7 @@ export default function ClinicDetail() {
                               })()}
                               <div className="flex items-center gap-3 mt-1">
                                 <span className="inline-flex items-center gap-1 text-xs font-semibold text-slate-400">
-                                  ⏱ {svc.durationMinutes} phút
+                                  ⏱ {formatServiceDuration(svc.durationMinutes, svc.category)}
                                 </span>
                                 <span className="text-slate-300 dark:text-slate-600">•</span>
                                 <button
@@ -1935,12 +1936,12 @@ export default function ClinicDetail() {
                       const itemCageExtra = isThisSelected ? cageSizeExtraPrice : 0;
                       return (
                         <div key={item.id} className={`flex items-center justify-between p-4 rounded-2xl border transition-all ${isCurrentSelected ? 'bg-indigo-50/30 border-indigo-100 dark:bg-indigo-950/15 dark:border-indigo-900/50' : 'bg-slate-50 dark:bg-slate-800/20 border-transparent'}`}>
-                          <div className="flex items-center gap-3">
+                          <div className="flex items-center gap-3 min-w-0">
                             <div className="w-12 h-12 bg-indigo-50 dark:bg-indigo-900/30 rounded-2xl flex items-center justify-center text-indigo-600 dark:text-indigo-400 shadow-sm border border-indigo-100 dark:border-indigo-800 shrink-0">
                               <span className="material-symbols-outlined text-2xl">hotel</span>
                             </div>
-                            <div>
-                              <h2 className="text-base font-bold text-slate-900 dark:text-slate-100">{item.serviceName}</h2>
+                            <div className="min-w-0">
+                              <h2 className="text-base font-bold text-slate-900 dark:text-slate-100 truncate">{item.serviceName}</h2>
                               {(() => {
                                 const [desc, notes] = (item.description || '').split('<!--SERVICE_NOTE_SEPARATOR-->');
                                 return (
@@ -1954,7 +1955,7 @@ export default function ClinicDetail() {
                               })()}
                             </div>
                           </div>
-                          <div className="flex items-center gap-2">
+                          <div className="flex items-center gap-2 shrink-0">
                             <div className="flex flex-col items-end">
                               <div className="flex items-center gap-1">
                                 <span className="text-sm font-bold text-slate-900 dark:text-white">{(itemBasePrice + itemRoomExtra).toLocaleString('vi-VN')}đ</span>
@@ -1993,49 +1994,6 @@ export default function ClinicDetail() {
                       );
                     })}
                   </div>
-
-                  {/* Pagination Controls for Boarding Services */}
-                  {totalBoardingPages > 1 && (
-                    <div className="flex items-center justify-between mb-5">
-                      <div className="flex items-center gap-2">
-                        <button
-                          onClick={() => setBoardingServicesPage(prev => Math.max(0, prev - 1))}
-                          disabled={boardingServicesPage === 0}
-                          className="px-3 py-1.5 text-xs font-medium rounded-lg bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-                        >
-                          Trước
-                        </button>
-                        
-                        <div className="flex items-center gap-1">
-                          {Array.from({ length: totalBoardingPages }, (_, i) => (
-                            <button
-                              key={i}
-                              onClick={() => setBoardingServicesPage(i)}
-                              className={`w-8 h-8 text-xs font-medium rounded-lg transition-colors ${
-                                boardingServicesPage === i
-                                  ? 'bg-indigo-600 text-white'
-                                  : 'bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-600'
-                              }`}
-                            >
-                              {i + 1}
-                            </button>
-                          ))}
-                        </div>
-
-                        <button
-                          onClick={() => setBoardingServicesPage(prev => Math.min(totalBoardingPages - 1, prev + 1))}
-                          disabled={boardingServicesPage >= totalBoardingPages - 1}
-                          className="px-3 py-1.5 text-xs font-medium rounded-lg bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-                        >
-                          Sau
-                        </button>
-                      </div>
-
-                      <span className="text-xs text-slate-500 dark:text-slate-400">
-                        {boardingServicesPage * BOARDING_SERVICES_PER_PAGE + 1}-{Math.min((boardingServicesPage + 1) * BOARDING_SERVICES_PER_PAGE, boardingServices.length)} của {boardingServices.length}
-                      </span>
-                    </div>
-                  )}
 
                   <div className={`transition-all duration-500 overflow-hidden ${isHotelSelected && boardingService ? 'max-h-[1200px] opacity-100 mt-4' : 'max-h-0 opacity-0'}`}>
                     {boardingService && (
@@ -2170,7 +2128,51 @@ export default function ClinicDetail() {
                     )}
                   </div>
                 )}
+
                 </div>
+
+                {/* Pagination Controls for Boarding Services */}
+                {totalBoardingPages > 1 && (
+                  <div className="flex items-center justify-between mt-6">
+                    <div className="flex items-center gap-2">
+                      <button
+                        onClick={() => setBoardingServicesPage(prev => Math.max(0, prev - 1))}
+                        disabled={boardingServicesPage === 0}
+                        className="px-3 py-1.5 text-xs font-medium rounded-lg bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                      >
+                        Trước
+                      </button>
+                      
+                      <div className="flex items-center gap-1">
+                        {Array.from({ length: totalBoardingPages }, (_, i) => (
+                          <button
+                            key={i}
+                            onClick={() => setBoardingServicesPage(i)}
+                            className={`w-8 h-8 text-xs font-medium rounded-lg transition-colors ${
+                              boardingServicesPage === i
+                                ? 'bg-indigo-600 text-white'
+                                : 'bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-600'
+                            }`}
+                          >
+                            {i + 1}
+                          </button>
+                        ))}
+                      </div>
+
+                      <button
+                        onClick={() => setBoardingServicesPage(prev => Math.min(totalBoardingPages - 1, prev + 1))}
+                        disabled={boardingServicesPage >= totalBoardingPages - 1}
+                        className="px-3 py-1.5 text-xs font-medium rounded-lg bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                      >
+                        Sau
+                      </button>
+                    </div>
+
+                    <span className="text-xs text-slate-500 dark:text-slate-400">
+                      {boardingServicesPage * BOARDING_SERVICES_PER_PAGE + 1}-{Math.min((boardingServicesPage + 1) * BOARDING_SERVICES_PER_PAGE, boardingServices.length)} của {boardingServices.length}
+                    </span>
+                  </div>
+                )}
               </section>
               </div>
             )} {/* end BOARDING conditional (Mobile) */}
@@ -2356,7 +2358,7 @@ export default function ClinicDetail() {
                                   {svc.serviceName}
                                 </span>
                                 <span className="text-xs text-slate-500">
-                                  {getServicePriceInfo(svc).displayPrice.toLocaleString('vi-VN')}đ • {svc.durationMinutes} phút {getServicePriceInfo(svc).matchedTierLabel}
+                                  {getServicePriceInfo(svc).displayPrice.toLocaleString('vi-VN')}đ • {formatServiceDuration(svc.durationMinutes, svc.category)} {getServicePriceInfo(svc).matchedTierLabel}
                                 </span>
                               </div>
                               <div className={`w-5 h-5 rounded border-2 flex items-center justify-center transition-all ${isSelected
@@ -2437,7 +2439,7 @@ export default function ClinicDetail() {
                                       {svc.serviceName}
                                     </span>
                                     <span className="text-[10px] text-slate-500 dark:text-slate-400 mt-0.5">
-                                      Thời gian: {svc.durationMinutes} phút
+                                      Thời gian: {formatServiceDuration(svc.durationMinutes, svc.category)}
                                     </span>
                                   </div>
                                     <div className="flex items-center gap-1.5 flex-shrink-0">
@@ -2468,7 +2470,7 @@ export default function ClinicDetail() {
                                 <span className="material-symbols-outlined text-[14px]">schedule</span>
                                 Tổng thời gian:
                               </span>
-                              <span className="font-bold">{totalServiceDuration} phút</span>
+                              <span className="font-bold">{formatServiceDuration(totalServiceDuration)}</span>
                             </div>
                           )}
                           <div className="flex justify-between items-center pt-2 border-t border-[#1a2b4c]/10 dark:border-slate-700">
@@ -3548,7 +3550,7 @@ export default function ClinicDetail() {
                       <span className="text-slate-400">•</span>
                       <span className="text-sm font-medium text-slate-500 dark:text-slate-400 flex items-center gap-1">
                         <span className="material-symbols-outlined text-sm">schedule</span>
-                        {selectedServiceForDetail.durationMinutes} phút
+                        {formatServiceDuration(selectedServiceForDetail.durationMinutes, selectedServiceForDetail.category)}
                       </span>
                     </div>
                   </div>

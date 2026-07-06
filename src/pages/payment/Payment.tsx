@@ -3,6 +3,7 @@ import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { bookingService } from '../../services/booking.service';
 import { trackBookingStep4_PaymentStart, trackSelectPaymentMethod, trackSelectVoucher } from '../../lib/analytics';
 type PayMethod = 'payos' | 'cash';
+import { formatServiceDuration } from '../../utils/shopHelper';
 
 function formatVND(n: number) {
   return n.toLocaleString('vi-VN') + 'đ';
@@ -343,7 +344,7 @@ export default function Payment() {
                     {serviceList.map((svc) => (
                       <span key={svc.id} className="px-2 py-1 bg-teal-50 dark:bg-teal-900/20 text-teal-700 dark:text-teal-300 text-xs font-semibold rounded-lg flex items-center gap-1">
                         {svc.name}
-                        {svc.durationMinutes ? ` (${svc.durationMinutes} phút)` : ''}
+                        {svc.durationMinutes ? ` (${formatServiceDuration(svc.durationMinutes, svc.category)})` : ''}
                       </span>
                     ))}
                     <span className="px-2 py-1 bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-300 text-xs font-semibold rounded-lg flex items-center gap-1">
@@ -513,7 +514,7 @@ export default function Payment() {
                       <span className="shrink-0 font-semibold">{formatVND(svc.price)}</span>
                     </div>
                     {svc.durationMinutes ? (
-                      <span className="text-xs text-slate-400 mt-0.5">⏱ Thời gian: {svc.durationMinutes} phút</span>
+                      <span className="text-xs text-slate-400 mt-0.5">⏱ Thời gian: {formatServiceDuration(svc.durationMinutes, svc.category)}</span>
                     ) : null}
                     {booking.petWeight && (
                       <span className="text-xs text-teal-600 dark:text-teal-400 mt-0.5 font-medium">

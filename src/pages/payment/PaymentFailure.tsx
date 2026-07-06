@@ -11,7 +11,7 @@ export default function PaymentFailure() {
   const bookingInfo = location.state?.bookingInfo;
 
   return (
-    <div className="flex-1 min-h-screen relative overflow-hidden flex items-center justify-center py-12 px-4 bg-slate-50 dark:bg-slate-950">
+    <div className="flex-1 min-h-screen relative overflow-hidden flex items-center justify-center pt-28 pb-12 sm:pt-32 sm:pb-16 px-4 bg-slate-50 dark:bg-slate-950">
       {/* Premium Background Effects */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <div className="absolute top-[-10%] right-[-5%] w-[40rem] h-[40rem] rounded-full bg-rose-400/10 dark:bg-rose-900/20 blur-[100px]" />
