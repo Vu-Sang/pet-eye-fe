@@ -69,13 +69,13 @@ function GuestNavbar() {
 
   return (
     <header
-      className={`fixed top-4 left-1/2 -translate-x-1/2 z-50 w-[calc(100%-2rem)] max-w-screen-xl transition-all duration-300 h-15
+      className={`fixed top-4 left-1/2 -translate-x-1/2 z-50 w-[calc(100%-2rem)] max-w-screen-xl transition-all duration-300 h-auto
         ${mobileOpen ? 'rounded-[24px]' : 'rounded-full'}
         ${scrolled
           ? 'bg-white/95 dark:bg-slate-950/95 shadow-md border border-primary/30 dark:border-blue-500/30 backdrop-blur-md'
           : 'bg-white/95 dark:bg-slate-950/95 shadow-sm border border-primary/15 dark:border-blue-500/15 backdrop-blur-sm'}`}
     >
-      <div className="h-full px-6 md:px-8 flex items-center gap-8">
+      <div className="h-15 px-6 md:px-8 flex items-center gap-8">
         <Link
           to="/"
           onClick={(e) => {
@@ -208,13 +208,13 @@ function AuthNavbar() {
 
   return (
     <header
-      className={`fixed top-4 left-1/2 -translate-x-1/2 z-50 w-[calc(100%-2rem)] max-w-screen-xl transition-all duration-300 h-14
+      className={`fixed top-4 left-1/2 -translate-x-1/2 z-50 w-[calc(100%-2rem)] max-w-screen-xl transition-all duration-300 h-auto
         ${mobileOpen ? 'rounded-[24px]' : 'rounded-full'}
         ${scrolled
           ? 'bg-white/95 dark:bg-slate-950/95 shadow-md border border-blue-900/40 dark:border-blue-900/60 backdrop-blur-md'
           : 'bg-white/95 dark:bg-slate-950/95 shadow-sm border border-blue-900/25 dark:border-blue-900/40 backdrop-blur-sm'}`}
     >
-      <div className="h-full px-6 md:px-8 flex items-center gap-6">
+      <div className="h-14 px-6 md:px-8 flex items-center gap-6">
 
         {/* ── Logo ──────────────────────────────── */}
         <Link
