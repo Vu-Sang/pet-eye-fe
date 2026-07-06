@@ -13,7 +13,7 @@ import type { NearbyShopResponse } from '../../services/clinic.service';
 import ShopMap from '../../components/ShopMap';
 import NearbyShops from '../../components/NearbyShops';
 import { trackSearch, trackFilterChange } from '../../lib/analytics';
-import { getShopTypeLabel } from '../../utils/shopHelper';
+import { getShopTypeLabel, stripHtml } from '../../utils/shopHelper';
 
 function calculateDistance(lat1: number, lon1: number, lat2: number, lon2: number): number {
   const R = 6371; // km
@@ -586,7 +586,7 @@ export default function VetSearch() {
                           {shop.description && (
                             <div className="hidden sm:block">
                               <p className="text-[11px] md:text-xs text-slate-500 dark:text-slate-400 line-clamp-2 leading-relaxed font-medium">
-                                {shop.description}
+                                {stripHtml(shop.description)}
                               </p>
                             </div>
                           )}
