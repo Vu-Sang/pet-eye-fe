@@ -103,3 +103,20 @@ export const stripHtml = (html: string | undefined): string => {
   if (!html) return '';
   return html.replace(/<[^>]*>/g, '').replace(/&nbsp;/g, ' ');
 };
+
+export const formatServiceDuration = (minutes: number | undefined | null, category?: string): string => {
+  if (minutes === undefined || minutes === null || isNaN(minutes) || minutes <= 0) return '';
+  const catUpper = (category || '').trim().toUpperCase();
+  if (catUpper === 'BOARDING' || catUpper === 'HOTEL') {
+    const days = Math.round(minutes / 1440) || 1;
+    return `${days} ngày`;
+  }
+  if (minutes >= 1440) {
+    const days = Math.round(minutes / 1440);
+    return `${days} ngày`;
+  }
+  if (minutes >= 60 && minutes % 60 === 0) {
+    return `${minutes / 60} giờ`;
+  }
+  return `${minutes} phút`;
+};

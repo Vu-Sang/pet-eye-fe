@@ -3,6 +3,7 @@ import { Plus, Search, Edit2, Trash2, Camera, X, Clock, DollarSign, Tag, ToggleL
 import { serviceService } from '../../services/service.service';
 import type { ServiceResponse, ServiceCreationRequest, ServiceUpdateRequest } from '../../types/api';
 import { useTheme } from '../../contexts/ThemeContext';
+import { formatServiceDuration } from '../../utils/shopHelper';
 
 // ─── Camera tier options (defaults — shop can override label & price) ─────────
 
@@ -693,7 +694,7 @@ export default function ShopServices() {
                     </div>
                     <div className={`flex items-center gap-1.5 text-sm font-medium px-2.5 py-1 rounded-lg ${isDark ? 'bg-slate-800/50 text-slate-300' : 'bg-slate-50 text-slate-600'}`}>
                       <Clock size={14} className={isDark ? 'text-slate-500' : 'text-slate-400'} />
-                      <span>{service.durationMinutes} phút</span>
+                      <span>{formatServiceDuration(service.durationMinutes, service.category)}</span>
                     </div>
                     {service.category === 'BOARDING' && service.cameraEnabled && (
                       <div className={`flex items-center gap-1 text-xs font-semibold px-2 py-1 rounded-full ${isDark ? 'text-indigo-300 bg-indigo-500/10' : 'text-indigo-600 bg-indigo-50'}`}>
@@ -790,7 +791,7 @@ export default function ShopServices() {
                       {service.price.toLocaleString('vi-VN')}đ
                     </span>
                     <span className={`flex items-center gap-1.5 text-xs font-medium px-2 py-0.5 rounded-lg ${isDark ? 'bg-slate-800/50 text-slate-300' : 'bg-slate-50 text-slate-600'}`}>
-                      <Clock size={12} /> {service.durationMinutes} phút
+                      <Clock size={12} /> {formatServiceDuration(service.durationMinutes, service.category)}
                     </span>
                     {service.category === 'BOARDING' && service.cameraEnabled && (
                       <span className={`flex items-center gap-1 text-xs font-semibold px-2 py-0.5 rounded-lg ${isDark ? 'text-indigo-300 bg-indigo-500/10' : 'text-indigo-600 bg-indigo-50'}`}>
@@ -1042,7 +1043,6 @@ export default function ShopServices() {
                     <>
                       <label className={`block text-sm font-bold mb-2 ${isDark ? 'text-slate-300' : 'text-slate-700'}`}>
                         Số ngày tối thiểu *
-                        <span className="ml-1 text-xs font-normal text-slate-500">(tự lưu thành phút)</span>
                       </label>
                       <input
                         type="number"

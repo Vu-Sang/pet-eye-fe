@@ -2,11 +2,14 @@ import React, { useEffect, useRef } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { trackBookingSuccess, trackPurchase } from '../../lib/analytics';
 
+import { formatServiceDuration } from '../../utils/shopHelper';
+
 interface BookingServiceItem {
   id: number;
   name: string;
   price: number;
   durationMinutes?: number;
+  category?: string;
 }
 
 export default function BookingSuccess() {
@@ -93,7 +96,7 @@ export default function BookingSuccess() {
 
 
   return (
-    <div className="flex-1 bg-gradient-to-br from-slate-50 via-white to-indigo-50/30 dark:from-slate-900 dark:via-slate-900 dark:to-indigo-950/20 flex items-center justify-center py-6 px-4 min-h-[calc(100vh-64px)]">
+    <div className="flex-1 bg-gradient-to-br from-slate-50 via-white to-indigo-50/30 dark:from-slate-900 dark:via-slate-900 dark:to-indigo-950/20 flex items-center justify-center pt-28 pb-10 sm:pt-32 sm:pb-12 px-4 min-h-[calc(100vh-64px)]">
 
       {/* Confetti container */}
       <div ref={confettiRef} className="fixed inset-0 pointer-events-none overflow-hidden z-50" />
@@ -273,8 +276,8 @@ export default function BookingSuccess() {
                             : 'content_cut'}
                       </span>
                       <div className="flex flex-col min-w-0">
-                        <span className="text-[11px] text-slate-700 dark:text-slate-200 leading-tight truncate">{svc.name}</span>
-                        {svc.durationMinutes ? <span className="text-[9px] text-slate-400 mt-0.5">⏱ {svc.durationMinutes} phút</span> : null}
+                        <span className="text-[11px] text-slate-700 dark:text-slate-200 leading-tight">{svc.name}</span>
+                        {svc.durationMinutes ? <span className="text-[9px] text-slate-400 mt-0.5">⏱ {formatServiceDuration(svc.durationMinutes, svc.category)}</span> : null}
                       </div>
                     </div>
                     <span className="text-[11px] font-bold text-slate-900 dark:text-white shrink-0">

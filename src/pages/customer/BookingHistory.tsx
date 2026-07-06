@@ -19,6 +19,7 @@ import { vi } from 'date-fns/locale';
 import toast from 'react-hot-toast';
 import { motion, AnimatePresence } from 'motion/react';
 import EditBookingModal from './EditBookingModal';
+import { formatServiceDuration } from '../../utils/shopHelper';
 
 // ─── Helpers & Meta ──────────────────────────────────────────────────────────
 
@@ -162,7 +163,7 @@ function BookingItem({ booking, onCancel, cancelling, onReview, onUpdateBank, on
                             <h4 className="text-sm font-bold text-slate-800 dark:text-white truncate max-w-[150px] sm:max-w-xs">{booking.shopName}</h4>
                             <span className="text-[10px] text-slate-400 font-bold">• Bé: {booking.petName}</span>
                         </div>
-                        <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5 truncate">{booking.services && booking.services.length > 0 ? booking.services.map((s: any) => `${s.serviceName}${s.durationMinutes ? ` (${s.durationMinutes}p)` : ''}`).join(', ') : booking.serviceName}</p>
+                        <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5 truncate">{booking.services && booking.services.length > 0 ? booking.services.map((s: any) => `${s.serviceName}${s.durationMinutes ? ` (${formatServiceDuration(s.durationMinutes, s.category)})` : ''}`).join(', ') : booking.serviceName}</p>
                     </div>
                 </div>
 
@@ -248,7 +249,7 @@ function BookingItem({ booking, onCancel, cancelling, onReview, onUpdateBank, on
                         </div>
                         <div>
                             <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Dịch vụ</p>
-                            <p className="text-sm font-bold text-slate-700 dark:text-slate-200">{booking.services && booking.services.length > 0 ? booking.services.map((s: any) => `${s.serviceName}${s.durationMinutes ? ` (${s.durationMinutes}p)` : ''}`).join(', ') : booking.serviceName}</p>
+                            <p className="text-sm font-bold text-slate-700 dark:text-slate-200">{booking.services && booking.services.length > 0 ? booking.services.map((s: any) => `${s.serviceName}${s.durationMinutes ? ` (${formatServiceDuration(s.durationMinutes, s.category)})` : ''}`).join(', ') : booking.serviceName}</p>
                         </div>
                     </div>
                     {booking.status === 'CANCEL_REQUESTED' && booking.cancellationReason && (
@@ -309,7 +310,7 @@ function BookingItem({ booking, onCancel, cancelling, onReview, onUpdateBank, on
                                                 <div key={svc.serviceId} className="flex justify-between items-center bg-white dark:bg-slate-800 p-3 rounded-2xl border border-slate-100 dark:border-slate-700/50 hover:shadow-md transition-shadow">
                                                     <div>
                                                         <p className="text-sm font-bold text-slate-800 dark:text-slate-200">{svc.serviceName}</p>
-                                                        {svc.durationMinutes > 0 && <p className="text-[10px] font-bold text-slate-400 mt-0.5">⏱ Thời gian làm: {svc.durationMinutes} phút</p>}
+                                                        {svc.durationMinutes > 0 && <p className="text-[10px] font-bold text-slate-400 mt-0.5">⏱ Thời gian làm: {formatServiceDuration(svc.durationMinutes, svc.category)}</p>}
                                                         {booking.petWeight && (
                                                             <p className="text-[10px] font-bold text-teal-600 dark:text-teal-400 mt-0.5">⚖️ Mức giá cho thú cưng {booking.petWeight.toLowerCase()}</p>
                                                         )}
