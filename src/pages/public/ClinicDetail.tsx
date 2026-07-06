@@ -133,6 +133,16 @@ function tierLabel(tierId: string, tierLabels?: Record<string, string>): string 
   return CAMERA_TIER_META[tierId]?.label ?? tierId;
 }
 
+function isPetCompatibleWithService(petSpecies: string, svcPetType: 'DOG' | 'CAT' | 'OTHER'): boolean {
+  const normSpecies = (petSpecies || '').trim().toUpperCase();
+  const isDog = normSpecies === 'CHÓ' || normSpecies === 'DOG';
+  const isCat = normSpecies === 'MÈO' || normSpecies === 'CAT';
+
+  if (svcPetType === 'DOG' && !isDog) return false;
+  if (svcPetType === 'CAT' && !isCat) return false;
+  return true;
+}
+
 function matchPetWeight(numericWeight: number, weightTiers?: string[], prices?: number[]): { tier: string; price: number } | null {
   if (!weightTiers || !prices || weightTiers.length === 0 || prices.length === 0) return null;
   
@@ -631,6 +641,34 @@ export default function ClinicDetail() {
   const [showPetModal, setShowPetModal] = useState(false);
   const [showLoginPrompt, setShowLoginPrompt] = useState(false);
   const [selectedPet, setSelectedPet] = useState<Pet | null>(null);
+  const [petCompatibilityError, setPetCompatibilityError] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!selectedPet) {
+      setPetCompatibilityError(null);
+      return;
+    }
+    const incompatibleServices = selectedServiceIds
+      .map(id => apiServices.find((s: ServiceResponse) => s.id === id))
+      .filter((svc): svc is ServiceResponse => !!svc)
+      .filter(svc => !isPetCompatibleWithService(selectedPet.species, svc.petType));
+
+    if (incompatibleServices.length > 0) {
+      const invalidNames = incompatibleServices.map(s => s.serviceName).join(', ');
+      setPetCompatibilityError(`Thú cưng ${selectedPet.name} (${selectedPet.species}) không phù hợp với các dịch vụ đã chọn: ${invalidNames}.`);
+      return;
+    }
+
+    if (isHotelSelected && boardingService) {
+      if (!isPetCompatibleWithService(selectedPet.species, boardingService.petType)) {
+        setPetCompatibilityError(`Thú cưng ${selectedPet.name} (${selectedPet.species}) không phù hợp với dịch vụ lưu trú đã chọn.`);
+        return;
+      }
+    }
+
+    setPetCompatibilityError(null);
+  }, [selectedPet, selectedServiceIds, isHotelSelected, boardingService, apiServices]);
+
   const [petNote, setPetNote] = useState('');
   const [selectedServiceForDetail, setSelectedServiceForDetail] = useState<ServiceResponse | null>(null);
   const [checkingPet, setCheckingPet] = useState(false);
@@ -867,6 +905,29 @@ export default function ClinicDetail() {
   // ── After pet selected → go to payment page with state ──────────────────────
   async function handleConfirmPet() {
     if (!selectedPet) return;
+
+    // Validate species compatibility
+    const incompatibleServices = selectedServiceIds
+      .map(id => apiServices.find((s: ServiceResponse) => s.id === id))
+      .filter((svc): svc is ServiceResponse => !!svc)
+      .filter(svc => !isPetCompatibleWithService(selectedPet.species, svc.petType));
+
+    if (incompatibleServices.length > 0) {
+      const invalidNames = incompatibleServices.map(s => s.serviceName).join(', ');
+      import('react-hot-toast').then(({ toast }) => {
+        toast.error(`Thú cưng ${selectedPet.name} (${selectedPet.species}) không phù hợp với các dịch vụ đã chọn: ${invalidNames}. Vui lòng chọn bé khác hoặc kiểm tra lại dịch vụ!`);
+      });
+      return;
+    }
+
+    if (isHotelSelected && boardingService) {
+      if (!isPetCompatibleWithService(selectedPet.species, boardingService.petType)) {
+        import('react-hot-toast').then(({ toast }) => {
+          toast.error(`Thú cưng ${selectedPet.name} (${selectedPet.species}) không phù hợp với dịch vụ lưu trú đã chọn.`);
+        });
+        return;
+      }
+    }
 
     trackBookingStep3_PetSelection(
       shopId,
@@ -3270,6 +3331,12 @@ export default function ClinicDetail() {
                     )}
                   </div>
                 )}
+                {petCompatibilityError && (
+                  <div className="mt-3 p-3 bg-rose-50 dark:bg-rose-950/20 border border-rose-100 dark:border-rose-900/50 rounded-xl flex items-start gap-2 text-rose-600 dark:text-rose-400 animate-in fade-in slide-in-from-bottom-2 duration-200">
+                    <span className="material-symbols-outlined text-lg shrink-0 mt-0.5">warning</span>
+                    <p className="text-xs font-semibold leading-relaxed">{petCompatibilityError}</p>
+                  </div>
+                )}
               </div>
 
               {/* Footer */}
@@ -3282,7 +3349,7 @@ export default function ClinicDetail() {
                 </button>
                 <button
                   onClick={handleConfirmPet}
-                  disabled={!selectedPet || checkingPet}
+                  disabled={!selectedPet || checkingPet || !!petCompatibilityError}
                   className="flex-1 py-3 bg-[#1a2b4c] text-white font-bold rounded-xl hover:bg-[#243d6b] disabled:opacity-40 disabled:cursor-not-allowed transition-all flex items-center justify-center gap-2"
                 >
                   {checkingPet ? (
@@ -3291,7 +3358,10 @@ export default function ClinicDetail() {
                       Đang kiểm tra...
                     </>
                   ) : (
-                    'Tiếp tục thanh toán →'
+                    <span className="flex items-center gap-1 whitespace-nowrap">
+                      Tiếp tục thanh toán
+                      <span className="material-symbols-outlined text-sm font-bold">arrow_forward</span>
+                    </span>
                   )}
                 </button>
               </div>
