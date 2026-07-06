@@ -222,12 +222,8 @@ export default function ShopProfile() {
         lateGracePeriod: data.lateGracePeriod ?? prev.lateGracePeriod,
       }));
       
-      if (user) {
-        setUserSession({
-          ...user,
-          name: data.shopName || user.name,
-          avatar: data.logoUrl || user.avatar,
-        });
+      if (user && data.shopName && user.name !== data.shopName) {
+        setUserSession({ ...user, name: data.shopName });
       }
       
       toast.success('Đã cập nhật thông tin cửa hàng!');
