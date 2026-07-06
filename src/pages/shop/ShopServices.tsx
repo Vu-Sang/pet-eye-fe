@@ -86,12 +86,17 @@ export default function ShopServices() {
   const [activePetTypeTab, setActivePetTypeTab] = useState<'DOG' | 'CAT' | 'OTHER'>('DOG');
   const [useWeightPricing, setUseWeightPricing] = useState(false);
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('list');
+  const [activeStatusTab, setActiveStatusTab] = useState<'ACTIVE' | 'ARCHIVED'>('ACTIVE');
 
   const [showModal, setShowModal] = useState(false);
   const [modalMode, setModalMode] = useState<'add' | 'edit'>('add');
   const [editingId, setEditingId] = useState<number | null>(null);
   const [form, setForm] = useState<ServiceForm>(EMPTY_FORM);
   const [deletingService, setDeletingService] = useState<ServiceResponse | null>(null);
+  const [confirmStatusAction, setConfirmStatusAction] = useState<{
+    service: ServiceResponse;
+    type: 'ACTIVATE' | 'DEACTIVATE' | 'RESTORE';
+  } | null>(null);
 
   const [imagePreview, setImagePreview] = useState<string>('');
   const [uploadingImage, setUploadingImage] = useState(false);
@@ -155,7 +160,8 @@ export default function ShopServices() {
     const matchesCategory =
       activeCategory === 'Tất cả' || s.category === activeCategory;
     const matchesPetType = (s.petType || 'DOG') === activePetTypeTab;
-    return matchesSearch && matchesCategory && matchesPetType;
+    const matchesStatus = activeStatusTab === 'ACTIVE' ? s.active === true : s.active === false;
+    return matchesSearch && matchesCategory && matchesPetType && matchesStatus;
   });
 
   // ── Modal helpers ───────────────────────────────────────────────────────────
@@ -371,8 +377,8 @@ export default function ShopServices() {
 
     try {
       await serviceService.deleteService(deletingService.id);
-      setServices((prev) => prev.filter((s) => s.id !== deletingService.id));
-      showSuccess('Dịch vụ đã được xóa.');
+      setServices((prev) => prev.map((s) => s.id === deletingService.id ? { ...s, active: false } : s));
+      showSuccess('Dịch vụ đã được ẩn vào Lưu trữ.');
     } catch {
       showError('Xóa dịch vụ thất bại. Vui lòng thử lại.');
     } finally {
@@ -380,23 +386,49 @@ export default function ShopServices() {
     }
   }
 
-  // ── Toggle active status ────────────────────────────────────────────────────
+  // ── Toggle active status & Restore confirmation ──────────────────────────────
 
   async function toggleServiceStatus(service: ServiceResponse) {
+    setConfirmStatusAction({
+      service,
+      type: service.active ? 'DEACTIVATE' : 'ACTIVATE'
+    });
+  }
+
+  async function handleRestoreService(service: ServiceResponse) {
+    setConfirmStatusAction({
+      service,
+      type: 'RESTORE'
+    });
+  }
+
+  async function confirmStatusChange() {
+    if (!confirmStatusAction) return;
+    const { service, type } = confirmStatusAction;
     try {
-      const updated = await serviceService.updateService(service.id, { active: !service.active });
-      setServices((prev) => prev.map((s) => (s.id === service.id ? updated : s)));
+      if (type === 'RESTORE') {
+        const updated = await serviceService.updateService(service.id, { active: true });
+        setServices((prev) => prev.map((s) => (s.id === service.id ? updated : s)));
+        showSuccess(`Đã khôi phục dịch vụ "${service.serviceName}" thành công!`);
+      } else {
+        const newActiveState = type === 'ACTIVATE';
+        const updated = await serviceService.updateService(service.id, { active: newActiveState });
+        setServices((prev) => prev.map((s) => (s.id === service.id ? updated : s)));
+        showSuccess(`Đã ${newActiveState ? 'kích hoạt' : 'tạm dừng'} dịch vụ "${service.serviceName}" thành công!`);
+      }
     } catch {
-      showError('Cập nhật trạng thái thất bại. Vui lòng thử lại.');
+      showError('Thao tác thất bại. Vui lòng thử lại.');
+    } finally {
+      setConfirmStatusAction(null);
     }
   }
 
   // ── Stats ───────────────────────────────────────────────────────────────────
 
-  const totalServices = services.length;
-  const groomingCount = services.filter(s => s.category === 'GROOMING').length;
-  const clinicCount = services.filter(s => s.category === 'CLINIC').length;
-  const boardingCount = services.filter(s => s.category === 'BOARDING').length;
+  const totalServices = services.filter(s => s.active).length;
+  const groomingCount = services.filter(s => s.active && s.category === 'GROOMING').length;
+  const clinicCount = services.filter(s => s.active && s.category === 'CLINIC').length;
+  const boardingCount = services.filter(s => s.active && s.category === 'BOARDING').length;
 
   const kpis = [
     { label: 'Tổng số dịch vụ', value: totalServices, icon: Package, color: 'bg-blue-500', shadow: 'shadow-blue-500/30', glow: 'glow-blue' },
@@ -460,26 +492,53 @@ export default function ShopServices() {
         ))}
       </div>
 
-      {/* Pet Type Tabs */}
-      <div className="flex border-b border-slate-200 dark:border-slate-800 mb-6 gap-6">
-        {[
-          { key: 'DOG', label: 'Dịch vụ cho Chó', icon: '🐶' },
-          { key: 'CAT', label: 'Dịch vụ cho Mèo', icon: '🐱' },
-          { key: 'OTHER', label: 'Dịch vụ Khác', icon: '🐰' }
-        ].map((tab) => (
+      {/* Pet Type & Status Tabs */}
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between border-b border-slate-200 dark:border-slate-800 mb-6 gap-4">
+        {/* Pet Type Tabs */}
+        <div className="flex gap-6">
+          {[
+            { key: 'DOG', label: 'Dịch vụ cho Chó', icon: '🐶' },
+            { key: 'CAT', label: 'Dịch vụ cho Mèo', icon: '🐱' },
+            { key: 'OTHER', label: 'Dịch vụ Khác', icon: '🐰' }
+          ].map((tab) => (
+            <button
+              key={tab.key}
+              onClick={() => setActivePetTypeTab(tab.key as any)}
+              className={`pb-4 px-2 font-bold text-sm flex items-center gap-2 border-b-2 transition-all cursor-pointer ${
+                activePetTypeTab === tab.key
+                  ? (isDark ? 'border-indigo-500 text-indigo-400 font-extrabold' : 'border-blue-600 text-blue-600 font-extrabold')
+                  : 'border-transparent text-slate-400 hover:text-slate-600 dark:hover:text-slate-300'
+              }`}
+            >
+              <span>{tab.icon}</span>
+              {tab.label}
+            </button>
+          ))}
+        </div>
+
+        {/* Status Tabs (Active / Archived) */}
+        <div className="flex items-center gap-2 pb-4 sm:pb-0">
           <button
-            key={tab.key}
-            onClick={() => setActivePetTypeTab(tab.key as any)}
-            className={`pb-4 px-2 font-bold text-sm flex items-center gap-2 border-b-2 transition-all cursor-pointer ${
-              activePetTypeTab === tab.key
-                ? (isDark ? 'border-indigo-500 text-indigo-400 font-extrabold' : 'border-blue-600 text-blue-600 font-extrabold')
-                : 'border-transparent text-slate-400 hover:text-slate-600 dark:hover:text-slate-300'
+            onClick={() => setActiveStatusTab('ACTIVE')}
+            className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+              activeStatusTab === 'ACTIVE'
+                ? (isDark ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-500/20' : 'bg-[#1a2b4c] text-white')
+                : (isDark ? 'bg-slate-800 text-slate-400 hover:text-slate-200' : 'bg-slate-100 text-slate-500 hover:text-slate-700')
             }`}
           >
-            <span>{tab.icon}</span>
-            {tab.label}
+            Đang hoạt động
           </button>
-        ))}
+          <button
+            onClick={() => setActiveStatusTab('ARCHIVED')}
+            className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+              activeStatusTab === 'ARCHIVED'
+                ? (isDark ? 'bg-rose-600 text-white shadow-lg shadow-rose-500/20' : 'bg-rose-600 text-white')
+                : (isDark ? 'bg-slate-800 text-slate-400 hover:text-slate-200' : 'bg-slate-100 text-slate-500 hover:text-slate-700')
+            }`}
+          >
+            Đã ẩn / Lưu trữ
+          </button>
+        </div>
       </div>
 
       {/* Search & Filter */}
@@ -623,35 +682,48 @@ export default function ShopServices() {
 
                   {/* Actions */}
                   <div className={`flex items-center justify-between pt-3 border-t ${isDark ? 'border-slate-800' : 'border-slate-100'}`}>
-                    {/* Toggle status */}
-                    <button
-                      onClick={() => toggleServiceStatus(service)}
-                      className={`flex items-center gap-1 text-sm font-semibold transition-colors ${isDark ? 'text-slate-400 hover:text-white' : 'text-slate-600 hover:text-[#1a2b4c]'}`}
-                      title={service.active ? 'Tạm dừng dịch vụ' : 'Kích hoạt dịch vụ'}
-                    >
-                      {service.active
-                        ? <ToggleRight size={22} className="text-green-500" />
-                        : <ToggleLeft size={22} className={isDark ? 'text-slate-600' : 'text-slate-400'} />
-                      }
-                      {service.active ? 'Đang bật' : 'Đang tắt'}
-                    </button>
+                    {activeStatusTab === 'ACTIVE' ? (
+                      <>
+                        {/* Toggle status */}
+                        <button
+                          onClick={() => toggleServiceStatus(service)}
+                          className={`flex items-center gap-1 text-sm font-semibold transition-colors ${isDark ? 'text-slate-400 hover:text-white' : 'text-slate-600 hover:text-[#1a2b4c]'}`}
+                          title={service.active ? 'Tạm dừng dịch vụ' : 'Kích hoạt dịch vụ'}
+                        >
+                          {service.active
+                            ? <ToggleRight size={22} className="text-green-500" />
+                            : <ToggleLeft size={22} className={isDark ? 'text-slate-600' : 'text-slate-400'} />
+                          }
+                          {service.active ? 'Đang bật' : 'Đang tắt'}
+                        </button>
 
-                    <div className="flex gap-2">
-                      <button
-                        onClick={() => openEditModal(service)}
-                        className={`p-2 rounded-lg transition-all ${isDark ? 'bg-slate-800 text-slate-300 hover:bg-indigo-600 hover:text-white' : 'bg-slate-100 hover:bg-[#1a2b4c] hover:text-white'}`}
-                        title="Chỉnh sửa"
-                      >
-                        <Edit2 size={16} />
-                      </button>
-                      <button
-                        onClick={() => setDeletingService(service)}
-                        className={`p-2 rounded-lg transition-all ${isDark ? 'bg-slate-800 text-slate-300 hover:bg-red-500 hover:text-white' : 'bg-slate-100 hover:bg-red-500 hover:text-white'}`}
-                        title="Xóa"
-                      >
-                        <Trash2 size={16} />
-                      </button>
-                    </div>
+                        <div className="flex gap-2">
+                          <button
+                            onClick={() => openEditModal(service)}
+                            className={`p-2 rounded-lg transition-all ${isDark ? 'bg-slate-800 text-slate-300 hover:bg-indigo-600 hover:text-white' : 'bg-slate-100 hover:bg-[#1a2b4c] hover:text-white'}`}
+                            title="Chỉnh sửa"
+                          >
+                            <Edit2 size={16} />
+                          </button>
+                          <button
+                            onClick={() => setDeletingService(service)}
+                            className={`p-2 rounded-lg transition-all ${isDark ? 'bg-slate-800 text-slate-300 hover:bg-red-500 hover:text-white' : 'bg-slate-100 hover:bg-red-500 hover:text-white'}`}
+                            title="Xóa"
+                          >
+                            <Trash2 size={16} />
+                          </button>
+                        </div>
+                      </>
+                    ) : (
+                      <div className="flex w-full justify-end">
+                        <button
+                          onClick={() => handleRestoreService(service)}
+                          className="flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-black transition-all cursor-pointer bg-green-500 text-white shadow-lg shadow-green-500/25 hover:opacity-90"
+                        >
+                          Khôi phục dịch vụ
+                        </button>
+                      </div>
+                    )}
                   </div>
                 </div>
               </div>
@@ -698,33 +770,44 @@ export default function ShopServices() {
 
                 {/* Actions */}
                 <div className={`flex items-center justify-between sm:justify-end gap-3 sm:pl-5 sm:border-l shrink-0 mt-4 sm:mt-0 ${isDark ? 'border-white/10' : 'border-slate-100'}`}>
-                  {/* Status Toggle */}
-                  <button
-                    onClick={() => toggleServiceStatus(service)}
-                    className={`flex items-center gap-1.5 p-2 rounded-xl text-xs font-semibold transition-colors ${isDark ? 'text-slate-400 hover:bg-slate-800 hover:text-white' : 'text-slate-600 hover:bg-slate-50 hover:text-[#1a2b4c]'}`}
-                    title={service.active ? 'Tạm dừng dịch vụ' : 'Kích hoạt dịch vụ'}
-                  >
-                    {service.active
-                      ? <ToggleRight size={24} className="text-green-500" />
-                      : <ToggleLeft size={24} className={isDark ? 'text-slate-600' : 'text-slate-400'} />
-                    }
-                  </button>
-                  <div className="flex gap-2">
+                  {activeStatusTab === 'ACTIVE' ? (
+                    <>
+                      {/* Status Toggle */}
+                      <button
+                        onClick={() => toggleServiceStatus(service)}
+                        className={`flex items-center gap-1.5 p-2 rounded-xl text-xs font-semibold transition-colors ${isDark ? 'text-slate-400 hover:bg-slate-800 hover:text-white' : 'text-slate-600 hover:bg-slate-50 hover:text-[#1a2b4c]'}`}
+                        title={service.active ? 'Tạm dừng dịch vụ' : 'Kích hoạt dịch vụ'}
+                      >
+                        {service.active
+                          ? <ToggleRight size={24} className="text-green-500" />
+                          : <ToggleLeft size={24} className={isDark ? 'text-slate-600' : 'text-slate-400'} />
+                        }
+                      </button>
+                      <div className="flex gap-2">
+                        <button
+                          onClick={() => openEditModal(service)}
+                          className={`p-2.5 rounded-xl transition-all ${isDark ? 'bg-slate-800 text-slate-300 hover:bg-indigo-600 hover:text-white' : 'bg-slate-100 text-slate-500 hover:bg-[#1a2b4c] hover:text-white'}`}
+                          title="Chỉnh sửa"
+                        >
+                          <Edit2 size={16} />
+                        </button>
+                        <button
+                          onClick={() => setDeletingService(service)}
+                          className={`p-2.5 rounded-xl transition-all ${isDark ? 'bg-slate-800 text-slate-300 hover:bg-red-500 hover:text-white' : 'bg-slate-100 text-slate-500 hover:bg-red-500 hover:text-white'}`}
+                          title="Xóa"
+                        >
+                          <Trash2 size={16} />
+                        </button>
+                      </div>
+                    </>
+                  ) : (
                     <button
-                      onClick={() => openEditModal(service)}
-                      className={`p-2.5 rounded-xl transition-all ${isDark ? 'bg-slate-800 text-slate-300 hover:bg-indigo-600 hover:text-white' : 'bg-slate-100 text-slate-500 hover:bg-[#1a2b4c] hover:text-white'}`}
-                      title="Chỉnh sửa"
+                      onClick={() => handleRestoreService(service)}
+                      className="flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-black transition-all cursor-pointer bg-green-500 text-white shadow-lg shadow-green-500/25 hover:opacity-90"
                     >
-                      <Edit2 size={16} />
+                      Khôi phục
                     </button>
-                    <button
-                      onClick={() => setDeletingService(service)}
-                      className={`p-2.5 rounded-xl transition-all ${isDark ? 'bg-slate-800 text-slate-300 hover:bg-red-500 hover:text-white' : 'bg-slate-100 text-slate-500 hover:bg-red-500 hover:text-white'}`}
-                      title="Xóa"
-                    >
-                      <Trash2 size={16} />
-                    </button>
-                  </div>
+                  )}
                 </div>
               </div>
             )
@@ -1307,6 +1390,59 @@ export default function ShopServices() {
                 className={`flex-1 py-3 text-white rounded-xl font-semibold transition-colors ${isDark ? 'bg-red-600 hover:bg-red-500 shadow-lg shadow-red-600/20' : 'bg-red-500 hover:bg-red-600'}`}
               >
                 Xóa dịch vụ
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ── Status Change Confirmation Modal ── */}
+      {confirmStatusAction && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-[60] p-4 backdrop-blur-sm">
+          <div className={`rounded-2xl w-full max-w-sm p-6 shadow-2xl text-center border ${isDark ? 'admin-glass-card bg-slate-900 border-white/10' : 'bg-white border-slate-100'}`}>
+            <div className={`w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 ${
+              confirmStatusAction.type === 'DEACTIVATE' 
+                ? (isDark ? 'bg-[#d97706]/20 text-[#fbbf24]' : 'bg-[#fef3c7] text-[#d97706]')
+                : (isDark ? 'bg-green-500/20 text-green-400' : 'bg-green-100 text-green-500')
+            }`}>
+              {confirmStatusAction.type === 'DEACTIVATE' ? (
+                <ToggleLeft size={32} />
+              ) : (
+                <ToggleRight size={32} />
+              )}
+            </div>
+            <h3 className={`text-xl font-bold mb-2 ${isDark ? 'text-white' : 'text-slate-900'}`}>
+              {confirmStatusAction.type === 'DEACTIVATE' && 'Tạm dừng dịch vụ'}
+              {confirmStatusAction.type === 'ACTIVATE' && 'Kích hoạt dịch vụ'}
+              {confirmStatusAction.type === 'RESTORE' && 'Khôi phục dịch vụ'}
+            </h3>
+            <p className={`mb-6 text-sm ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>
+              {confirmStatusAction.type === 'DEACTIVATE' && (
+                <>Bạn có chắc muốn tạm dừng dịch vụ <span className="font-bold">"{confirmStatusAction.service.serviceName}"</span>? Khách hàng sẽ không nhìn thấy hoặc đặt lịch dịch vụ này.</>
+              )}
+              {confirmStatusAction.type === 'ACTIVATE' && (
+                <>Bạn có muốn bật lại dịch vụ <span className="font-bold">"{confirmStatusAction.service.serviceName}"</span>? Khách hàng có thể tìm thấy và đặt dịch vụ ngay lập tức.</>
+              )}
+              {confirmStatusAction.type === 'RESTORE' && (
+                <>Bạn có muốn khôi phục dịch vụ <span className="font-bold">"{confirmStatusAction.service.serviceName}"</span> từ thùng rác? Dịch vụ sẽ hiển thị lại trong danh sách hoạt động.</>
+              )}
+            </p>
+            <div className="flex gap-3">
+              <button
+                onClick={() => setConfirmStatusAction(null)}
+                className={`flex-1 py-3 rounded-xl font-semibold transition-colors ${isDark ? 'bg-slate-800 text-slate-300 hover:bg-slate-700' : 'bg-slate-100 text-slate-700 hover:bg-slate-200'}`}
+              >
+                Hủy
+              </button>
+              <button
+                onClick={confirmStatusChange}
+                className={`flex-1 py-3 text-white rounded-xl font-semibold transition-colors ${
+                  confirmStatusAction.type === 'DEACTIVATE'
+                    ? (isDark ? 'bg-amber-600 hover:bg-amber-500 shadow-lg shadow-amber-600/20' : 'bg-amber-500 hover:bg-amber-600')
+                    : (isDark ? 'bg-green-600 hover:bg-green-500 shadow-lg shadow-green-600/20' : 'bg-green-500 hover:bg-green-600')
+                }`}
+              >
+                Xác nhận
               </button>
             </div>
           </div>
