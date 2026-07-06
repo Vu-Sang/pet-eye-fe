@@ -1708,7 +1708,7 @@ export default function ClinicDetail() {
                     ].map((btn) => (
                       <button
                         key={btn.key}
-                        onClick={() => setPetTypeFilter(btn.key as any)}
+                        onClick={() => { setPetTypeFilter(btn.key as any); setFeaturedServicesPage(0); }}
                         className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
                           petTypeFilter === btn.key
                             ? 'bg-white dark:bg-slate-800 text-slate-800 dark:text-white shadow-sm'
@@ -2338,8 +2338,9 @@ export default function ClinicDetail() {
                       <label className="text-xs font-bold uppercase tracking-wider text-slate-400 mb-0 block">
                         Chọn Dịch vụ
                       </label>
-                      <div className="flex flex-col gap-2">
-                        {nonBoardingServices.map((svc: ServiceResponse) => {
+                      <div className="relative">
+                        <div className="flex flex-col gap-2 max-h-[340px] overflow-y-auto pr-1 scroll-smooth [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:bg-slate-200 dark:[&::-webkit-scrollbar-thumb]:bg-slate-700 [&::-webkit-scrollbar-thumb]:rounded-full">
+                          {nonBoardingServices.map((svc: ServiceResponse) => {
                           const isSelected = selectedServiceIds.includes(svc.id);
                           return (
                             <div
@@ -2369,6 +2370,10 @@ export default function ClinicDetail() {
                             </div>
                           );
                         })}
+                        </div>
+                        {nonBoardingServices.length > 4 && (
+                          <div className="pointer-events-none absolute bottom-0 left-0 right-1 h-10 bg-gradient-to-t from-white dark:from-slate-900 to-transparent rounded-b-xl" />
+                        )}
                       </div>
                     </div>
                   )}
