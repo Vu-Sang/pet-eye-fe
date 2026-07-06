@@ -13,7 +13,7 @@ import type { Pet } from '../../types';
 import type { DirectionsResponse } from '../../services/clinic.service';
 import ShopMap from '../../components/ShopMap';
 import { trackBookingStep1_ServiceSelection, trackBookingStep2_TimeSelection, trackBookingStep3_PetSelection, trackUseGpsNearby } from '../../lib/analytics';
-import { formatPetWeightLabel } from '../../utils/shopHelper';
+import { formatPetWeightLabel, formatWorkingDays } from '../../utils/shopHelper';
 
 // Camera tier metadata — default fallbacks (shop can override via cameraTierLabels/cameraTierPrices)
 const CAMERA_TIER_META: Record<string, { label: string; desc: string; icon: string; defaultPrice: number }> = {
@@ -1084,10 +1084,11 @@ export default function ClinicDetail() {
             {galleryImages.map((img, i) => (
               <div
                 key={i}
-                className="w-full h-full flex-none snap-center bg-center bg-no-repeat bg-cover relative"
+                onClick={() => { setActiveImageIndex(i); setShowGallery(true); }}
+                className="w-full h-full flex-none snap-center bg-center bg-no-repeat bg-cover relative cursor-pointer"
                 style={{ backgroundImage: `url(${img})` }}
               >
-                <div className="absolute inset-0 bg-black/5" />
+                <div className="absolute inset-0 bg-black/5 active:bg-black/20 transition-colors" />
                 {galleryImages.length > 1 && (
                   <div className="absolute bottom-3 right-3 bg-black/50 text-white px-2.5 py-1 rounded-full text-xs font-bold backdrop-blur-sm">
                     {i + 1} / {galleryImages.length}
@@ -1115,7 +1116,7 @@ export default function ClinicDetail() {
                     return (
                       <div 
                         key={block.id || i} 
-                        onClick={() => { setActiveImageIndex(0); setShowGallery(true); }}
+                        onClick={() => { const idx = galleryImages.indexOf(block.url); setActiveImageIndex(idx !== -1 ? idx : 0); setShowGallery(true); }}
                         className={`${spanClass} bg-center bg-no-repeat bg-cover hover:brightness-95 transition-all cursor-pointer relative rounded-lg overflow-hidden border border-black/5 shadow-sm`} 
                         style={{ backgroundImage: `url(${block.url || 'https://images.unsplash.com/photo-1548199973-03cce0bbc87b?auto=format&fit=crop&w=1200&q=80'})` }}
                       >
@@ -1141,6 +1142,7 @@ export default function ClinicDetail() {
           {/* Layout for 1 image */}
           {effectiveLayoutCount === 1 && (
             <div
+              onClick={() => { setActiveImageIndex(0); setShowGallery(true); }}
               className="w-full h-full bg-center bg-no-repeat bg-cover hover:brightness-95 transition-all cursor-pointer relative"
               style={{ backgroundImage: `url(${galleryImages[0]})` }}
             >
@@ -1156,6 +1158,7 @@ export default function ClinicDetail() {
           {effectiveLayoutCount === 2 && galleryImages.slice(0, 2).map((img, i) => (
             <div
               key={i}
+              onClick={() => { setActiveImageIndex(i); setShowGallery(true); }}
               className="w-full h-full bg-center bg-no-repeat bg-cover hover:brightness-95 transition-all cursor-pointer relative"
               style={{ backgroundImage: `url(${img})` }}
             >
@@ -1173,6 +1176,7 @@ export default function ClinicDetail() {
           {effectiveLayoutCount === 3 && (
             <>
               <div
+                onClick={() => { setActiveImageIndex(0); setShowGallery(true); }}
                 className="col-span-2 row-span-1 bg-center bg-no-repeat bg-cover hover:brightness-95 transition-all cursor-pointer relative"
                 style={{ backgroundImage: `url(${galleryImages[0]})` }}
               >
@@ -1182,6 +1186,7 @@ export default function ClinicDetail() {
                 {galleryImages.slice(1, 3).map((img, i) => (
                   <div
                     key={i}
+                    onClick={() => { setActiveImageIndex(i + 1); setShowGallery(true); }}
                     className="flex-1 bg-center bg-no-repeat bg-cover hover:brightness-95 transition-all cursor-pointer relative"
                     style={{ backgroundImage: `url(${img})` }}
                   >
@@ -1202,6 +1207,7 @@ export default function ClinicDetail() {
           {effectiveLayoutCount >= 5 && (
             <>
               <div
+                onClick={() => { setActiveImageIndex(0); setShowGallery(true); }}
                 className="col-span-2 row-span-2 bg-center bg-no-repeat bg-cover hover:brightness-95 transition-all cursor-pointer relative"
                 style={{ backgroundImage: `url(${galleryImages[0]})` }}
               >
@@ -1210,6 +1216,7 @@ export default function ClinicDetail() {
               {galleryImages.slice(1, 4).map((img, i) => (
                 <div
                   key={i}
+                  onClick={() => { setActiveImageIndex(i + 1); setShowGallery(true); }}
                   className="col-span-1 row-span-1 bg-center bg-no-repeat bg-cover hover:brightness-95 transition-all cursor-pointer relative"
                   style={{ backgroundImage: `url(${img})` }}
                 >
@@ -1217,6 +1224,7 @@ export default function ClinicDetail() {
                 </div>
               ))}
               <div
+                onClick={() => { setActiveImageIndex(4); setShowGallery(true); }}
                 className="col-span-1 row-span-1 bg-center bg-no-repeat bg-cover hover:brightness-95 transition-all cursor-pointer relative"
                 style={{ backgroundImage: `url(${galleryImages[4]})` }}
               >
@@ -1244,11 +1252,12 @@ export default function ClinicDetail() {
             <section className="border-b border-slate-200 dark:border-slate-800 pb-8">
               <h2 className="text-lg sm:text-xl font-bold text-slate-900 dark:text-slate-100 mb-4">Giới thiệu</h2>
               <div className="relative">
-                <p className={`text-slate-600 dark:text-slate-300 leading-relaxed text-base transition-all duration-300 ${
-                  !showFullDesc ? 'line-clamp-3 lg:line-clamp-none' : ''
-                }`}>
-                  {shop?.description ?? 'Đang tải thông tin...'}
-                </p>
+                <div 
+                  className={`text-slate-600 dark:text-slate-300 leading-relaxed text-base transition-all duration-300 ${
+                    !showFullDesc ? 'line-clamp-3 lg:line-clamp-none' : ''
+                  }`}
+                  dangerouslySetInnerHTML={{ __html: shop?.description ?? 'Đang tải thông tin...' }}
+                />
                 {shop?.description && shop.description.length > 200 && (
                   <div className="lg:hidden mt-2">
                     <button
@@ -2755,7 +2764,7 @@ export default function ClinicDetail() {
                             <span className="text-green-600 dark:text-green-400 font-semibold">Đang mở cửa</span>
                             <span className="text-slate-500 dark:text-slate-400">
                               {shop.openTime} - {shop.closeTime}
-                              {shop.workingDays ? ` (${shop.workingDays})` : ''}
+                              {shop.workingDays ? ` (${formatWorkingDays(shop.workingDays)})` : ''}
                             </span>
                           </>
                         ) : (

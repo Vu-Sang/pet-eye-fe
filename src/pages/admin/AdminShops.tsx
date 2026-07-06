@@ -7,6 +7,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { adminService, AdminShopResponse, AdminStaffResponse } from '../../services/admin.service';
 import { useTheme } from '../../contexts/ThemeContext';
 import toast from 'react-hot-toast';
+import { formatWorkingDays } from '../../utils/shopHelper';
 
 type ShopStatus = 'PENDING' | 'APPROVED' | 'REJECTED';
 
@@ -326,7 +327,7 @@ export default function AdminShops() {
                         <span className={`text-xs ${isDark ? 'text-slate-500' : 'text-slate-400'}`}>Giờ mở cửa: </span>
                         <span className={`font-medium ${isDark ? 'text-slate-300' : 'text-slate-700'}`}>
                           {detailShop.openTime} - {detailShop.closeTime}
-                          {detailShop.workingDays ? ` (${detailShop.workingDays})` : ''}
+                          {detailShop.workingDays ? ` (${formatWorkingDays(detailShop.workingDays)})` : ''}
                         </span>
                       </div>
                     </div>
@@ -368,7 +369,10 @@ export default function AdminShops() {
               {detailShop.description && (
                 <div>
                   <p className={`text-xs font-bold uppercase tracking-wider mb-2 ${isDark ? 'text-slate-500' : 'text-slate-400'}`}>Mô tả</p>
-                  <p className={`text-sm rounded-xl p-4 leading-relaxed ${isDark ? 'text-slate-400 bg-white/[0.02] border border-white/5' : 'text-slate-600 bg-slate-50'}`}>{detailShop.description}</p>
+                  <div 
+                    className={`text-sm rounded-xl p-4 leading-relaxed ${isDark ? 'text-slate-400 bg-white/[0.02] border border-white/5' : 'text-slate-600 bg-slate-50'}`}
+                    dangerouslySetInnerHTML={{ __html: detailShop.description }}
+                  />
                 </div>
               )}
 

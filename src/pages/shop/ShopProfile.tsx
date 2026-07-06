@@ -4,6 +4,8 @@ import { shopService } from '../../services/shop.service';
 import { fileService } from '../../services/file.service';
 import toast from 'react-hot-toast';
 import { useTheme } from '../../contexts/ThemeContext';
+import { useAuth } from '../../contexts/AuthContext';
+import RichTextEditor from '../../components/RichTextEditor';
 
 export interface CustomGalleryBlock {
   id: string;
@@ -13,6 +15,7 @@ export interface CustomGalleryBlock {
 
 export default function ShopProfile() {
   const { isDark } = useTheme();
+  const { user, setUserSession } = useAuth();
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [uploadingLogo, setUploadingLogo] = useState(false);
@@ -219,6 +222,14 @@ export default function ShopProfile() {
         lateGracePeriod: data.lateGracePeriod ?? prev.lateGracePeriod,
       }));
       
+      if (user) {
+        setUserSession({
+          ...user,
+          name: data.shopName || user.name,
+          avatar: data.logoUrl || user.avatar,
+        });
+      }
+      
       toast.success('Đã cập nhật thông tin cửa hàng!');
     } catch (err: any) {
       console.error('Failed to update shop profile:', err.response?.data || err);
@@ -283,7 +294,15 @@ export default function ShopProfile() {
         websiteUrl: updatedInfo.websiteUrl,
         lateGracePeriod: updatedInfo.lateGracePeriod,
       };
-      await shopService.updateMyShop(updateData);
+      const data = await shopService.updateMyShop(updateData);
+      
+      if (user) {
+        setUserSession({
+          ...user,
+          name: data.shopName || user.name,
+          avatar: data.logoUrl || user.avatar,
+        });
+      }
       
       toast.success(`Đã tải ${type === 'logo' ? 'logo' : type === 'banner' ? 'ảnh bìa' : 'ảnh thư viện'} lên thành công!`);
     } catch (err) {
@@ -1152,11 +1171,10 @@ export default function ShopProfile() {
                 <label className={`block text-sm font-bold mb-2 ${isDark ? 'text-slate-300' : 'text-slate-700'}`}>
                   Mô tả
                 </label>
-                <textarea
+                <RichTextEditor
                   value={shopInfo.description}
-                  onChange={(e) => setShopInfo({ ...shopInfo, description: e.target.value })}
-                  rows={4}
-                  className={`w-full px-4 py-2 border rounded-lg focus:ring-2 outline-none resize-none transition-all ${isDark ? 'bg-slate-800/50 border-slate-700 text-white focus:ring-indigo-500/50 focus:border-indigo-500' : 'bg-white border-slate-200 text-slate-900 focus:ring-indigo-500/20 focus:border-indigo-500'}`}
+                  onChange={(val) => setShopInfo({ ...shopInfo, description: val })}
+                  isDark={isDark}
                 />
               </div>
             </div>

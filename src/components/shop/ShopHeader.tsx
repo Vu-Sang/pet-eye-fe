@@ -142,8 +142,12 @@ export default function ShopHeader() {
             onClick={() => setUserMenuOpen(!userMenuOpen)}
             className={`flex items-center gap-3 pl-1 pr-3 py-1 rounded-2xl transition-all border border-transparent ${isDark ? 'bg-white/5 hover:bg-white/10 hover:border-white/10' : 'bg-slate-50 hover:bg-slate-100 hover:border-slate-200'}`}
           >
-            <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-primary to-indigo-600 flex items-center justify-center text-white font-black text-sm shadow-md shadow-primary/20 glow-indigo">
-              {user?.name?.charAt(0).toUpperCase() || 'S'}
+            <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-primary to-indigo-600 flex items-center justify-center text-white font-black text-sm shadow-md shadow-primary/20 glow-indigo overflow-hidden">
+              {user?.avatar ? (
+                <img src={user.avatar} alt={user.name} className="w-full h-full object-cover" />
+              ) : (
+                user?.name?.charAt(0).toUpperCase() || 'S'
+              )}
             </div>
             <div className="hidden md:block text-left">
               <p className={`text-[12px] font-black leading-tight ${isDark ? 'text-white' : 'text-slate-900'}`}>{user?.name || 'Shop Owner'}</p>

@@ -44,3 +44,60 @@ export const formatPetWeightLabel = (tierId: string, allTiers?: string[]): strin
   
   return tierId;
 };
+
+export const formatWorkingDays = (workingDaysStr: string | undefined): string => {
+  if (!workingDaysStr) return '';
+  
+  const dayOrder = ['Thứ 2', 'Thứ 3', 'Thứ 4', 'Thứ 5', 'Thứ 6', 'Thứ 7', 'Chủ nhật'];
+  
+  const selectedDays = workingDaysStr
+    .split(',')
+    .map(d => d.trim())
+    .filter(d => dayOrder.includes(d));
+    
+  if (selectedDays.length === 0) return '';
+  if (selectedDays.length === 7) return 'All day';
+  
+  selectedDays.sort((a, b) => dayOrder.indexOf(a) - dayOrder.indexOf(b));
+  
+  const ranges: string[][] = [];
+  let currentRange: string[] = [];
+  
+  for (let i = 0; i < selectedDays.length; i++) {
+    const day = selectedDays[i];
+    if (currentRange.length === 0) {
+      currentRange.push(day);
+    } else {
+      const prevDay = currentRange[currentRange.length - 1];
+      const prevIdx = dayOrder.indexOf(prevDay);
+      const currIdx = dayOrder.indexOf(day);
+      
+      if (currIdx === prevIdx + 1) {
+        currentRange.push(day);
+      } else {
+        ranges.push(currentRange);
+        currentRange = [day];
+      }
+    }
+  }
+  if (currentRange.length > 0) {
+    ranges.push(currentRange);
+  }
+  
+  return ranges
+    .map(range => {
+      if (range.length === 1) {
+        return range[0];
+      } else if (range.length === 2) {
+        return `${range[0]}, ${range[1]}`;
+      } else {
+        return `${range[0]} - ${range[range.length - 1]}`;
+      }
+    })
+    .join(', ');
+};
+
+export const stripHtml = (html: string | undefined): string => {
+  if (!html) return '';
+  return html.replace(/<[^>]*>/g, '').replace(/&nbsp;/g, ' ');
+};
