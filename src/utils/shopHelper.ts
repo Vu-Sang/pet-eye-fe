@@ -24,9 +24,9 @@ export const getShopTypeLabel = (type: string | undefined): string => {
   return translateShopType(type);
 };
 
-export const formatPetWeightLabel = (tierId: string, allTiers?: string[]): string => {
+export const formatPetWeightLabel = (tierId: string, allTiers?: string[], itemIdx?: number): string => {
   if (!allTiers || allTiers.length === 0) return tierId;
-  const idx = allTiers.indexOf(tierId);
+  const idx = typeof itemIdx === 'number' ? itemIdx : allTiers.indexOf(tierId);
   if (idx === -1) return tierId;
 
   const thresholds = allTiers.map(t => {
@@ -37,6 +37,8 @@ export const formatPetWeightLabel = (tierId: string, allTiers?: string[]): strin
   if (thresholds.length >= 2) {
     if (idx === 0) {
       return `< ${thresholds[0]} kg`;
+    } else if (idx === thresholds.length - 1) {
+      return `Trên ${thresholds[idx]} kg`;
     } else {
       return `${thresholds[idx - 1]} - ${thresholds[idx]} kg`;
     }

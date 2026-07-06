@@ -42,6 +42,85 @@ const ROLE_MAP: Record<string, string> = {
   'MANAGER': 'Quản lý vận hành'
 };
 
+interface CustomSelectProps {
+  options: { value: string | number; label: string }[];
+  value: string | number;
+  onChange: (val: any) => void;
+  className?: string;
+}
+
+const CustomSelect: React.FC<CustomSelectProps> = ({ options, value, onChange, className = '' }) => {
+  const [isOpen, setIsOpen] = React.useState(false);
+  const containerRef = React.useRef<HTMLDivElement>(null);
+
+  const selectedOption = options.find(opt => opt.value === value) || options[0];
+
+  React.useEffect(() => {
+    const handleOutsideClick = (e: MouseEvent) => {
+      if (containerRef.current && !containerRef.current.contains(e.target as Node)) {
+        setIsOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleOutsideClick);
+    return () => document.removeEventListener('mousedown', handleOutsideClick);
+  }, []);
+
+  return (
+    <div ref={containerRef} className={`relative inline-block w-full ${className}`}>
+      <button
+        type="button"
+        onClick={() => setIsOpen(!isOpen)}
+        className="w-full flex items-center justify-between px-3 py-2 border border-slate-200 dark:border-slate-700 rounded-xl text-sm font-semibold text-slate-800 dark:text-slate-200 bg-white dark:bg-slate-800 hover:border-[#1a2b4c]/30 dark:hover:border-indigo-900 transition-all focus:outline-none shadow-sm cursor-pointer"
+      >
+        <span className="truncate">{selectedOption?.label}</span>
+        <span className={`material-symbols-outlined text-slate-400 text-lg transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`}>
+          keyboard_arrow_down
+        </span>
+      </button>
+
+      <AnimatePresence>
+        {isOpen && (
+          <motion.div
+            initial={{ opacity: 0, y: 8, scale: 0.95 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: 8, scale: 0.95 }}
+            transition={{ duration: 0.15, ease: 'easeOut' }}
+            className="absolute z-50 left-0 right-0 mt-1.5 max-h-60 overflow-y-auto rounded-xl border border-slate-100 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-xl"
+          >
+            <div className="py-1 px-1 flex flex-col gap-0.5">
+              {options.map((opt) => {
+                const isSelected = opt.value === value;
+                return (
+                  <button
+                    key={opt.value}
+                    type="button"
+                    onClick={() => {
+                      onChange(opt.value);
+                      setIsOpen(false);
+                    }}
+                    className={`w-full flex items-center justify-between px-3 py-2 text-left rounded-lg text-sm transition-all cursor-pointer ${
+                      isSelected
+                        ? 'bg-indigo-50 dark:bg-indigo-950/40 text-indigo-600 dark:text-indigo-400 font-bold'
+                        : 'text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800/50 font-medium'
+                    }`}
+                  >
+                    <span>{opt.label}</span>
+                    {isSelected && (
+                      <span className="material-symbols-outlined text-indigo-500 dark:text-indigo-400 text-sm">
+                        check
+                      </span>
+                    )}
+                  </button>
+                );
+              })}
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
+  );
+};
+
 /** Resolve effective price for a tier: use shop's custom price if set, else default */
 function tierPrice(tierId: string, tierPrices?: Record<string, number>): number {
   if (tierPrices && tierId in tierPrices) return tierPrices[tierId];
@@ -315,10 +394,12 @@ export default function ClinicDetail() {
   });
   const [isFavorited, setIsFavorited] = useState(false);
   const [reviewFilter, setReviewFilter] = useState('Tất cả');
+  const [reviewSort, setReviewSort] = useState('Mới nhất');
   const [selectedServiceIds, setSelectedServiceIds] = useState<number[]>(editBooking ? editBooking.services?.map((s: any) => s.serviceId) || [] : []);
   const [isHotelSelected, setIsHotelSelected] = useState(editBooking?.services?.some((s: any) => s.category?.toUpperCase() === 'BOARDING' || s.category?.toUpperCase() === 'HOTEL') || false);
   const [selectedCameraTier, setSelectedCameraTier] = useState<string>('BASIC');
   const [selectedCageSize, setSelectedCageSize] = useState<string>(editBooking?.petWeight || '');
+  const [selectedCageSizeIndex, setSelectedCageSizeIndex] = useState<number>(0);
   const [selectedRoomType, setSelectedRoomType] = useState<string>(editBooking?.roomType || '');
   const [petTypeFilter, setPetTypeFilter] = useState<'ALL' | 'DOG' | 'CAT' | 'OTHER'>('ALL');
   const [weightFilter, setWeightFilter] = useState<string>('');
@@ -403,16 +484,29 @@ export default function ClinicDetail() {
 
   useEffect(() => {
     if (boardingService) {
-      const validCage = boardingService.petWeight?.includes(selectedCageSize);
-      if (!validCage && boardingService.petWeight?.length) {
-        setSelectedCageSize(boardingService.petWeight[0]);
+      let initialIdx = boardingService.petWeight?.indexOf(selectedCageSize) ?? -1;
+      if (initialIdx === -1 && boardingService.petWeight?.length) {
+        // Try to match by friendly label
+        const matchedIdx = boardingService.petWeight.findIndex((w, idx) => 
+          formatPetWeightLabel(w, boardingService.petWeight, idx).toLowerCase().replace(/\s+/g, '') === 
+          selectedCageSize.toLowerCase().replace(/\s+/g, '')
+        );
+        if (matchedIdx !== -1) {
+          setSelectedCageSize(boardingService.petWeight[matchedIdx]);
+          setSelectedCageSizeIndex(matchedIdx);
+        } else {
+          setSelectedCageSize(boardingService.petWeight[0]);
+          setSelectedCageSizeIndex(0);
+        }
+      } else {
+        setSelectedCageSizeIndex(initialIdx >= 0 ? initialIdx : 0);
       }
       const validRoom = boardingService.roomType?.includes(selectedRoomType);
       if (!validRoom && boardingService.roomType?.length) {
         setSelectedRoomType(boardingService.roomType[0]);
       }
     }
-  }, [boardingService, selectedBoardingServiceId]);
+  }, [boardingService, selectedBoardingServiceId, selectedCageSize]);
 
   // Number of boarding days
   const boardingDays = isHotelSelected
@@ -422,13 +516,13 @@ export default function ClinicDetail() {
   const boardingBasePrice = useMemo(() => {
     if (!boardingService) return 0;
     if (boardingService.petWeight?.length && boardingService.prices?.length) {
-      const idx = boardingService.petWeight.indexOf(selectedCageSize);
-      if (idx !== -1 && typeof boardingService.prices[idx] === 'number') {
+      const idx = selectedCageSizeIndex;
+      if (idx >= 0 && idx < boardingService.prices.length && typeof boardingService.prices[idx] === 'number') {
         return boardingService.prices[idx];
       }
     }
     return boardingService.price ?? 0;
-  }, [boardingService, selectedCageSize]);
+  }, [boardingService, selectedCageSizeIndex]);
 
   const roomTypeExtraPrice = useMemo(() => {
     if (!boardingService || !selectedRoomType || !boardingService.roomTypePrices) return 0;
@@ -1293,7 +1387,17 @@ export default function ClinicDetail() {
                             </div>
                             <div>
                               <h2 className="text-base font-bold text-slate-900 dark:text-slate-100">{item.serviceName}</h2>
-                              <p className="text-xs text-slate-500 font-medium mt-0.5 line-clamp-1">{item.description}</p>
+                              {(() => {
+                                const [desc, notes] = (item.description || '').split('<!--SERVICE_NOTE_SEPARATOR-->');
+                                return (
+                                  <>
+                                    <p className="text-xs text-slate-500 font-medium mt-0.5 line-clamp-1">{desc}</p>
+                                    {notes && (
+                                      <p className="text-[10px] text-slate-500 dark:text-slate-400 italic mt-0.5">Lưu ý: {notes}</p>
+                                    )}
+                                  </>
+                                );
+                              })()}
                             </div>
                           </div>
                           <div className="flex items-center gap-2">
@@ -1397,19 +1501,29 @@ export default function ClinicDetail() {
                       <div className="flex-1">
                         <h4 className="font-bold text-slate-900 dark:text-slate-100 text-base mb-2">{boardingService.serviceName}</h4>
                         {(() => {
-                          const descText = boardingService.cameraEnabled && boardingService.cameraDescription
+                          const rawDesc = boardingService.cameraEnabled && boardingService.cameraDescription
                             ? boardingService.cameraDescription
                             : boardingService.description;
-                          return descText ? (
-                            <div className="flex flex-col gap-1.5">
-                              {descText.split(/[,;.\n]/).filter((s: string) => s.trim().length > 5).map((feature: string, i: number) => (
-                                <div key={i} className="flex items-start gap-2 text-sm text-slate-600 dark:text-slate-300">
-                                  <span className="material-symbols-outlined text-indigo-500 text-base mt-0.5 shrink-0" style={{ fontVariationSettings: "'FILL' 1" }}>check_circle</span>
-                                  <span>{feature.trim()}</span>
+                          const [descText, notes] = (rawDesc || '').split('<!--SERVICE_NOTE_SEPARATOR-->');
+                          return (
+                            <>
+                              {descText ? (
+                                <div className="flex flex-col gap-1.5">
+                                  {descText.split(/[,;.\n]/).filter((s: string) => s.trim().length > 5).map((feature: string, i: number) => (
+                                    <div key={i} className="flex items-start gap-2 text-sm text-slate-600 dark:text-slate-300">
+                                      <span className="material-symbols-outlined text-indigo-500 text-base mt-0.5 shrink-0" style={{ fontVariationSettings: "'FILL' 1" }}>check_circle</span>
+                                      <span>{feature.trim()}</span>
+                                    </div>
+                                  ))}
                                 </div>
-                              ))}
-                            </div>
-                          ) : null;
+                              ) : null}
+                              {notes && (
+                                <div className="mt-3 p-3 bg-slate-50 dark:bg-slate-800/40 border border-slate-100 dark:border-slate-700/50 rounded-xl">
+                                  <p className="text-xs text-slate-500 dark:text-slate-400 italic">Lưu ý: {notes}</p>
+                                </div>
+                              )}
+                            </>
+                          );
                         })()}
 
                         {/* Additional Boarding info (Cage, Room) */}
@@ -1419,19 +1533,11 @@ export default function ClinicDetail() {
                               <div className="flex flex-col">
                                 <span className="text-[10px] font-black uppercase text-slate-400 mb-1">Loại phòng</span>
                                 {boardingService.roomType.length > 1 ? (
-                                  <select
+                                  <CustomSelect
                                     value={selectedRoomType}
-                                    onChange={(e) => setSelectedRoomType(e.target.value)}
-                                    className="px-3 py-1.5 border border-slate-200 dark:border-slate-700 rounded-lg text-sm font-semibold text-slate-800 dark:text-slate-200 bg-white dark:bg-slate-800 focus:ring-2 focus:ring-[#1a2b4c] outline-none"
-                                  >
-                                    {boardingService.roomType.map((r: string) => {
-                                      return (
-                                        <option key={r} value={r}>
-                                          {r}
-                                        </option>
-                                      );
-                                    })}
-                                  </select>
+                                    onChange={(val) => setSelectedRoomType(val)}
+                                    options={boardingService.roomType.map((r: string) => ({ value: r, label: r }))}
+                                  />
                                 ) : (
                                   <span className="text-sm font-semibold text-slate-800 dark:text-slate-200">
                                     {boardingService.roomType[0]}
@@ -1443,15 +1549,18 @@ export default function ClinicDetail() {
                               <div className="flex flex-col">
                                 <span className="text-[10px] font-black uppercase text-slate-400 mb-1">Cân nặng của Pet</span>
                                 {boardingService.petWeight.length > 1 ? (
-                                  <select
-                                    value={selectedCageSize}
-                                    onChange={(e) => setSelectedCageSize(e.target.value)}
-                                    className="px-3 py-1.5 border border-slate-200 dark:border-slate-700 rounded-lg text-sm font-semibold text-slate-800 dark:text-slate-200 bg-white dark:bg-slate-800 focus:ring-2 focus:ring-[#1a2b4c] outline-none"
-                                  >
-                                    {boardingService.petWeight.map((c: string) => (
-                                      <option key={c} value={c}>{formatPetWeightLabel(c, boardingService.petWeight)}</option>
-                                    ))}
-                                  </select>
+                                  <CustomSelect
+                                    value={selectedCageSizeIndex}
+                                    onChange={(val) => {
+                                      const idx = Number(val);
+                                      setSelectedCageSizeIndex(idx);
+                                      setSelectedCageSize(boardingService.petWeight[idx] || '');
+                                    }}
+                                    options={boardingService.petWeight.map((c: string, idx: number) => ({
+                                      value: idx,
+                                      label: formatPetWeightLabel(c, boardingService.petWeight, idx)
+                                    }))}
+                                  />
                                 ) : (
                                   <span className="text-sm font-semibold text-slate-800 dark:text-slate-200">{formatPetWeightLabel(boardingService.petWeight[0], boardingService.petWeight)}</span>
                                 )}
@@ -1478,7 +1587,7 @@ export default function ClinicDetail() {
                             return (
                               <div
                                 key={tierId}
-                                onClick={() => setSelectedCameraTier(tierId)}
+                                onClick={() => setSelectedCameraTier(isSelected ? 'BASIC' : tierId)}
                                 className={`p-4 rounded-xl border-2 cursor-pointer transition-all flex items-center justify-between group ${isSelected
                                   ? 'bg-white dark:bg-indigo-900/40 border-indigo-500 shadow-md'
                                   : 'bg-white dark:bg-slate-800 border-slate-100 dark:border-slate-700 hover:border-indigo-200'
@@ -1600,9 +1709,21 @@ export default function ClinicDetail() {
                               <h4 className="font-bold text-slate-900 dark:text-slate-100 text-sm group-hover:text-[#1a2b4c] dark:group-hover:text-teal-400 transition-colors">
                                 {svc.serviceName}
                               </h4>
-                              <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 line-clamp-1">
-                                {svc.description}
-                              </p>
+                              {(() => {
+                                const [desc, notes] = (svc.description || '').split('<!--SERVICE_NOTE_SEPARATOR-->');
+                                return (
+                                  <>
+                                    <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 line-clamp-1">
+                                      {desc}
+                                    </p>
+                                    {notes && (
+                                      <p className="text-[10px] text-slate-500 dark:text-slate-400 italic mt-0.5">
+                                        Lưu ý: {notes}
+                                      </p>
+                                    )}
+                                  </>
+                                );
+                              })()}
                               <div className="flex items-center gap-3 mt-1">
                                 <span className="inline-flex items-center gap-1 text-xs font-semibold text-slate-400">
                                   ⏱ {svc.durationMinutes} phút
@@ -1759,7 +1880,17 @@ export default function ClinicDetail() {
                             </div>
                             <div>
                               <h2 className="text-base font-bold text-slate-900 dark:text-slate-100">{item.serviceName}</h2>
-                              <p className="text-xs text-slate-500 font-medium mt-0.5 line-clamp-1">{item.description}</p>
+                              {(() => {
+                                const [desc, notes] = (item.description || '').split('<!--SERVICE_NOTE_SEPARATOR-->');
+                                return (
+                                  <>
+                                    <p className="text-xs text-slate-500 font-medium mt-0.5 line-clamp-1">{desc}</p>
+                                    {notes && (
+                                      <p className="text-[10px] text-slate-500 dark:text-slate-400 italic mt-0.5">Lưu ý: {notes}</p>
+                                    )}
+                                  </>
+                                );
+                              })()}
                             </div>
                           </div>
                           <div className="flex items-center gap-2">
@@ -1863,19 +1994,29 @@ export default function ClinicDetail() {
                       <div className="flex-1">
                         <h4 className="font-bold text-slate-900 dark:text-slate-100 text-base mb-2">{boardingService.serviceName}</h4>
                         {(() => {
-                          const descText = boardingService.cameraEnabled && boardingService.cameraDescription
+                          const rawDesc = boardingService.cameraEnabled && boardingService.cameraDescription
                             ? boardingService.cameraDescription
                             : boardingService.description;
-                          return descText ? (
-                            <div className="flex flex-col gap-1.5">
-                              {descText.split(/[,;.\n]/).filter((s: string) => s.trim().length > 5).map((feature: string, i: number) => (
-                                <div key={i} className="flex items-start gap-2 text-sm text-slate-600 dark:text-slate-300">
-                                  <span className="material-symbols-outlined text-indigo-500 text-base mt-0.5 shrink-0" style={{ fontVariationSettings: "'FILL' 1" }}>check_circle</span>
-                                  <span>{feature.trim()}</span>
+                          const [descText, notes] = (rawDesc || '').split('<!--SERVICE_NOTE_SEPARATOR-->');
+                          return (
+                            <>
+                              {descText ? (
+                                <div className="flex flex-col gap-1.5">
+                                  {descText.split(/[,;.\n]/).filter((s: string) => s.trim().length > 5).map((feature: string, i: number) => (
+                                    <div key={i} className="flex items-start gap-2 text-sm text-slate-600 dark:text-slate-300">
+                                      <span className="material-symbols-outlined text-indigo-500 text-base mt-0.5 shrink-0" style={{ fontVariationSettings: "'FILL' 1" }}>check_circle</span>
+                                      <span>{feature.trim()}</span>
+                                    </div>
+                                  ))}
                                 </div>
-                              ))}
-                            </div>
-                          ) : null;
+                              ) : null}
+                              {notes && (
+                                <div className="mt-3 p-3 bg-slate-50 dark:bg-slate-800/40 border border-slate-100 dark:border-slate-700/50 rounded-xl">
+                                  <p className="text-xs text-slate-500 dark:text-slate-400 italic">Lưu ý: {notes}</p>
+                                </div>
+                              )}
+                            </>
+                          );
                         })()}
 
                         {/* Additional Boarding info (Cage, Room) */}
@@ -1885,19 +2026,11 @@ export default function ClinicDetail() {
                               <div className="flex flex-col">
                                 <span className="text-[10px] font-black uppercase text-slate-400 mb-1">Loại phòng</span>
                                 {boardingService.roomType.length > 1 ? (
-                                  <select
+                                  <CustomSelect
                                     value={selectedRoomType}
-                                    onChange={(e) => setSelectedRoomType(e.target.value)}
-                                    className="px-3 py-1.5 border border-slate-200 dark:border-slate-700 rounded-lg text-sm font-semibold text-slate-800 dark:text-slate-200 bg-white dark:bg-slate-800 focus:ring-2 focus:ring-[#1a2b4c] outline-none"
-                                  >
-                                    {boardingService.roomType.map((r: string) => {
-                                      return (
-                                        <option key={r} value={r}>
-                                          {r}
-                                        </option>
-                                      );
-                                    })}
-                                  </select>
+                                    onChange={(val) => setSelectedRoomType(val)}
+                                    options={boardingService.roomType.map((r: string) => ({ value: r, label: r }))}
+                                  />
                                 ) : (
                                   <span className="text-sm font-semibold text-slate-800 dark:text-slate-200">
                                     {boardingService.roomType[0]}
@@ -1909,15 +2042,18 @@ export default function ClinicDetail() {
                               <div className="flex flex-col">
                                 <span className="text-[10px] font-black uppercase text-slate-400 mb-1">Cân nặng của Pet</span>
                                 {boardingService.petWeight.length > 1 ? (
-                                  <select
-                                    value={selectedCageSize}
-                                    onChange={(e) => setSelectedCageSize(e.target.value)}
-                                    className="px-3 py-1.5 border border-slate-200 dark:border-slate-700 rounded-lg text-sm font-semibold text-slate-800 dark:text-slate-200 bg-white dark:bg-slate-800 focus:ring-2 focus:ring-[#1a2b4c] outline-none"
-                                  >
-                                    {boardingService.petWeight.map((c: string) => (
-                                      <option key={c} value={c}>{formatPetWeightLabel(c, boardingService.petWeight)}</option>
-                                    ))}
-                                  </select>
+                                  <CustomSelect
+                                    value={selectedCageSizeIndex}
+                                    onChange={(val) => {
+                                      const idx = Number(val);
+                                      setSelectedCageSizeIndex(idx);
+                                      setSelectedCageSize(boardingService.petWeight[idx] || '');
+                                    }}
+                                    options={boardingService.petWeight.map((c: string, idx: number) => ({
+                                      value: idx,
+                                      label: formatPetWeightLabel(c, boardingService.petWeight, idx)
+                                    }))}
+                                  />
                                 ) : (
                                   <span className="text-sm font-semibold text-slate-800 dark:text-slate-200">{formatPetWeightLabel(boardingService.petWeight[0], boardingService.petWeight)}</span>
                                 )}
@@ -1944,7 +2080,7 @@ export default function ClinicDetail() {
                             return (
                               <div
                                 key={tierId}
-                                onClick={() => setSelectedCameraTier(tierId)}
+                                onClick={() => setSelectedCameraTier(isSelected ? 'BASIC' : tierId)}
                                 className={`p-4 rounded-xl border-2 cursor-pointer transition-all flex items-center justify-between group ${isSelected
                                   ? 'bg-white dark:bg-indigo-900/40 border-indigo-500 shadow-md'
                                   : 'bg-white dark:bg-slate-800 border-slate-100 dark:border-slate-700 hover:border-indigo-200'
@@ -2002,11 +2138,16 @@ export default function ClinicDetail() {
                       ))}
                     </div>
                   </div>
-                  <select className="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-sm px-3 py-2 text-slate-700 dark:text-slate-300 outline-none focus:ring-1 focus:ring-[#1a2b4c]">
-                    <option>Mới nhất</option>
-                    <option>Cao nhất</option>
-                    <option>Thấp nhất</option>
-                  </select>
+                  <CustomSelect
+                    value={reviewSort}
+                    onChange={(val) => setReviewSort(val)}
+                    options={[
+                      { value: 'Mới nhất', label: 'Mới nhất' },
+                      { value: 'Cao nhất', label: 'Cao nhất' },
+                      { value: 'Thấp nhất', label: 'Thấp nhất' }
+                    ]}
+                    className="w-32"
+                  />
                 </div>
               </div>
 
@@ -2036,6 +2177,15 @@ export default function ClinicDetail() {
                   else if (reviewFilter === '2 sao') filteredList = filteredList.filter(r => r.rating === 2);
                   else if (reviewFilter === '1 sao') filteredList = filteredList.filter(r => r.rating === 1);
                   else if (reviewFilter === 'Có hình ảnh') filteredList = filteredList.filter((r: any) => r.images?.length > 0);
+                  
+                  // Apply sorting
+                  if (reviewSort === 'Mới nhất') {
+                    filteredList.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+                  } else if (reviewSort === 'Cao nhất') {
+                    filteredList.sort((a, b) => b.rating - a.rating);
+                  } else if (reviewSort === 'Thấp nhất') {
+                    filteredList.sort((a, b) => a.rating - b.rating);
+                  }
                   
                   return filteredList.length > 0 ? (
                     filteredList.map((review: any) => (
@@ -3345,9 +3495,27 @@ export default function ClinicDetail() {
                     <span className="material-symbols-outlined text-sm">description</span>
                     Mô tả dịch vụ
                   </h4>
-                  <p className="text-sm text-slate-600 dark:text-slate-300 leading-relaxed">
-                    {selectedServiceForDetail.description || 'Chưa có mô tả chi tiết cho dịch vụ này.'}
-                  </p>
+                  {(() => {
+                    const [desc, notes] = (selectedServiceForDetail.description || '').split('<!--SERVICE_NOTE_SEPARATOR-->');
+                    return (
+                      <>
+                        <p className="text-sm text-slate-600 dark:text-slate-300 leading-relaxed">
+                          {desc || 'Chưa có mô tả chi tiết cho dịch vụ này.'}
+                        </p>
+                        {notes && (
+                          <div className="mt-4 p-4 bg-slate-50 dark:bg-slate-800/40 border border-slate-100 dark:border-slate-700/50 rounded-2xl">
+                            <h5 className="text-xs font-black uppercase tracking-wider text-slate-400 mb-1 flex items-center gap-1.5">
+                              <span className="material-symbols-outlined text-sm">info</span>
+                              Lưu ý dịch vụ
+                            </h5>
+                            <p className="text-xs text-slate-500 dark:text-slate-400 italic leading-relaxed">
+                              {notes}
+                            </p>
+                          </div>
+                        )}
+                      </>
+                    );
+                  })()}
                 </section>
 
                 {/* Features / Benefits */}

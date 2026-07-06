@@ -265,6 +265,7 @@ export default function Payment() {
         checkOut: booking.checkOut,
         note: combinedNote,
         petWeight: booking.petWeight,
+        cageSize: booking.petWeight,
         roomType: booking.roomType,
         userVoucherId: payMethod === 'payos' && selectedVoucherId ? selectedVoucherId : undefined,
       });
@@ -622,6 +623,7 @@ export default function Payment() {
                           : (booking.petNote || ''),
                         paymentMethod: (payMethod === 'cash' ? 'CASH' : 'PAYOS') as "PAYOS" | "CASH",
                         petWeight: booking.petWeight,
+                        cageSize: booking.petWeight,
                         roomType: booking.roomType,
                         userVoucherId: payMethod === 'payos' && selectedVoucherId ? selectedVoucherId : undefined,
                       };

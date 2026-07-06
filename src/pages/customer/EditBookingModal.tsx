@@ -67,6 +67,7 @@ export default function EditBookingModal({ booking, onClose, onSuccess }: EditBo
     booking.services?.some(s => s.category?.toUpperCase() === 'BOARDING' || s.category?.toUpperCase() === 'HOTEL') || false
   );
   const [selectedCageSize, setSelectedCageSize] = useState<string>(booking.petWeight || '');
+  const [selectedCageSizeIndex, setSelectedCageSizeIndex] = useState<number>(0);
   const [selectedRoomType, setSelectedRoomType] = useState<string>(booking.roomType || '');
   const [checkInDate, setCheckInDate] = useState(booking.checkIn ? booking.checkIn.substring(0, 10) : today.toISOString().split('T')[0]);
   const [checkOutDate, setCheckOutDate] = useState(() => {
@@ -110,6 +111,29 @@ export default function EditBookingModal({ booking, onClose, onSuccess }: EditBo
       setIsHotelSelected(false);
     }
   }, [selectedServiceIds, boardingService]);
+
+  // Sync boarding weight index
+  useEffect(() => {
+    if (boardingService) {
+      const initialIdx = boardingService.petWeight?.indexOf(selectedCageSize) ?? -1;
+      if (initialIdx === -1 && boardingService.petWeight?.length) {
+        // Try to match by friendly label
+        const matchedIdx = boardingService.petWeight.findIndex((w, idx) => 
+          formatPetWeightLabel(w, boardingService.petWeight, idx).toLowerCase().replace(/\s+/g, '') === 
+          selectedCageSize.toLowerCase().replace(/\s+/g, '')
+        );
+        if (matchedIdx !== -1) {
+          setSelectedCageSize(boardingService.petWeight[matchedIdx]);
+          setSelectedCageSizeIndex(matchedIdx);
+        } else {
+          setSelectedCageSize(boardingService.petWeight[0]);
+          setSelectedCageSizeIndex(0);
+        }
+      } else {
+        setSelectedCageSizeIndex(initialIdx >= 0 ? initialIdx : 0);
+      }
+    }
+  }, [boardingService, selectedCageSize]);
 
   const toggleService = (svcId: number) => {
     setSelectedServiceIds(prev => {
@@ -165,13 +189,13 @@ export default function EditBookingModal({ booking, onClose, onSuccess }: EditBo
   const boardingBasePrice = React.useMemo(() => {
     if (!boardingService) return 0;
     if (boardingService.petWeight?.length && boardingService.prices?.length) {
-      const idx = boardingService.petWeight.indexOf(selectedCageSize);
-      if (idx !== -1 && typeof boardingService.prices[idx] === 'number') {
+      const idx = selectedCageSizeIndex;
+      if (idx >= 0 && idx < boardingService.prices.length && typeof boardingService.prices[idx] === 'number') {
         return boardingService.prices[idx];
       }
     }
     return boardingService.price ?? 0;
-  }, [boardingService, selectedCageSize]);
+  }, [boardingService, selectedCageSizeIndex]);
 
   const selectedPet = myPets.find((p: any) => p.id === selectedPetId);
 
@@ -256,6 +280,7 @@ export default function EditBookingModal({ booking, onClose, onSuccess }: EditBo
         checkOut: isHotelSelected ? checkOutDate : undefined,
         note: booking.note,
         petWeight: matchedPetWeightOption || selectedCageSize || undefined,
+        cageSize: matchedPetWeightOption || selectedCageSize || undefined,
         roomType: selectedRoomType || undefined,
         paymentMethod: payDifferenceMethod,
       };
@@ -388,20 +413,26 @@ export default function EditBookingModal({ booking, onClose, onSuccess }: EditBo
                 <div>
                   <label className="text-[10px] font-bold text-slate-500 uppercase mb-2 block">Cân nặng của Pet</label>
                   <div className="flex flex-wrap gap-2">
-                    {boardingService.petWeight.map((size: string, idx: number) => (
-                      <button
-                        key={size}
-                        onClick={() => setSelectedCageSize(size)}
-                        className={`flex-1 py-2 px-3 rounded-xl border-2 font-bold text-sm min-w-[80px] ${selectedCageSize === size ? 'border-indigo-500 text-indigo-600 bg-white' : 'border-indigo-200 text-slate-500 bg-transparent'}`}
-                      >
-                        {formatPetWeightLabel(size, boardingService.petWeight)}
-                        {boardingService.prices && boardingService.prices[idx] !== undefined && (
-                          <div className="text-[10px] opacity-70 font-normal">
-                            {(boardingService.prices[idx] as number).toLocaleString('vi-VN')}đ
-                          </div>
-                        )}
-                      </button>
-                    ))}
+                    {boardingService.petWeight.map((size: string, idx: number) => {
+                      const isSelected = selectedCageSizeIndex === idx;
+                      return (
+                        <button
+                          key={`${size}-${idx}`}
+                          onClick={() => {
+                            setSelectedCageSizeIndex(idx);
+                            setSelectedCageSize(size);
+                          }}
+                          className={`flex-1 py-2 px-3 rounded-xl border-2 font-bold text-sm min-w-[80px] ${isSelected ? 'border-indigo-500 text-indigo-600 bg-white' : 'border-indigo-200 text-slate-500 bg-transparent'}`}
+                        >
+                          {formatPetWeightLabel(size, boardingService.petWeight, idx)}
+                          {boardingService.prices && boardingService.prices[idx] !== undefined && (
+                            <div className="text-[10px] opacity-70 font-normal">
+                              {(boardingService.prices[idx] as number).toLocaleString('vi-VN')}đ
+                            </div>
+                          )}
+                        </button>
+                      );
+                    })}
                   </div>
                 </div>
               )}

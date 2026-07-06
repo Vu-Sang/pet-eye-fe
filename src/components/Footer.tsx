@@ -21,7 +21,7 @@ export default function Footer() {
                             <a href="#" className="w-9 h-9 rounded-full bg-slate-800 flex items-center justify-center hover:bg-primary transition-colors text-slate-300 hover:text-white">
                                 <FaInstagram size={18} />
                             </a>
-                            <a href="#" className="w-9 h-9 rounded-full bg-slate-800 flex items-center justify-center hover:bg-primary transition-colors text-slate-300 hover:text-white">
+                            <a href="https://www.tiktok.com/@peteye26?_r=1&_t=ZS-97Fg67GwKf7" target="_blank" rel="noreferrer" className="w-9 h-9 rounded-full bg-slate-800 flex items-center justify-center hover:bg-primary transition-colors text-slate-300 hover:text-white">
                                 <FaTiktok size={16} />
                             </a>
                         </div>
