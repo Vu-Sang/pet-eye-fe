@@ -233,6 +233,32 @@ function SocialIcon({ type }: { type: string }) {
   return <span className="material-symbols-outlined text-[20px] text-slate-500">link</span>;
 }
 
+const getStaffAvatar = (staff: any) => {
+  if (!staff) return '';
+  if (staff.avatar) return staff.avatar;
+
+  const nameLower = (staff.fullName || '').toLowerCase();
+  const femaleKeywords = [
+    'thị', 'thí', 'hồng', 'lan', 'mai', 'vy', 'phương', 'thảo', 'trang', 
+    'nhi', 'quỳnh', 'bích', 'linh', 'nga', 'hương', 'yến', 'diệp', 'tuyết', 
+    'trinh', 'diệu', 'hạnh', 'dung', 'oanh', 'cúc', 'liên', 'hoa', 'thu', 
+    'xuân', 'hà', 'giang', 'nguyệt'
+  ];
+  
+  const isFemale = femaleKeywords.some(keyword => {
+    if (keyword === 'thị') {
+      return nameLower.includes(' thị ') || nameLower.includes('thị ');
+    }
+    const words = nameLower.split(/\s+/);
+    return words.includes(keyword);
+  });
+
+  if (isFemale) {
+    return 'https://images.unsplash.com/photo-1559839734-2b71ea197ec2?q=80&w=200&auto=format&fit=crop';
+  }
+  return 'https://images.unsplash.com/photo-1612349317150-e413f6a5b16d?q=80&w=200&auto=format&fit=crop';
+};
+
 export default function ClinicDetail() {
   const { id } = useParams<{ id: string }>();
   const shopId = Number(id);
@@ -1879,8 +1905,8 @@ export default function ClinicDetail() {
                 </button>
               </div>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                {(shop?.staffs || []).length > 0 ? (
-                  shop?.staffs?.map((staff: any) => (
+                {(shop?.staffs || []).filter((s: any) => s.isActive).length > 0 ? (
+                  shop?.staffs?.filter((s: any) => s.isActive).map((staff: any) => (
                     <div
                       key={staff.id}
                       onClick={() => setSelectedStaff(staff)}
@@ -1888,7 +1914,7 @@ export default function ClinicDetail() {
                     >
                       <div className="flex items-start gap-4">
                         <img
-                          src={staff.avatar || 'https://images.unsplash.com/photo-1612349317150-e413f6a5b16d?q=80&w=200&auto=format&fit=crop'}
+                          src={getStaffAvatar(staff)}
                           alt={staff.fullName}
                           className="size-16 rounded-full object-cover shrink-0 border-2 border-slate-100 dark:border-slate-700 group-hover:border-teal-400 transition-colors"
                         />
@@ -3397,7 +3423,7 @@ export default function ClinicDetail() {
                 <div className="relative flex flex-col md:flex-row gap-6 -mt-12 mb-8">
                   <div className="relative">
                     <img
-                      src={(selectedStaff as any).avatar || 'https://images.unsplash.com/photo-1612349317150-e413f6a5b16d?q=80&w=200&auto=format&fit=crop'}
+                      src={getStaffAvatar(selectedStaff)}
                       alt={selectedStaff.fullName}
                       className="size-32 rounded-3xl object-cover border-4 border-white dark:border-slate-900 shadow-xl"
                     />
