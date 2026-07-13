@@ -204,7 +204,7 @@ export default function Home() {
                   </div>
                   <div className="md:col-span-4 relative border-t md:border-t-0 md:border-l border-slate-200 dark:border-slate-800 pt-1.5 pb-1 md:py-0" ref={typeDropdownRef}>
                     <Sparkles className="absolute left-4 top-1/2 -translate-y-1/2 text-secondary dark:text-cyan-400 w-5 h-5 pointer-events-none" />
-                    
+
                     <button
                       type="button"
                       onClick={() => setIsOpenType(!isOpenType)}
@@ -212,10 +212,10 @@ export default function Home() {
                     >
                       <span>
                         {heroType === 'Tất cả' ? 'Tất cả dịch vụ' :
-                         heroType === 'CLINIC' ? 'Khám thú y (Clinic)' :
-                         heroType === 'SPA' ? 'Spa & Grooming' :
-                         heroType === 'HOTEL' ? 'Lưu trú (Hotel)' :
-                         'Dịch vụ tổng hợp'}
+                          heroType === 'CLINIC' ? 'Khám thú y (Clinic)' :
+                            heroType === 'SPA' ? 'Spa & Grooming' :
+                              heroType === 'HOTEL' ? 'Lưu trú (Hotel)' :
+                                'Dịch vụ tổng hợp'}
                       </span>
                       <ChevronDown className={`text-slate-400 w-4 h-4 transition-transform duration-200 ${isOpenType ? 'rotate-180' : ''}`} />
                     </button>
@@ -244,11 +244,10 @@ export default function Home() {
                                   setHeroType(item.value);
                                   setIsOpenType(false);
                                 }}
-                                className={`w-full px-4 py-2.5 text-left text-sm font-medium flex items-center justify-between transition-colors ${
-                                  isSelected
-                                    ? 'bg-primary/5 dark:bg-blue-500/10 text-primary dark:text-blue-400'
-                                    : 'hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-350'
-                                }`}
+                                className={`w-full px-4 py-2.5 text-left text-sm font-medium flex items-center justify-between transition-colors ${isSelected
+                                  ? 'bg-primary/5 dark:bg-blue-500/10 text-primary dark:text-blue-400'
+                                  : 'hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-350'
+                                  }`}
                               >
                                 <span>{item.label}</span>
                                 {isSelected && (
@@ -634,18 +633,18 @@ export default function Home() {
                 <div className="relative aspect-[4/3] rounded-xl md:rounded-[40px] overflow-hidden bg-slate-950">
                   {/* Lớp phủ giả lập viền tối của Camera */}
                   <div className="absolute top-0 left-0 w-full h-full pointer-events-none z-10 shadow-[inset_0_0_50px_rgba(0,0,0,0.4)]"></div>
-                  
+
                   {/* Video Live Stream thực tế */}
-                  <video 
-                    src="/video/video.mp4" 
+                  <video
+                    src="/video/video.mp4"
                     poster={cameraPreview}
-                    autoPlay 
-                    loop 
-                    muted 
-                    playsInline 
-                    className="w-full h-full object-cover object-center opacity-90 pointer-events-none grayscale-[30%] contrast-125 sepia-[.15]" 
+                    autoPlay
+                    loop
+                    muted
+                    playsInline
+                    className="w-full h-full object-cover object-center opacity-90 pointer-events-none grayscale-[30%] contrast-125 sepia-[.15]"
                   />
-                  
+
                   {/* Hiển thị Ngày/Giờ CCTV */}
                   <div className="absolute top-6 right-6 font-mono text-white/95 text-sm md:text-base font-black tracking-widest drop-shadow-[0_2px_4px_rgba(0,0,0,0.9)] z-20 hidden sm:block">
                     2025-07-22 09:42:27
@@ -655,7 +654,7 @@ export default function Home() {
                   <div className="absolute bottom-6 left-6 font-mono text-white/95 text-base md:text-2xl font-black tracking-widest drop-shadow-[0_2px_4px_rgba(0,0,0,0.9)] z-20 hidden sm:flex items-center gap-3">
                     CAM01
                   </div>
-                  
+
                   {/* Trạng thái LIVE góc trái */}
                   <div className="absolute top-6 left-6 z-20 flex items-center gap-3">
                     <div className="px-3 py-1.5 rounded-sm bg-black/40 backdrop-blur-md border border-white/10 text-[10px] font-black text-white flex items-center gap-2 tracking-widest uppercase">
@@ -665,7 +664,7 @@ export default function Home() {
 
                   {/* Giữ lại Box thông tin mô phỏng PetEye để trang trí */}
                   <div className="absolute bottom-6 right-6 flex items-center gap-2 z-20">
-                     <div className="bg-slate-950/70 backdrop-blur-md border border-white/10 p-3 rounded-2xl text-right">
+                    <div className="bg-slate-950/70 backdrop-blur-md border border-white/10 p-3 rounded-2xl text-right">
                       <p className="text-xs font-black text-white">Mochi - Scottish Fold</p>
                       <p className="text-[10px] font-medium text-white/70">Đang được chăm sóc</p>
                     </div>
@@ -722,7 +721,6 @@ export default function Home() {
                 transition={{ duration: 0.7, ease: "easeOut" }}
                 className="w-full max-w-sm lg:max-w-none group relative bg-transparent lg:bg-white lg:dark:bg-slate-900 border-none lg:border lg:border-slate-200 lg:dark:border-slate-800 p-0 lg:p-8 rounded-none lg:rounded-[40px] shadow-none lg:shadow-xl lg:hover:shadow-2xl lg:hover:shadow-blue-500/10 lg:hover:border-blue-500/50 transition-all duration-500 flex flex-col items-center text-center"
               >
-                <div className="absolute -top-4 -right-4 sm:-top-6 sm:-right-6 md:-top-8 md:-right-8 text-[100px] sm:text-[120px] md:text-[180px] font-black text-slate-50 dark:text-slate-800/30 leading-none select-none z-0 transition-transform duration-700 group-hover:scale-110 group-hover:-rotate-6 hidden lg:block">1</div>
 
                 <div className="relative z-10 flex flex-col h-full items-center w-full">
                   <div className="inline-flex items-center justify-center text-[#005FFF] bg-[#F7FBFF] border border-[#D7ECFF] dark:bg-blue-900/50 dark:text-blue-400 dark:border-blue-800 text-[10px] sm:text-xs font-black px-3 py-1.5 sm:px-4 sm:py-2 rounded-full mb-4 sm:mb-6 w-fit uppercase tracking-widest order-1 lg:order-1">
@@ -760,7 +758,6 @@ export default function Home() {
                 transition={{ duration: 0.7, delay: 0.2, ease: "easeOut" }}
                 className="w-full max-w-sm lg:max-w-none group relative bg-transparent lg:bg-white lg:dark:bg-slate-900 border-none lg:border lg:border-slate-200 lg:dark:border-slate-800 p-0 lg:p-8 rounded-none lg:rounded-[40px] shadow-none lg:shadow-xl lg:hover:shadow-2xl lg:hover:shadow-purple-500/10 lg:hover:border-purple-500/50 transition-all duration-500 flex flex-col items-center text-center"
               >
-                <div className="absolute -top-4 -right-4 sm:-top-6 sm:-right-6 md:-top-8 md:-right-8 text-[100px] sm:text-[120px] md:text-[180px] font-black text-slate-50 dark:text-slate-800/30 leading-none select-none z-0 transition-transform duration-700 group-hover:scale-110 group-hover:-rotate-6 hidden lg:block">2</div>
 
                 <div className="relative z-10 flex flex-col h-full items-center w-full">
                   <div className="inline-flex items-center justify-center text-[#A800FF] bg-[#FDFAFF] border border-[#F5E8FF] dark:bg-purple-900/50 dark:text-purple-400 dark:border-purple-800 text-[10px] sm:text-xs font-black px-3 py-1.5 sm:px-4 sm:py-2 rounded-full mb-4 sm:mb-6 w-fit uppercase tracking-widest order-1 lg:order-1">
@@ -793,7 +790,6 @@ export default function Home() {
                 transition={{ duration: 0.7, delay: 0.4, ease: "easeOut" }}
                 className="w-full max-w-sm lg:max-w-none group relative bg-transparent lg:bg-white lg:dark:bg-slate-900 border-none lg:border lg:border-slate-200 lg:dark:border-slate-800 p-0 lg:p-8 rounded-none lg:rounded-[40px] shadow-none lg:shadow-xl lg:hover:shadow-2xl lg:hover:shadow-rose-500/10 lg:hover:border-rose-500/50 transition-all duration-500 flex flex-col items-center text-center"
               >
-                <div className="absolute -top-4 -right-4 sm:-top-6 sm:-right-6 md:-top-8 md:-right-8 text-[100px] sm:text-[120px] md:text-[180px] font-black text-slate-50 dark:text-slate-800/30 leading-none select-none z-0 transition-transform duration-700 group-hover:scale-110 group-hover:-rotate-6 hidden lg:block">3</div>
 
                 <div className="relative z-10 flex flex-col h-full items-center w-full">
                   <div className="inline-flex items-center justify-center text-[#FF0038] bg-[#FFF9FA] border border-[#FFE3E6] dark:bg-rose-900/50 dark:text-rose-400 dark:border-rose-800 text-[10px] sm:text-xs font-black px-3 py-1.5 sm:px-4 sm:py-2 rounded-full mb-4 sm:mb-6 w-fit uppercase tracking-widest order-1 lg:order-1">
