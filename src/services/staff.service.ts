@@ -29,6 +29,7 @@ export interface StaffResponse {
   phone: string | null;
   specialization: string | null;
   isActive: boolean;
+  avatar?: string | null;
   certificates?: StaffCertificateResponse[];
 }
 

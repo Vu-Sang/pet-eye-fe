@@ -98,11 +98,10 @@ const CustomSelect: React.FC<CustomSelectProps> = ({ options, value, onChange, c
                       onChange(opt.value);
                       setIsOpen(false);
                     }}
-                    className={`w-full flex items-center justify-between px-3 py-2 text-left rounded-lg text-sm transition-all cursor-pointer ${
-                      isSelected
-                        ? 'bg-indigo-50 dark:bg-indigo-950/40 text-indigo-600 dark:text-indigo-400 font-bold'
-                        : 'text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800/50 font-medium'
-                    }`}
+                    className={`w-full flex items-center justify-between px-3 py-2 text-left rounded-lg text-sm transition-all cursor-pointer ${isSelected
+                      ? 'bg-indigo-50 dark:bg-indigo-950/40 text-indigo-600 dark:text-indigo-400 font-bold'
+                      : 'text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800/50 font-medium'
+                      }`}
                   >
                     <span>{opt.label}</span>
                     {isSelected && (
@@ -145,12 +144,12 @@ function isPetCompatibleWithService(petSpecies: string, svcPetType: 'DOG' | 'CAT
 
 function matchPetWeight(numericWeight: number, weightTiers?: string[], prices?: number[]): { tier: string; price: number } | null {
   if (!weightTiers || !prices || weightTiers.length === 0 || prices.length === 0) return null;
-  
+
   const thresholds = weightTiers.map(tier => {
     const num = parseFloat(tier.replace(/[^0-9.]/g, ''));
     return isNaN(num) ? 0 : num;
   });
-  
+
   let idx = 0;
   if (numericWeight >= thresholds[0]) {
     for (let i = 0; i < thresholds.length - 1; i++) {
@@ -159,10 +158,10 @@ function matchPetWeight(numericWeight: number, weightTiers?: string[], prices?: 
       }
     }
   }
-  
+
   const price = prices[idx] ?? prices[prices.length - 1];
   const tier = weightTiers[idx];
-  
+
   let friendlyLabel = tier;
   if (thresholds.length >= 2) {
     if (idx === 0) {
@@ -173,7 +172,7 @@ function matchPetWeight(numericWeight: number, weightTiers?: string[], prices?: 
       friendlyLabel = `${thresholds[idx - 1]} - ${thresholds[idx]}kg`;
     }
   }
-  
+
   return { tier: friendlyLabel, price };
 }
 
@@ -195,7 +194,7 @@ function SocialIcon({ type }: { type: string }) {
   if (type === 'FACEBOOK') {
     return (
       <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="currentColor" className="text-[#1877F2]">
-        <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.469h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.469h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
+        <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.469h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.469h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z" />
       </svg>
     );
   }
@@ -209,14 +208,14 @@ function SocialIcon({ type }: { type: string }) {
   if (type === 'TIKTOK') {
     return (
       <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="currentColor" className="text-black dark:text-white">
-        <path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-5.2 1.74 2.89 2.89 0 0 1 2.31-4.64 2.93 2.93 0 0 1 .88.13V9.4a6.84 6.84 0 0 0-1-.05A6.33 6.33 0 0 0 5 20.1a6.34 6.34 0 0 0 10.86-4.43v-7a8.16 8.16 0 0 0 4.77 1.52v-3.4a4.85 4.85 0 0 1-1-.1z"/>
+        <path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-5.2 1.74 2.89 2.89 0 0 1 2.31-4.64 2.93 2.93 0 0 1 .88.13V9.4a6.84 6.84 0 0 0-1-.05A6.33 6.33 0 0 0 5 20.1a6.34 6.34 0 0 0 10.86-4.43v-7a8.16 8.16 0 0 0 4.77 1.52v-3.4a4.85 4.85 0 0 1-1-.1z" />
       </svg>
     );
   }
   if (type === 'YOUTUBE') {
     return (
       <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="currentColor" className="text-[#FF0000]">
-        <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/>
+        <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z" />
       </svg>
     );
   }
@@ -232,6 +231,11 @@ function SocialIcon({ type }: { type: string }) {
   }
   return <span className="material-symbols-outlined text-[20px] text-slate-500">link</span>;
 }
+
+const getStaffAvatar = (staff: any) => {
+  if (!staff) return '';
+  return staff.avatar || 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="%23a8a29e"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 4c1.93 0 3.5 1.57 3.5 3.5S13.93 13 12 13s-3.5-1.57-3.5-3.5S10.07 6 12 6zm0 14c-2.03 0-4.43-1.07-5.5-2.78.03-1.82 3.66-2.82 5.5-2.82 1.83 0 5.47 1 5.5 2.82-1.07 1.71-3.47 2.78-5.5 2.78z"/></svg>';
+};
 
 export default function ClinicDetail() {
   const { id } = useParams<{ id: string }>();
@@ -473,7 +477,7 @@ export default function ClinicDetail() {
   // Pagination for featured services
   const [featuredServicesPage, setFeaturedServicesPage] = useState(0);
   const SERVICES_PER_PAGE = 4;
-  
+
   const paginatedFeaturedServices = useMemo(() => {
     const startIndex = featuredServicesPage * SERVICES_PER_PAGE;
     return nonBoardingServices.slice(startIndex, startIndex + SERVICES_PER_PAGE);
@@ -484,7 +488,7 @@ export default function ClinicDetail() {
   // Pagination for boarding services
   const [boardingServicesPage, setBoardingServicesPage] = useState(0);
   const BOARDING_SERVICES_PER_PAGE = 4;
-  
+
   const paginatedBoardingServices = useMemo(() => {
     const startIndex = boardingServicesPage * BOARDING_SERVICES_PER_PAGE;
     return boardingServices.slice(startIndex, startIndex + BOARDING_SERVICES_PER_PAGE);
@@ -497,8 +501,8 @@ export default function ClinicDetail() {
       let initialIdx = boardingService.petWeight?.indexOf(selectedCageSize) ?? -1;
       if (initialIdx === -1 && boardingService.petWeight?.length) {
         // Try to match by friendly label
-        const matchedIdx = boardingService.petWeight.findIndex((w, idx) => 
-          formatPetWeightLabel(w, boardingService.petWeight, idx).toLowerCase().replace(/\s+/g, '') === 
+        const matchedIdx = boardingService.petWeight.findIndex((w, idx) =>
+          formatPetWeightLabel(w, boardingService.petWeight, idx).toLowerCase().replace(/\s+/g, '') ===
           selectedCageSize.toLowerCase().replace(/\s+/g, '')
         );
         if (matchedIdx !== -1) {
@@ -1066,7 +1070,7 @@ export default function ClinicDetail() {
     }
 
     return images;
-  }, [shop?.bannerUrl, shop?.galleryUrls, shop?.galleryLayout, shop?.customGalleryUrls, shop?.useBannerInGallery]);
+  }, [shop?.bannerUrl, shop?.galleryUrls, shop?.galleryLayout, shop?.useBannerInGallery]);
 
   // Determine effective layout count based on shop preference
   const effectiveLayoutCount = React.useMemo(() => {
@@ -1124,115 +1128,114 @@ export default function ClinicDetail() {
           <div className="order-2 lg:order-none flex flex-wrap justify-between items-start gap-4 pb-5 mt-5 lg:mt-0">
             <div className="flex flex-col gap-2">
               <h1 className="text-slate-900 dark:text-slate-100 text-xl sm:text-2xl md:text-4xl font-black leading-tight tracking-tight">
-              {shop?.shopName ?? 'Đang tải...'}
-            </h1>
-            {shop?.shopType && (
-              <div className="flex flex-wrap gap-2">
-                {shop.shopType === 'MIXED' ? (
+                {shop?.shopName ?? 'Đang tải...'}
+              </h1>
+              {shop?.shopType && (
+                <div className="flex flex-wrap gap-2">
+                  {shop.shopType === 'MIXED' ? (
+                    <>
+                      <span className="px-2.5 py-1 bg-purple-50 dark:bg-purple-500/10 text-purple-600 dark:text-purple-400 rounded-md text-[11px] sm:text-[12px] font-medium border border-purple-100 dark:border-purple-500/20">
+                        Spa & Grooming
+                      </span>
+                      <span className="px-2.5 py-1 bg-blue-50 dark:bg-blue-500/10 text-blue-600 dark:text-blue-400 rounded-md text-[11px] sm:text-[12px] font-medium border border-blue-100 dark:border-blue-500/20">
+                        Thú y
+                      </span>
+                      <span className="px-2.5 py-1 bg-orange-50 dark:bg-orange-500/10 text-orange-600 dark:text-orange-400 rounded-md text-[11px] sm:text-[12px] font-medium border border-orange-100 dark:border-orange-500/20">
+                        Khách sạn
+                      </span>
+                    </>
+                  ) : (
+                    <span className={`px-2.5 py-1 rounded-md text-[11px] sm:text-[12px] font-medium border ${(shop.shopType === 'GROOMING' || shop.shopType === 'SPA') ? 'bg-purple-50 dark:bg-purple-500/10 text-purple-600 dark:text-purple-400 border-purple-100 dark:border-purple-500/20' :
+                      shop.shopType === 'CLINIC' ? 'bg-blue-50 dark:bg-blue-500/10 text-blue-600 dark:text-blue-400 border-blue-100 dark:border-blue-500/20' :
+                        (shop.shopType === 'HOTEL' || shop.shopType === 'BOARDING') ? 'bg-orange-50 dark:bg-orange-500/10 text-orange-600 dark:text-orange-400 border-orange-100 dark:border-orange-500/20' :
+                          'bg-slate-50 dark:bg-slate-800 text-slate-600 dark:text-slate-300 border-slate-200 dark:border-slate-700'
+                      }`}>
+                      {(shop.shopType === 'GROOMING' || shop.shopType === 'SPA') ? 'Spa & Grooming' :
+                        shop.shopType === 'CLINIC' ? 'Phòng khám thú y' :
+                          (shop.shopType === 'HOTEL' || shop.shopType === 'BOARDING') ? 'Khách sạn thú cưng' :
+                            shop.shopType}
+                    </span>
+                  )}
+
+                  {/* Camera Badge */}
+                  {apiServices?.some((s: any) => s.cameraEnabled) && (
+                    <span className="flex items-center gap-1.5 px-2.5 py-1 bg-red-50 dark:bg-red-500/10 text-red-600 dark:text-red-400 rounded-md text-[11px] sm:text-[12px] font-bold border border-red-100 dark:border-red-500/20">
+                      <span className="relative flex h-2 w-2">
+                        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-500 opacity-75"></span>
+                        <span className="relative inline-flex rounded-full h-2 w-2 bg-red-600"></span>
+                      </span>
+                      Live Camera
+                    </span>
+                  )}
+                </div>
+              )}
+
+              <div className="flex flex-wrap items-center gap-2 text-slate-500 dark:text-slate-400 text-sm font-medium">
+                {shop?.ratingAvg ? (
                   <>
-                    <span className="px-2.5 py-1 bg-purple-50 dark:bg-purple-500/10 text-purple-600 dark:text-purple-400 rounded-md text-[11px] sm:text-[12px] font-medium border border-purple-100 dark:border-purple-500/20">
-                      Spa & Grooming
+                    <span className="flex items-center text-amber-500 gap-1">
+                      <span className="material-symbols-outlined text-lg" style={{ fontVariationSettings: "'FILL' 1" }}>
+                        star
+                      </span>
+                      {shop.ratingAvg.toFixed(1)}
                     </span>
-                    <span className="px-2.5 py-1 bg-blue-50 dark:bg-blue-500/10 text-blue-600 dark:text-blue-400 rounded-md text-[11px] sm:text-[12px] font-medium border border-blue-100 dark:border-blue-500/20">
-                      Thú y
-                    </span>
-                    <span className="px-2.5 py-1 bg-orange-50 dark:bg-orange-500/10 text-orange-600 dark:text-orange-400 rounded-md text-[11px] sm:text-[12px] font-medium border border-orange-100 dark:border-orange-500/20">
-                      Khách sạn
-                    </span>
+                    <span>•</span>
                   </>
                 ) : (
-                  <span className={`px-2.5 py-1 rounded-md text-[11px] sm:text-[12px] font-medium border ${
-                    (shop.shopType === 'GROOMING' || shop.shopType === 'SPA') ? 'bg-purple-50 dark:bg-purple-500/10 text-purple-600 dark:text-purple-400 border-purple-100 dark:border-purple-500/20' : 
-                    shop.shopType === 'CLINIC' ? 'bg-blue-50 dark:bg-blue-500/10 text-blue-600 dark:text-blue-400 border-blue-100 dark:border-blue-500/20' : 
-                    (shop.shopType === 'HOTEL' || shop.shopType === 'BOARDING') ? 'bg-orange-50 dark:bg-orange-500/10 text-orange-600 dark:text-orange-400 border-orange-100 dark:border-orange-500/20' : 
-                    'bg-slate-50 dark:bg-slate-800 text-slate-600 dark:text-slate-300 border-slate-200 dark:border-slate-700'
-                  }`}>
-                    {(shop.shopType === 'GROOMING' || shop.shopType === 'SPA') ? 'Spa & Grooming' : 
-                     shop.shopType === 'CLINIC' ? 'Phòng khám thú y' : 
-                     (shop.shopType === 'HOTEL' || shop.shopType === 'BOARDING') ? 'Khách sạn thú cưng' : 
-                     shop.shopType}
-                  </span>
+                  <>
+                    <span className="hidden sm:flex items-center text-amber-500 gap-1">
+                      <span className="material-symbols-outlined text-lg" style={{ fontVariationSettings: "'FILL' 1" }}>
+                        star
+                      </span>
+                      Mới
+                    </span>
+                    <span className="hidden sm:inline">•</span>
+                  </>
                 )}
-                
-                {/* Camera Badge */}
-                {apiServices?.some((s: any) => s.cameraEnabled) && (
-                  <span className="flex items-center gap-1.5 px-2.5 py-1 bg-red-50 dark:bg-red-500/10 text-red-600 dark:text-red-400 rounded-md text-[11px] sm:text-[12px] font-bold border border-red-100 dark:border-red-500/20">
-                    <span className="relative flex h-2 w-2">
-                      <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-500 opacity-75"></span>
-                      <span className="relative inline-flex rounded-full h-2 w-2 bg-red-600"></span>
-                    </span>
-                    Live Camera
-                  </span>
-                )}
-              </div>
-            )}
-
-            <div className="flex flex-wrap items-center gap-2 text-slate-500 dark:text-slate-400 text-sm font-medium">
-              {shop?.ratingAvg ? (
-                <>
-                  <span className="flex items-center text-amber-500 gap-1">
-                    <span className="material-symbols-outlined text-lg" style={{ fontVariationSettings: "'FILL' 1" }}>
-                      star
-                    </span>
-                    {shop.ratingAvg.toFixed(1)}
-                  </span>
-                  <span>•</span>
-                </>
-              ) : (
-                <>
-                  <span className="hidden sm:flex items-center text-amber-500 gap-1">
-                    <span className="material-symbols-outlined text-lg" style={{ fontVariationSettings: "'FILL' 1" }}>
-                      star
-                    </span>
-                    Mới
-                  </span>
-                  <span className="hidden sm:inline">•</span>
-                </>
-              )}
-              <span className="flex items-center gap-1">
-                <span className="material-symbols-outlined text-sm text-teal-500">location_on</span>
-                {shop ? `${shop.address}${shop.city ? `, ${shop.city}` : ''}` : '---'}
-              </span>
-              {shop?.isVerified && (
-                <span className="flex items-center gap-1 bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-300 px-2 py-0.5 rounded-full font-bold text-xs">
-                  <span className="material-symbols-outlined text-sm">verified</span>
-                  Đối tác xác minh
+                <span className="flex items-center gap-1">
+                  <span className="material-symbols-outlined text-sm text-teal-500">location_on</span>
+                  {shop ? `${shop.address}${shop.city ? `, ${shop.city}` : ''}` : '---'}
                 </span>
-              )}
-              {(() => {
-                let links: any[] = [];
-                try {
-                  links = JSON.parse(shop?.socialLinks || '[]');
-                } catch {}
-                
-                if (links.length > 0) {
-                  return (
-                    <>
-                      <span className="hidden sm:inline text-slate-300 dark:text-slate-600">•</span>
-                      <div className="flex items-center gap-2">
-                        {links.map((link) => {
-                          return (
-                            <a
-                              key={link.id}
-                              href={link.url}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="flex items-center justify-center hover:scale-110 opacity-80 hover:opacity-100 transition-all drop-shadow-sm"
-                              title={link.label || link.type}
-                            >
-                              <SocialIcon type={link.type} />
-                            </a>
-                          );
-                        })}
-                      </div>
-                    </>
-                  );
-                }
-                return null;
-              })()}
+                {shop?.isVerified && (
+                  <span className="flex items-center gap-1 bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-300 px-2 py-0.5 rounded-full font-bold text-xs">
+                    <span className="material-symbols-outlined text-sm">verified</span>
+                    Đối tác xác minh
+                  </span>
+                )}
+                {(() => {
+                  let links: any[] = [];
+                  try {
+                    links = JSON.parse(shop?.socialLinks || '[]');
+                  } catch { }
+
+                  if (links.length > 0) {
+                    return (
+                      <>
+                        <span className="hidden sm:inline text-slate-300 dark:text-slate-600">•</span>
+                        <div className="flex items-center gap-2">
+                          {links.map((link) => {
+                            return (
+                              <a
+                                key={link.id}
+                                href={link.url}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="flex items-center justify-center hover:scale-110 opacity-80 hover:opacity-100 transition-all drop-shadow-sm"
+                                title={link.label || link.type}
+                              >
+                                <SocialIcon type={link.type} />
+                              </a>
+                            );
+                          })}
+                        </div>
+                      </>
+                    );
+                  }
+                  return null;
+                })()}
+              </div>
             </div>
           </div>
-        </div>
 
           {/* Mobile Hero Slider (Only on < lg) */}
           <div className="order-1 lg:hidden w-full h-[240px] sm:h-[320px] flex overflow-x-auto snap-x snap-mandatory hide-scrollbar rounded-2xl shadow-sm mb-5">
@@ -1260,7 +1263,7 @@ export default function ClinicDetail() {
                 try {
                   const blocks = JSON.parse(shop.customGalleryConfig || '[]');
                   if (blocks.length === 0) return null;
-                  
+
                   return blocks.map((block: any, i: number) => {
                     let spanClass = "col-span-1 row-span-1";
                     if (block.type === '1x2') spanClass = "col-span-1 row-span-2";
@@ -1269,10 +1272,10 @@ export default function ClinicDetail() {
                     else if (block.type === '3x2') spanClass = "col-span-3 row-span-2";
 
                     return (
-                      <div 
-                        key={block.id || i} 
+                      <div
+                        key={block.id || i}
                         onClick={() => { const idx = galleryImages.indexOf(block.url); setActiveImageIndex(idx !== -1 ? idx : 0); setShowGallery(true); }}
-                        className={`${spanClass} bg-center bg-no-repeat bg-cover hover:brightness-95 transition-all cursor-pointer relative rounded-lg overflow-hidden border border-black/5 shadow-sm`} 
+                        className={`${spanClass} bg-center bg-no-repeat bg-cover hover:brightness-95 transition-all cursor-pointer relative rounded-lg overflow-hidden border border-black/5 shadow-sm`}
                         style={{ backgroundImage: `url(${block.url || 'https://images.unsplash.com/photo-1548199973-03cce0bbc87b?auto=format&fit=crop&w=1200&q=80'})` }}
                       >
                         <div className="absolute inset-0 bg-black/10 hover:bg-transparent transition-colors" />
@@ -1294,104 +1297,104 @@ export default function ClinicDetail() {
                 effectiveLayoutCount === 3 ? 'lg:grid lg:grid-cols-3' :
                   'lg:grid lg:grid-cols-4 lg:grid-rows-2'
               }`}>
-          {/* Layout for 1 image */}
-          {effectiveLayoutCount === 1 && (
-            <div
-              onClick={() => { setActiveImageIndex(0); setShowGallery(true); }}
-              className="w-full h-full bg-center bg-no-repeat bg-cover hover:brightness-95 transition-all cursor-pointer relative"
-              style={{ backgroundImage: `url(${galleryImages[0]})` }}
-            >
-              <div className="absolute inset-0 bg-black/10 hover:bg-transparent transition-colors" />
-              <button onClick={() => { setActiveImageIndex(0); setShowGallery(true); }} className="absolute bottom-3 right-3 bg-white dark:bg-slate-900 text-slate-900 dark:text-white px-3 py-1.5 rounded-lg text-xs font-bold shadow-lg flex items-center gap-1.5 hover:scale-105 transition-transform">
-                <span className="material-symbols-outlined text-sm">grid_view</span>
-                Xem tất cả ảnh
-              </button>
-            </div>
-          )}
-
-          {/* Layout for 2 images */}
-          {effectiveLayoutCount === 2 && galleryImages.slice(0, 2).map((img, i) => (
-            <div
-              key={i}
-              onClick={() => { setActiveImageIndex(i); setShowGallery(true); }}
-              className="w-full h-full bg-center bg-no-repeat bg-cover hover:brightness-95 transition-all cursor-pointer relative"
-              style={{ backgroundImage: `url(${img})` }}
-            >
-              <div className="absolute inset-0 bg-black/10 hover:bg-transparent transition-colors" />
-              {i === 1 && (
-                <button onClick={() => { setActiveImageIndex(0); setShowGallery(true); }} className="absolute bottom-3 right-3 bg-white dark:bg-slate-900 text-slate-900 dark:text-white px-3 py-1.5 rounded-lg text-xs font-bold shadow-lg flex items-center gap-1.5 hover:scale-105 transition-transform">
-                  <span className="material-symbols-outlined text-sm">grid_view</span>
-                  Xem tất cả ảnh
-                </button>
+              {/* Layout for 1 image */}
+              {effectiveLayoutCount === 1 && (
+                <div
+                  onClick={() => { setActiveImageIndex(0); setShowGallery(true); }}
+                  className="w-full h-full bg-center bg-no-repeat bg-cover hover:brightness-95 transition-all cursor-pointer relative"
+                  style={{ backgroundImage: `url(${galleryImages[0]})` }}
+                >
+                  <div className="absolute inset-0 bg-black/10 hover:bg-transparent transition-colors" />
+                  <button onClick={() => { setActiveImageIndex(0); setShowGallery(true); }} className="absolute bottom-3 right-3 bg-white dark:bg-slate-900 text-slate-900 dark:text-white px-3 py-1.5 rounded-lg text-xs font-bold shadow-lg flex items-center gap-1.5 hover:scale-105 transition-transform">
+                    <span className="material-symbols-outlined text-sm">grid_view</span>
+                    Xem tất cả ảnh
+                  </button>
+                </div>
               )}
-            </div>
-          ))}
 
-          {/* Layout for 3 images */}
-          {effectiveLayoutCount === 3 && (
-            <>
-              <div
-                onClick={() => { setActiveImageIndex(0); setShowGallery(true); }}
-                className="col-span-2 row-span-1 bg-center bg-no-repeat bg-cover hover:brightness-95 transition-all cursor-pointer relative"
-                style={{ backgroundImage: `url(${galleryImages[0]})` }}
-              >
-                <div className="absolute inset-0 bg-black/10 hover:bg-transparent transition-colors" />
-              </div>
-              <div className="col-span-1 flex flex-col gap-2">
-                {galleryImages.slice(1, 3).map((img, i) => (
-                  <div
-                    key={i}
-                    onClick={() => { setActiveImageIndex(i + 1); setShowGallery(true); }}
-                    className="flex-1 bg-center bg-no-repeat bg-cover hover:brightness-95 transition-all cursor-pointer relative"
-                    style={{ backgroundImage: `url(${img})` }}
-                  >
-                    <div className="absolute inset-0 bg-black/10 hover:bg-transparent transition-colors" />
-                    {i === 1 && (
-                      <button onClick={() => { setActiveImageIndex(0); setShowGallery(true); }} className="absolute bottom-3 right-3 bg-white dark:bg-slate-900 text-slate-900 dark:text-white px-3 py-1.5 rounded-lg text-xs font-bold shadow-lg flex items-center gap-1.5 hover:scale-105 transition-transform">
-                        <span className="material-symbols-outlined text-sm">grid_view</span>
-                        Xem tất cả ảnh
-                      </button>
-                    )}
-                  </div>
-                ))}
-              </div>
-            </>
-          )}
-
-          {/* Layout for 5+ images */}
-          {effectiveLayoutCount >= 5 && (
-            <>
-              <div
-                onClick={() => { setActiveImageIndex(0); setShowGallery(true); }}
-                className="col-span-2 row-span-2 bg-center bg-no-repeat bg-cover hover:brightness-95 transition-all cursor-pointer relative"
-                style={{ backgroundImage: `url(${galleryImages[0]})` }}
-              >
-                <div className="absolute inset-0 bg-black/10 hover:bg-transparent transition-colors" />
-              </div>
-              {galleryImages.slice(1, 4).map((img, i) => (
+              {/* Layout for 2 images */}
+              {effectiveLayoutCount === 2 && galleryImages.slice(0, 2).map((img, i) => (
                 <div
                   key={i}
-                  onClick={() => { setActiveImageIndex(i + 1); setShowGallery(true); }}
-                  className="col-span-1 row-span-1 bg-center bg-no-repeat bg-cover hover:brightness-95 transition-all cursor-pointer relative"
+                  onClick={() => { setActiveImageIndex(i); setShowGallery(true); }}
+                  className="w-full h-full bg-center bg-no-repeat bg-cover hover:brightness-95 transition-all cursor-pointer relative"
                   style={{ backgroundImage: `url(${img})` }}
                 >
                   <div className="absolute inset-0 bg-black/10 hover:bg-transparent transition-colors" />
+                  {i === 1 && (
+                    <button onClick={() => { setActiveImageIndex(0); setShowGallery(true); }} className="absolute bottom-3 right-3 bg-white dark:bg-slate-900 text-slate-900 dark:text-white px-3 py-1.5 rounded-lg text-xs font-bold shadow-lg flex items-center gap-1.5 hover:scale-105 transition-transform">
+                      <span className="material-symbols-outlined text-sm">grid_view</span>
+                      Xem tất cả ảnh
+                    </button>
+                  )}
                 </div>
               ))}
-              <div
-                onClick={() => { setActiveImageIndex(4); setShowGallery(true); }}
-                className="col-span-1 row-span-1 bg-center bg-no-repeat bg-cover hover:brightness-95 transition-all cursor-pointer relative"
-                style={{ backgroundImage: `url(${galleryImages[4]})` }}
-              >
-                <div className="absolute inset-0 bg-black/10 hover:bg-transparent transition-colors" />
-                <button onClick={() => { setActiveImageIndex(0); setShowGallery(true); }} className="absolute bottom-3 right-3 bg-white dark:bg-slate-900 text-slate-900 dark:text-white px-3 py-1.5 rounded-lg text-xs font-bold shadow-lg flex items-center gap-1.5 hover:scale-105 transition-transform">
-                  <span className="material-symbols-outlined text-sm">grid_view</span>
-                  Xem tất cả ảnh
-                </button>
-              </div>
-            </>
-          )}
-        </div>
+
+              {/* Layout for 3 images */}
+              {effectiveLayoutCount === 3 && (
+                <>
+                  <div
+                    onClick={() => { setActiveImageIndex(0); setShowGallery(true); }}
+                    className="col-span-2 row-span-1 bg-center bg-no-repeat bg-cover hover:brightness-95 transition-all cursor-pointer relative"
+                    style={{ backgroundImage: `url(${galleryImages[0]})` }}
+                  >
+                    <div className="absolute inset-0 bg-black/10 hover:bg-transparent transition-colors" />
+                  </div>
+                  <div className="col-span-1 flex flex-col gap-2">
+                    {galleryImages.slice(1, 3).map((img, i) => (
+                      <div
+                        key={i}
+                        onClick={() => { setActiveImageIndex(i + 1); setShowGallery(true); }}
+                        className="flex-1 bg-center bg-no-repeat bg-cover hover:brightness-95 transition-all cursor-pointer relative"
+                        style={{ backgroundImage: `url(${img})` }}
+                      >
+                        <div className="absolute inset-0 bg-black/10 hover:bg-transparent transition-colors" />
+                        {i === 1 && (
+                          <button onClick={() => { setActiveImageIndex(0); setShowGallery(true); }} className="absolute bottom-3 right-3 bg-white dark:bg-slate-900 text-slate-900 dark:text-white px-3 py-1.5 rounded-lg text-xs font-bold shadow-lg flex items-center gap-1.5 hover:scale-105 transition-transform">
+                            <span className="material-symbols-outlined text-sm">grid_view</span>
+                            Xem tất cả ảnh
+                          </button>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                </>
+              )}
+
+              {/* Layout for 5+ images */}
+              {effectiveLayoutCount >= 5 && (
+                <>
+                  <div
+                    onClick={() => { setActiveImageIndex(0); setShowGallery(true); }}
+                    className="col-span-2 row-span-2 bg-center bg-no-repeat bg-cover hover:brightness-95 transition-all cursor-pointer relative"
+                    style={{ backgroundImage: `url(${galleryImages[0]})` }}
+                  >
+                    <div className="absolute inset-0 bg-black/10 hover:bg-transparent transition-colors" />
+                  </div>
+                  {galleryImages.slice(1, 4).map((img, i) => (
+                    <div
+                      key={i}
+                      onClick={() => { setActiveImageIndex(i + 1); setShowGallery(true); }}
+                      className="col-span-1 row-span-1 bg-center bg-no-repeat bg-cover hover:brightness-95 transition-all cursor-pointer relative"
+                      style={{ backgroundImage: `url(${img})` }}
+                    >
+                      <div className="absolute inset-0 bg-black/10 hover:bg-transparent transition-colors" />
+                    </div>
+                  ))}
+                  <div
+                    onClick={() => { setActiveImageIndex(4); setShowGallery(true); }}
+                    className="col-span-1 row-span-1 bg-center bg-no-repeat bg-cover hover:brightness-95 transition-all cursor-pointer relative"
+                    style={{ backgroundImage: `url(${galleryImages[4]})` }}
+                  >
+                    <div className="absolute inset-0 bg-black/10 hover:bg-transparent transition-colors" />
+                    <button onClick={() => { setActiveImageIndex(0); setShowGallery(true); }} className="absolute bottom-3 right-3 bg-white dark:bg-slate-900 text-slate-900 dark:text-white px-3 py-1.5 rounded-lg text-xs font-bold shadow-lg flex items-center gap-1.5 hover:scale-105 transition-transform">
+                      <span className="material-symbols-outlined text-sm">grid_view</span>
+                      Xem tất cả ảnh
+                    </button>
+                  </div>
+                </>
+              )}
+            </div>
           )}
         </div>
 
@@ -1407,10 +1410,9 @@ export default function ClinicDetail() {
             <section className="border-b border-slate-200 dark:border-slate-800 pb-8">
               <h2 className="text-lg sm:text-xl font-bold text-slate-900 dark:text-slate-100 mb-4">Giới thiệu</h2>
               <div className="relative">
-                <div 
-                  className={`text-slate-600 dark:text-slate-300 leading-relaxed text-base transition-all duration-300 ${
-                    !showFullDesc ? 'line-clamp-3 lg:line-clamp-none' : ''
-                  }`}
+                <div
+                  className={`text-slate-600 dark:text-slate-300 leading-relaxed text-base transition-all duration-300 ${!showFullDesc ? 'line-clamp-3 lg:line-clamp-none' : ''
+                    }`}
                   dangerouslySetInnerHTML={{ __html: shop?.description ?? 'Đang tải thông tin...' }}
                 />
                 {shop?.description && shop.description.length > 200 && (
@@ -1504,186 +1506,185 @@ export default function ClinicDetail() {
                   <div className={`transition-all duration-500 overflow-hidden ${isHotelSelected && boardingService ? 'max-h-[1200px] opacity-100 mt-4' : 'max-h-0 opacity-0'}`}>
                     {boardingService && (
                       <div className="bg-white dark:bg-slate-800 rounded-2xl border border-indigo-100 dark:border-indigo-800 shadow-sm overflow-hidden mb-6">
-                    {/* Service image + description */}
-                    <div className="p-5 flex flex-col sm:flex-row gap-5">
-                      {/* Image */}
-                      <div className="w-full sm:w-48 h-40 rounded-xl overflow-hidden shadow-md shrink-0 bg-slate-100 dark:bg-slate-700">
-                        <img
-                          src={boardingService.imageUrl || 'https://images.unsplash.com/photo-1548199973-03cce0bbc87b?auto=format&fit=crop&w=600&q=80'}
-                          className="w-full h-full object-cover"
-                          alt={boardingService.serviceName}
-                        />
-                      </div>
+                        {/* Service image + description */}
+                        <div className="p-5 flex flex-col sm:flex-row gap-5">
+                          {/* Image */}
+                          <div className="w-full sm:w-48 h-40 rounded-xl overflow-hidden shadow-md shrink-0 bg-slate-100 dark:bg-slate-700">
+                            <img
+                              src={boardingService.imageUrl || 'https://images.unsplash.com/photo-1548199973-03cce0bbc87b?auto=format&fit=crop&w=600&q=80'}
+                              className="w-full h-full object-cover"
+                              alt={boardingService.serviceName}
+                            />
+                          </div>
 
-                      {/* Description as feature list — dùng cameraDescription nếu có, fallback sang description chung */}
-                      <div className="flex-1">
-                        <h4 className="font-bold text-slate-900 dark:text-slate-100 text-base mb-2">{boardingService.serviceName}</h4>
-                        {(() => {
-                          const rawDesc = boardingService.cameraEnabled && boardingService.cameraDescription
-                            ? boardingService.cameraDescription
-                            : boardingService.description;
-                          const [descText, notes] = (rawDesc || '').split('<!--SERVICE_NOTE_SEPARATOR-->');
-                          return (
-                            <>
-                              {descText ? (
-                                <div className="flex flex-col gap-1.5">
-                                  {descText.split(/[,;.\n]/).filter((s: string) => s.trim().length > 5).map((feature: string, i: number) => (
-                                    <div key={i} className="flex items-start gap-2 text-sm text-slate-600 dark:text-slate-300">
-                                      <span className="material-symbols-outlined text-indigo-500 text-base mt-0.5 shrink-0" style={{ fontVariationSettings: "'FILL' 1" }}>check_circle</span>
-                                      <span>{feature.trim()}</span>
+                          {/* Description as feature list — dùng cameraDescription nếu có, fallback sang description chung */}
+                          <div className="flex-1">
+                            <h4 className="font-bold text-slate-900 dark:text-slate-100 text-base mb-2">{boardingService.serviceName}</h4>
+                            {(() => {
+                              const rawDesc = boardingService.cameraEnabled && boardingService.cameraDescription
+                                ? boardingService.cameraDescription
+                                : boardingService.description;
+                              const [descText, notes] = (rawDesc || '').split('<!--SERVICE_NOTE_SEPARATOR-->');
+                              return (
+                                <>
+                                  {descText ? (
+                                    <div className="flex flex-col gap-1.5">
+                                      {descText.split(/[,;.\n]/).filter((s: string) => s.trim().length > 5).map((feature: string, i: number) => (
+                                        <div key={i} className="flex items-start gap-2 text-sm text-slate-600 dark:text-slate-300">
+                                          <span className="material-symbols-outlined text-indigo-500 text-base mt-0.5 shrink-0" style={{ fontVariationSettings: "'FILL' 1" }}>check_circle</span>
+                                          <span>{feature.trim()}</span>
+                                        </div>
+                                      ))}
                                     </div>
-                                  ))}
-                                </div>
-                              ) : null}
-                              {notes && (
-                                <div className="mt-3 p-3 bg-slate-50 dark:bg-slate-800/40 border border-slate-100 dark:border-slate-700/50 rounded-xl">
-                                  <p className="text-xs text-slate-500 dark:text-slate-400 italic">Lưu ý: {notes}</p>
-                                </div>
-                              )}
-                            </>
-                          );
-                        })()}
+                                  ) : null}
+                                  {notes && (
+                                    <div className="mt-3 p-3 bg-slate-50 dark:bg-slate-800/40 border border-slate-100 dark:border-slate-700/50 rounded-xl">
+                                      <p className="text-xs text-slate-500 dark:text-slate-400 italic">Lưu ý: {notes}</p>
+                                    </div>
+                                  )}
+                                </>
+                              );
+                            })()}
 
-                        {/* Additional Boarding info (Cage, Room) */}
-                        {(boardingService.roomType?.length > 0 || boardingService.petWeight?.length > 0) && (
-                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-4 border-t border-slate-100 dark:border-slate-700/50 pt-4">
-                            {boardingService.roomType?.length > 0 && (
-                              <div className="flex flex-col">
-                                <span className="text-[10px] font-black uppercase text-slate-400 mb-1">Loại phòng</span>
-                                {boardingService.roomType.length > 1 ? (
-                                  <CustomSelect
-                                    value={selectedRoomType}
-                                    onChange={(val) => setSelectedRoomType(val)}
-                                    options={boardingService.roomType.map((r: string) => ({ value: r, label: r }))}
-                                  />
-                                ) : (
-                                  <span className="text-sm font-semibold text-slate-800 dark:text-slate-200">
-                                    {boardingService.roomType[0]}
-                                  </span>
+                            {/* Additional Boarding info (Cage, Room) */}
+                            {(boardingService.roomType?.length > 0 || boardingService.petWeight?.length > 0) && (
+                              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-4 border-t border-slate-100 dark:border-slate-700/50 pt-4">
+                                {boardingService.roomType?.length > 0 && (
+                                  <div className="flex flex-col">
+                                    <span className="text-[10px] font-black uppercase text-slate-400 mb-1">Loại phòng</span>
+                                    {boardingService.roomType.length > 1 ? (
+                                      <CustomSelect
+                                        value={selectedRoomType}
+                                        onChange={(val) => setSelectedRoomType(val)}
+                                        options={boardingService.roomType.map((r: string) => ({ value: r, label: r }))}
+                                      />
+                                    ) : (
+                                      <span className="text-sm font-semibold text-slate-800 dark:text-slate-200">
+                                        {boardingService.roomType[0]}
+                                      </span>
+                                    )}
+                                  </div>
                                 )}
-                              </div>
-                            )}
-                            {boardingService.petWeight?.length > 0 && (
-                              <div className="flex flex-col">
-                                <span className="text-[10px] font-black uppercase text-slate-400 mb-1">Cân nặng của Pet</span>
-                                {boardingService.petWeight.length > 1 ? (
-                                  <CustomSelect
-                                    value={selectedCageSizeIndex}
-                                    onChange={(val) => {
-                                      const idx = Number(val);
-                                      setSelectedCageSizeIndex(idx);
-                                      setSelectedCageSize(boardingService.petWeight[idx] || '');
-                                    }}
-                                    options={boardingService.petWeight.map((c: string, idx: number) => ({
-                                      value: idx,
-                                      label: formatPetWeightLabel(c, boardingService.petWeight, idx)
-                                    }))}
-                                  />
-                                ) : (
-                                  <span className="text-sm font-semibold text-slate-800 dark:text-slate-200">{formatPetWeightLabel(boardingService.petWeight[0], boardingService.petWeight)}</span>
+                                {boardingService.petWeight?.length > 0 && (
+                                  <div className="flex flex-col">
+                                    <span className="text-[10px] font-black uppercase text-slate-400 mb-1">Cân nặng của Pet</span>
+                                    {boardingService.petWeight.length > 1 ? (
+                                      <CustomSelect
+                                        value={selectedCageSizeIndex}
+                                        onChange={(val) => {
+                                          const idx = Number(val);
+                                          setSelectedCageSizeIndex(idx);
+                                          setSelectedCageSize(boardingService.petWeight[idx] || '');
+                                        }}
+                                        options={boardingService.petWeight.map((c: string, idx: number) => ({
+                                          value: idx,
+                                          label: formatPetWeightLabel(c, boardingService.petWeight, idx)
+                                        }))}
+                                      />
+                                    ) : (
+                                      <span className="text-sm font-semibold text-slate-800 dark:text-slate-200">{formatPetWeightLabel(boardingService.petWeight[0], boardingService.petWeight)}</span>
+                                    )}
+                                  </div>
                                 )}
                               </div>
                             )}
                           </div>
+                        </div>
+
+                        {/* Camera tiers — only if shop configured camera */}
+                        {boardingService.cameraEnabled && supportedCameraTiers.length > 0 && (
+                          <div className="bg-indigo-50/50 dark:bg-indigo-950/20 p-5 border-t border-indigo-100 dark:border-indigo-900 mt-5">
+                            <h4 className="text-sm font-bold text-indigo-900 dark:text-indigo-400 uppercase tracking-wider mb-4">
+                              Nâng cấp Camera Giám sát
+                            </h4>
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                              {supportedCameraTiers.map((tierId: string) => {
+                                const meta = CAMERA_TIER_META[tierId];
+                                if (!meta) return null;
+                                const isSelected = selectedCameraTier === tierId;
+                                const effectiveLabel = tierLabel(tierId, boardingService?.cameraTierLabels);
+                                const effectivePrice = tierPrice(tierId, boardingService?.cameraTierPrices);
+                                return (
+                                  <div
+                                    key={tierId}
+                                    onClick={() => setSelectedCameraTier(isSelected ? 'BASIC' : tierId)}
+                                    className={`p-4 rounded-xl border-2 cursor-pointer transition-all flex items-center justify-between group ${isSelected
+                                      ? 'bg-white dark:bg-indigo-900/40 border-indigo-500 shadow-md'
+                                      : 'bg-white dark:bg-slate-800 border-slate-100 dark:border-slate-700 hover:border-indigo-200'
+                                      }`}
+                                  >
+                                    <div className="flex items-center gap-3">
+                                      <div className={`w-10 h-10 rounded-lg flex items-center justify-center transition-colors shrink-0 ${isSelected ? 'bg-indigo-500 text-white' : 'bg-slate-100 dark:bg-slate-700 text-slate-400 group-hover:bg-indigo-100 group-hover:text-indigo-500'}`}>
+                                        <span className="material-symbols-outlined text-xl">{meta.icon}</span>
+                                      </div>
+                                      <div>
+                                        <p className="text-sm font-bold text-slate-900 dark:text-white">{effectiveLabel}</p>
+                                        <p className="text-[10px] text-slate-500 dark:text-slate-400">{meta.desc}</p>
+                                      </div>
+                                    </div>
+                                    <div className="text-right">
+                                      <p className={`text-xs font-bold ${effectivePrice === 0 ? 'text-teal-600' : 'text-slate-900 dark:text-white'}`}>
+                                        {effectivePrice === 0 ? 'MIỄN PHÍ' : `+${effectivePrice.toLocaleString()}đ`}
+                                      </p>
+                                      {effectivePrice > 0 && <p className="text-[8px] text-slate-400">/ngày</p>}
+                                    </div>
+                                  </div>
+                                );
+                              })}
+                            </div>
+                          </div>
                         )}
                       </div>
-                    </div>
-
-                    {/* Camera tiers — only if shop configured camera */}
-                    {boardingService.cameraEnabled && supportedCameraTiers.length > 0 && (
-                      <div className="bg-indigo-50/50 dark:bg-indigo-950/20 p-5 border-t border-indigo-100 dark:border-indigo-900 mt-5">
-                        <h4 className="text-sm font-bold text-indigo-900 dark:text-indigo-400 uppercase tracking-wider mb-4">
-                          Nâng cấp Camera Giám sát
-                        </h4>
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                          {supportedCameraTiers.map((tierId: string) => {
-                            const meta = CAMERA_TIER_META[tierId];
-                            if (!meta) return null;
-                            const isSelected = selectedCameraTier === tierId;
-                            const effectiveLabel = tierLabel(tierId, boardingService?.cameraTierLabels);
-                            const effectivePrice = tierPrice(tierId, boardingService?.cameraTierPrices);
-                            return (
-                              <div
-                                key={tierId}
-                                onClick={() => setSelectedCameraTier(isSelected ? 'BASIC' : tierId)}
-                                className={`p-4 rounded-xl border-2 cursor-pointer transition-all flex items-center justify-between group ${isSelected
-                                  ? 'bg-white dark:bg-indigo-900/40 border-indigo-500 shadow-md'
-                                  : 'bg-white dark:bg-slate-800 border-slate-100 dark:border-slate-700 hover:border-indigo-200'
-                                  }`}
-                              >
-                                <div className="flex items-center gap-3">
-                                  <div className={`w-10 h-10 rounded-lg flex items-center justify-center transition-colors shrink-0 ${isSelected ? 'bg-indigo-500 text-white' : 'bg-slate-100 dark:bg-slate-700 text-slate-400 group-hover:bg-indigo-100 group-hover:text-indigo-500'}`}>
-                                    <span className="material-symbols-outlined text-xl">{meta.icon}</span>
-                                  </div>
-                                  <div>
-                                    <p className="text-sm font-bold text-slate-900 dark:text-white">{effectiveLabel}</p>
-                                    <p className="text-[10px] text-slate-500 dark:text-slate-400">{meta.desc}</p>
-                                  </div>
-                                </div>
-                                <div className="text-right">
-                                  <p className={`text-xs font-bold ${effectivePrice === 0 ? 'text-teal-600' : 'text-slate-900 dark:text-white'}`}>
-                                    {effectivePrice === 0 ? 'MIỄN PHÍ' : `+${effectivePrice.toLocaleString()}đ`}
-                                  </p>
-                                  {effectivePrice > 0 && <p className="text-[8px] text-slate-400">/ngày</p>}
-                                </div>
-                              </div>
-                            );
-                          })}
-                        </div>
-                      </div>
                     )}
+
                   </div>
-                )}
 
-                </div>
+                  {/* Pagination Controls for Boarding Services */}
+                  {totalBoardingPages > 1 && (
+                    <div className="flex items-center justify-between mt-6">
+                      <div className="flex items-center gap-2">
+                        <button
+                          onClick={() => setBoardingServicesPage(prev => Math.max(0, prev - 1))}
+                          disabled={boardingServicesPage === 0}
+                          className="px-3 py-1.5 text-xs font-medium rounded-lg bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                        >
+                          Trước
+                        </button>
 
-                {/* Pagination Controls for Boarding Services */}
-                {totalBoardingPages > 1 && (
-                  <div className="flex items-center justify-between mt-6">
-                    <div className="flex items-center gap-2">
-                      <button
-                        onClick={() => setBoardingServicesPage(prev => Math.max(0, prev - 1))}
-                        disabled={boardingServicesPage === 0}
-                        className="px-3 py-1.5 text-xs font-medium rounded-lg bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-                      >
-                        Trước
-                      </button>
-                      
-                      <div className="flex items-center gap-1">
-                        {Array.from({ length: totalBoardingPages }, (_, i) => (
-                          <button
-                            key={i}
-                            onClick={() => setBoardingServicesPage(i)}
-                            className={`w-8 h-8 text-xs font-medium rounded-lg transition-colors ${
-                              boardingServicesPage === i
+                        <div className="flex items-center gap-1">
+                          {Array.from({ length: totalBoardingPages }, (_, i) => (
+                            <button
+                              key={i}
+                              onClick={() => setBoardingServicesPage(i)}
+                              className={`w-8 h-8 text-xs font-medium rounded-lg transition-colors ${boardingServicesPage === i
                                 ? 'bg-indigo-600 text-white'
                                 : 'bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-600'
-                            }`}
-                          >
-                            {i + 1}
-                          </button>
-                        ))}
+                                }`}
+                            >
+                              {i + 1}
+                            </button>
+                          ))}
+                        </div>
+
+                        <button
+                          onClick={() => setBoardingServicesPage(prev => Math.min(totalBoardingPages - 1, prev + 1))}
+                          disabled={boardingServicesPage >= totalBoardingPages - 1}
+                          className="px-3 py-1.5 text-xs font-medium rounded-lg bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                        >
+                          Sau
+                        </button>
                       </div>
 
-                      <button
-                        onClick={() => setBoardingServicesPage(prev => Math.min(totalBoardingPages - 1, prev + 1))}
-                        disabled={boardingServicesPage >= totalBoardingPages - 1}
-                        className="px-3 py-1.5 text-xs font-medium rounded-lg bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-                      >
-                        Sau
-                      </button>
+                      <span className="text-xs text-slate-500 dark:text-slate-400">
+                        {boardingServicesPage * BOARDING_SERVICES_PER_PAGE + 1}-{Math.min((boardingServicesPage + 1) * BOARDING_SERVICES_PER_PAGE, boardingServices.length)} của {boardingServices.length}
+                      </span>
                     </div>
-
-                    <span className="text-xs text-slate-500 dark:text-slate-400">
-                      {boardingServicesPage * BOARDING_SERVICES_PER_PAGE + 1}-{Math.min((boardingServicesPage + 1) * BOARDING_SERVICES_PER_PAGE, boardingServices.length)} của {boardingServices.length}
-                    </span>
-                  </div>
-                )}
-              </section>
+                  )}
+                </section>
               </div>
             )} {/* end BOARDING conditional (Desktop) */}
 
-            
+
 
             {/* Featured Services */}
             <section className="border-b border-slate-200 dark:border-slate-800 pb-8">
@@ -1710,11 +1711,10 @@ export default function ClinicDetail() {
                       <button
                         key={btn.key}
                         onClick={() => { setPetTypeFilter(btn.key as any); setFeaturedServicesPage(0); }}
-                        className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
-                          petTypeFilter === btn.key
-                            ? 'bg-white dark:bg-slate-800 text-slate-800 dark:text-white shadow-sm'
-                            : 'text-slate-400 hover:text-slate-600 dark:hover:text-slate-300'
-                        }`}
+                        className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${petTypeFilter === btn.key
+                          ? 'bg-white dark:bg-slate-800 text-slate-800 dark:text-white shadow-sm'
+                          : 'text-slate-400 hover:text-slate-600 dark:hover:text-slate-300'
+                          }`}
                       >
                         {btn.label}
                       </button>
@@ -1834,17 +1834,16 @@ export default function ClinicDetail() {
                         >
                           Trước
                         </button>
-                        
+
                         <div className="flex items-center gap-1">
                           {Array.from({ length: totalFeaturedPages }, (_, i) => (
                             <button
                               key={i}
                               onClick={() => setFeaturedServicesPage(i)}
-                              className={`w-8 h-8 text-xs font-medium rounded-lg transition-colors ${
-                                featuredServicesPage === i
-                                  ? 'bg-[#1a2b4c] dark:bg-teal-500 text-white'
-                                  : 'bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-600'
-                              }`}
+                              className={`w-8 h-8 text-xs font-medium rounded-lg transition-colors ${featuredServicesPage === i
+                                ? 'bg-[#1a2b4c] dark:bg-teal-500 text-white'
+                                : 'bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-600'
+                                }`}
                             >
                               {i + 1}
                             </button>
@@ -1879,8 +1878,8 @@ export default function ClinicDetail() {
                 </button>
               </div>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                {(shop?.staffs || []).length > 0 ? (
-                  shop?.staffs?.map((staff: any) => (
+                {(shop?.staffs || []).filter((s: any) => s.isActive).length > 0 ? (
+                  shop?.staffs?.filter((s: any) => s.isActive).map((staff: any) => (
                     <div
                       key={staff.id}
                       onClick={() => setSelectedStaff(staff)}
@@ -1888,7 +1887,7 @@ export default function ClinicDetail() {
                     >
                       <div className="flex items-start gap-4">
                         <img
-                          src={staff.avatar || 'https://images.unsplash.com/photo-1612349317150-e413f6a5b16d?q=80&w=200&auto=format&fit=crop'}
+                          src={getStaffAvatar(staff)}
                           alt={staff.fullName}
                           className="size-16 rounded-full object-cover shrink-0 border-2 border-slate-100 dark:border-slate-700 group-hover:border-teal-400 transition-colors"
                         />
@@ -1998,186 +1997,185 @@ export default function ClinicDetail() {
                   <div className={`transition-all duration-500 overflow-hidden ${isHotelSelected && boardingService ? 'max-h-[1200px] opacity-100 mt-4' : 'max-h-0 opacity-0'}`}>
                     {boardingService && (
                       <div className="bg-white dark:bg-slate-800 rounded-2xl border border-indigo-100 dark:border-indigo-800 shadow-sm overflow-hidden mb-6">
-                    {/* Service image + description */}
-                    <div className="p-5 flex flex-col sm:flex-row gap-5">
-                      {/* Image */}
-                      <div className="w-full sm:w-48 h-40 rounded-xl overflow-hidden shadow-md shrink-0 bg-slate-100 dark:bg-slate-700">
-                        <img
-                          src={boardingService.imageUrl || 'https://images.unsplash.com/photo-1548199973-03cce0bbc87b?auto=format&fit=crop&w=600&q=80'}
-                          className="w-full h-full object-cover"
-                          alt={boardingService.serviceName}
-                        />
-                      </div>
+                        {/* Service image + description */}
+                        <div className="p-5 flex flex-col sm:flex-row gap-5">
+                          {/* Image */}
+                          <div className="w-full sm:w-48 h-40 rounded-xl overflow-hidden shadow-md shrink-0 bg-slate-100 dark:bg-slate-700">
+                            <img
+                              src={boardingService.imageUrl || 'https://images.unsplash.com/photo-1548199973-03cce0bbc87b?auto=format&fit=crop&w=600&q=80'}
+                              className="w-full h-full object-cover"
+                              alt={boardingService.serviceName}
+                            />
+                          </div>
 
-                      {/* Description as feature list — dùng cameraDescription nếu có, fallback sang description chung */}
-                      <div className="flex-1">
-                        <h4 className="font-bold text-slate-900 dark:text-slate-100 text-base mb-2">{boardingService.serviceName}</h4>
-                        {(() => {
-                          const rawDesc = boardingService.cameraEnabled && boardingService.cameraDescription
-                            ? boardingService.cameraDescription
-                            : boardingService.description;
-                          const [descText, notes] = (rawDesc || '').split('<!--SERVICE_NOTE_SEPARATOR-->');
-                          return (
-                            <>
-                              {descText ? (
-                                <div className="flex flex-col gap-1.5">
-                                  {descText.split(/[,;.\n]/).filter((s: string) => s.trim().length > 5).map((feature: string, i: number) => (
-                                    <div key={i} className="flex items-start gap-2 text-sm text-slate-600 dark:text-slate-300">
-                                      <span className="material-symbols-outlined text-indigo-500 text-base mt-0.5 shrink-0" style={{ fontVariationSettings: "'FILL' 1" }}>check_circle</span>
-                                      <span>{feature.trim()}</span>
+                          {/* Description as feature list — dùng cameraDescription nếu có, fallback sang description chung */}
+                          <div className="flex-1">
+                            <h4 className="font-bold text-slate-900 dark:text-slate-100 text-base mb-2">{boardingService.serviceName}</h4>
+                            {(() => {
+                              const rawDesc = boardingService.cameraEnabled && boardingService.cameraDescription
+                                ? boardingService.cameraDescription
+                                : boardingService.description;
+                              const [descText, notes] = (rawDesc || '').split('<!--SERVICE_NOTE_SEPARATOR-->');
+                              return (
+                                <>
+                                  {descText ? (
+                                    <div className="flex flex-col gap-1.5">
+                                      {descText.split(/[,;.\n]/).filter((s: string) => s.trim().length > 5).map((feature: string, i: number) => (
+                                        <div key={i} className="flex items-start gap-2 text-sm text-slate-600 dark:text-slate-300">
+                                          <span className="material-symbols-outlined text-indigo-500 text-base mt-0.5 shrink-0" style={{ fontVariationSettings: "'FILL' 1" }}>check_circle</span>
+                                          <span>{feature.trim()}</span>
+                                        </div>
+                                      ))}
                                     </div>
-                                  ))}
-                                </div>
-                              ) : null}
-                              {notes && (
-                                <div className="mt-3 p-3 bg-slate-50 dark:bg-slate-800/40 border border-slate-100 dark:border-slate-700/50 rounded-xl">
-                                  <p className="text-xs text-slate-500 dark:text-slate-400 italic">Lưu ý: {notes}</p>
-                                </div>
-                              )}
-                            </>
-                          );
-                        })()}
+                                  ) : null}
+                                  {notes && (
+                                    <div className="mt-3 p-3 bg-slate-50 dark:bg-slate-800/40 border border-slate-100 dark:border-slate-700/50 rounded-xl">
+                                      <p className="text-xs text-slate-500 dark:text-slate-400 italic">Lưu ý: {notes}</p>
+                                    </div>
+                                  )}
+                                </>
+                              );
+                            })()}
 
-                        {/* Additional Boarding info (Cage, Room) */}
-                        {(boardingService.roomType?.length > 0 || boardingService.petWeight?.length > 0) && (
-                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-4 border-t border-slate-100 dark:border-slate-700/50 pt-4">
-                            {boardingService.roomType?.length > 0 && (
-                              <div className="flex flex-col">
-                                <span className="text-[10px] font-black uppercase text-slate-400 mb-1">Loại phòng</span>
-                                {boardingService.roomType.length > 1 ? (
-                                  <CustomSelect
-                                    value={selectedRoomType}
-                                    onChange={(val) => setSelectedRoomType(val)}
-                                    options={boardingService.roomType.map((r: string) => ({ value: r, label: r }))}
-                                  />
-                                ) : (
-                                  <span className="text-sm font-semibold text-slate-800 dark:text-slate-200">
-                                    {boardingService.roomType[0]}
-                                  </span>
+                            {/* Additional Boarding info (Cage, Room) */}
+                            {(boardingService.roomType?.length > 0 || boardingService.petWeight?.length > 0) && (
+                              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-4 border-t border-slate-100 dark:border-slate-700/50 pt-4">
+                                {boardingService.roomType?.length > 0 && (
+                                  <div className="flex flex-col">
+                                    <span className="text-[10px] font-black uppercase text-slate-400 mb-1">Loại phòng</span>
+                                    {boardingService.roomType.length > 1 ? (
+                                      <CustomSelect
+                                        value={selectedRoomType}
+                                        onChange={(val) => setSelectedRoomType(val)}
+                                        options={boardingService.roomType.map((r: string) => ({ value: r, label: r }))}
+                                      />
+                                    ) : (
+                                      <span className="text-sm font-semibold text-slate-800 dark:text-slate-200">
+                                        {boardingService.roomType[0]}
+                                      </span>
+                                    )}
+                                  </div>
                                 )}
-                              </div>
-                            )}
-                            {boardingService.petWeight?.length > 0 && (
-                              <div className="flex flex-col">
-                                <span className="text-[10px] font-black uppercase text-slate-400 mb-1">Cân nặng của Pet</span>
-                                {boardingService.petWeight.length > 1 ? (
-                                  <CustomSelect
-                                    value={selectedCageSizeIndex}
-                                    onChange={(val) => {
-                                      const idx = Number(val);
-                                      setSelectedCageSizeIndex(idx);
-                                      setSelectedCageSize(boardingService.petWeight[idx] || '');
-                                    }}
-                                    options={boardingService.petWeight.map((c: string, idx: number) => ({
-                                      value: idx,
-                                      label: formatPetWeightLabel(c, boardingService.petWeight, idx)
-                                    }))}
-                                  />
-                                ) : (
-                                  <span className="text-sm font-semibold text-slate-800 dark:text-slate-200">{formatPetWeightLabel(boardingService.petWeight[0], boardingService.petWeight)}</span>
+                                {boardingService.petWeight?.length > 0 && (
+                                  <div className="flex flex-col">
+                                    <span className="text-[10px] font-black uppercase text-slate-400 mb-1">Cân nặng của Pet</span>
+                                    {boardingService.petWeight.length > 1 ? (
+                                      <CustomSelect
+                                        value={selectedCageSizeIndex}
+                                        onChange={(val) => {
+                                          const idx = Number(val);
+                                          setSelectedCageSizeIndex(idx);
+                                          setSelectedCageSize(boardingService.petWeight[idx] || '');
+                                        }}
+                                        options={boardingService.petWeight.map((c: string, idx: number) => ({
+                                          value: idx,
+                                          label: formatPetWeightLabel(c, boardingService.petWeight, idx)
+                                        }))}
+                                      />
+                                    ) : (
+                                      <span className="text-sm font-semibold text-slate-800 dark:text-slate-200">{formatPetWeightLabel(boardingService.petWeight[0], boardingService.petWeight)}</span>
+                                    )}
+                                  </div>
                                 )}
                               </div>
                             )}
                           </div>
+                        </div>
+
+                        {/* Camera tiers — only if shop configured camera */}
+                        {boardingService.cameraEnabled && supportedCameraTiers.length > 0 && (
+                          <div className="bg-indigo-50/50 dark:bg-indigo-950/20 p-5 border-t border-indigo-100 dark:border-indigo-900 mt-5">
+                            <h4 className="text-sm font-bold text-indigo-900 dark:text-indigo-400 uppercase tracking-wider mb-4">
+                              Nâng cấp Camera Giám sát
+                            </h4>
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                              {supportedCameraTiers.map((tierId: string) => {
+                                const meta = CAMERA_TIER_META[tierId];
+                                if (!meta) return null;
+                                const isSelected = selectedCameraTier === tierId;
+                                const effectiveLabel = tierLabel(tierId, boardingService?.cameraTierLabels);
+                                const effectivePrice = tierPrice(tierId, boardingService?.cameraTierPrices);
+                                return (
+                                  <div
+                                    key={tierId}
+                                    onClick={() => setSelectedCameraTier(isSelected ? 'BASIC' : tierId)}
+                                    className={`p-4 rounded-xl border-2 cursor-pointer transition-all flex items-center justify-between group ${isSelected
+                                      ? 'bg-white dark:bg-indigo-900/40 border-indigo-500 shadow-md'
+                                      : 'bg-white dark:bg-slate-800 border-slate-100 dark:border-slate-700 hover:border-indigo-200'
+                                      }`}
+                                  >
+                                    <div className="flex items-center gap-3">
+                                      <div className={`w-10 h-10 rounded-lg flex items-center justify-center transition-colors shrink-0 ${isSelected ? 'bg-indigo-500 text-white' : 'bg-slate-100 dark:bg-slate-700 text-slate-400 group-hover:bg-indigo-100 group-hover:text-indigo-500'}`}>
+                                        <span className="material-symbols-outlined text-xl">{meta.icon}</span>
+                                      </div>
+                                      <div>
+                                        <p className="text-sm font-bold text-slate-900 dark:text-white">{effectiveLabel}</p>
+                                        <p className="text-[10px] text-slate-500 dark:text-slate-400">{meta.desc}</p>
+                                      </div>
+                                    </div>
+                                    <div className="text-right">
+                                      <p className={`text-xs font-bold ${effectivePrice === 0 ? 'text-teal-600' : 'text-slate-900 dark:text-white'}`}>
+                                        {effectivePrice === 0 ? 'MIỄN PHÍ' : `+${effectivePrice.toLocaleString()}đ`}
+                                      </p>
+                                      {effectivePrice > 0 && <p className="text-[8px] text-slate-400">/ngày</p>}
+                                    </div>
+                                  </div>
+                                );
+                              })}
+                            </div>
+                          </div>
                         )}
                       </div>
-                    </div>
-
-                    {/* Camera tiers — only if shop configured camera */}
-                    {boardingService.cameraEnabled && supportedCameraTiers.length > 0 && (
-                      <div className="bg-indigo-50/50 dark:bg-indigo-950/20 p-5 border-t border-indigo-100 dark:border-indigo-900 mt-5">
-                        <h4 className="text-sm font-bold text-indigo-900 dark:text-indigo-400 uppercase tracking-wider mb-4">
-                          Nâng cấp Camera Giám sát
-                        </h4>
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                          {supportedCameraTiers.map((tierId: string) => {
-                            const meta = CAMERA_TIER_META[tierId];
-                            if (!meta) return null;
-                            const isSelected = selectedCameraTier === tierId;
-                            const effectiveLabel = tierLabel(tierId, boardingService?.cameraTierLabels);
-                            const effectivePrice = tierPrice(tierId, boardingService?.cameraTierPrices);
-                            return (
-                              <div
-                                key={tierId}
-                                onClick={() => setSelectedCameraTier(isSelected ? 'BASIC' : tierId)}
-                                className={`p-4 rounded-xl border-2 cursor-pointer transition-all flex items-center justify-between group ${isSelected
-                                  ? 'bg-white dark:bg-indigo-900/40 border-indigo-500 shadow-md'
-                                  : 'bg-white dark:bg-slate-800 border-slate-100 dark:border-slate-700 hover:border-indigo-200'
-                                  }`}
-                              >
-                                <div className="flex items-center gap-3">
-                                  <div className={`w-10 h-10 rounded-lg flex items-center justify-center transition-colors shrink-0 ${isSelected ? 'bg-indigo-500 text-white' : 'bg-slate-100 dark:bg-slate-700 text-slate-400 group-hover:bg-indigo-100 group-hover:text-indigo-500'}`}>
-                                    <span className="material-symbols-outlined text-xl">{meta.icon}</span>
-                                  </div>
-                                  <div>
-                                    <p className="text-sm font-bold text-slate-900 dark:text-white">{effectiveLabel}</p>
-                                    <p className="text-[10px] text-slate-500 dark:text-slate-400">{meta.desc}</p>
-                                  </div>
-                                </div>
-                                <div className="text-right">
-                                  <p className={`text-xs font-bold ${effectivePrice === 0 ? 'text-teal-600' : 'text-slate-900 dark:text-white'}`}>
-                                    {effectivePrice === 0 ? 'MIỄN PHÍ' : `+${effectivePrice.toLocaleString()}đ`}
-                                  </p>
-                                  {effectivePrice > 0 && <p className="text-[8px] text-slate-400">/ngày</p>}
-                                </div>
-                              </div>
-                            );
-                          })}
-                        </div>
-                      </div>
                     )}
+
                   </div>
-                )}
 
-                </div>
+                  {/* Pagination Controls for Boarding Services */}
+                  {totalBoardingPages > 1 && (
+                    <div className="flex items-center justify-between mt-6">
+                      <div className="flex items-center gap-2">
+                        <button
+                          onClick={() => setBoardingServicesPage(prev => Math.max(0, prev - 1))}
+                          disabled={boardingServicesPage === 0}
+                          className="px-3 py-1.5 text-xs font-medium rounded-lg bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                        >
+                          Trước
+                        </button>
 
-                {/* Pagination Controls for Boarding Services */}
-                {totalBoardingPages > 1 && (
-                  <div className="flex items-center justify-between mt-6">
-                    <div className="flex items-center gap-2">
-                      <button
-                        onClick={() => setBoardingServicesPage(prev => Math.max(0, prev - 1))}
-                        disabled={boardingServicesPage === 0}
-                        className="px-3 py-1.5 text-xs font-medium rounded-lg bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-                      >
-                        Trước
-                      </button>
-                      
-                      <div className="flex items-center gap-1">
-                        {Array.from({ length: totalBoardingPages }, (_, i) => (
-                          <button
-                            key={i}
-                            onClick={() => setBoardingServicesPage(i)}
-                            className={`w-8 h-8 text-xs font-medium rounded-lg transition-colors ${
-                              boardingServicesPage === i
+                        <div className="flex items-center gap-1">
+                          {Array.from({ length: totalBoardingPages }, (_, i) => (
+                            <button
+                              key={i}
+                              onClick={() => setBoardingServicesPage(i)}
+                              className={`w-8 h-8 text-xs font-medium rounded-lg transition-colors ${boardingServicesPage === i
                                 ? 'bg-indigo-600 text-white'
                                 : 'bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-600'
-                            }`}
-                          >
-                            {i + 1}
-                          </button>
-                        ))}
+                                }`}
+                            >
+                              {i + 1}
+                            </button>
+                          ))}
+                        </div>
+
+                        <button
+                          onClick={() => setBoardingServicesPage(prev => Math.min(totalBoardingPages - 1, prev + 1))}
+                          disabled={boardingServicesPage >= totalBoardingPages - 1}
+                          className="px-3 py-1.5 text-xs font-medium rounded-lg bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                        >
+                          Sau
+                        </button>
                       </div>
 
-                      <button
-                        onClick={() => setBoardingServicesPage(prev => Math.min(totalBoardingPages - 1, prev + 1))}
-                        disabled={boardingServicesPage >= totalBoardingPages - 1}
-                        className="px-3 py-1.5 text-xs font-medium rounded-lg bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-                      >
-                        Sau
-                      </button>
+                      <span className="text-xs text-slate-500 dark:text-slate-400">
+                        {boardingServicesPage * BOARDING_SERVICES_PER_PAGE + 1}-{Math.min((boardingServicesPage + 1) * BOARDING_SERVICES_PER_PAGE, boardingServices.length)} của {boardingServices.length}
+                      </span>
                     </div>
-
-                    <span className="text-xs text-slate-500 dark:text-slate-400">
-                      {boardingServicesPage * BOARDING_SERVICES_PER_PAGE + 1}-{Math.min((boardingServicesPage + 1) * BOARDING_SERVICES_PER_PAGE, boardingServices.length)} của {boardingServices.length}
-                    </span>
-                  </div>
-                )}
-              </section>
+                  )}
+                </section>
               </div>
             )} {/* end BOARDING conditional (Mobile) */}
 
-            
+
 
 
           </div>
@@ -2240,7 +2238,7 @@ export default function ClinicDetail() {
                   else if (reviewFilter === '2 sao') filteredList = filteredList.filter(r => r.rating === 2);
                   else if (reviewFilter === '1 sao') filteredList = filteredList.filter(r => r.rating === 1);
                   else if (reviewFilter === 'Có hình ảnh') filteredList = filteredList.filter((r: any) => r.images?.length > 0);
-                  
+
                   // Apply sorting
                   if (reviewSort === 'Mới nhất') {
                     filteredList.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
@@ -2249,72 +2247,72 @@ export default function ClinicDetail() {
                   } else if (reviewSort === 'Thấp nhất') {
                     filteredList.sort((a, b) => a.rating - b.rating);
                   }
-                  
+
                   return filteredList.length > 0 ? (
                     filteredList.map((review: any) => (
-                    <div
-                      key={review.id}
-                      className="flex gap-3 sm:gap-4 pb-4 sm:pb-6 border-b border-slate-100 dark:border-slate-800 last:border-0"
-                    >
-                      <img
-                        src={review.userAvatar || 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?q=80&w=100&auto=format&fit=crop'}
-                        alt={review.userName}
-                        className="size-8 sm:size-10 rounded-full object-cover shrink-0"
-                      />
-                      <div className="flex flex-col gap-2 flex-1">
-                        <div className="flex justify-between items-start">
-                          <div>
-                            <h4 className="font-bold text-slate-900 dark:text-slate-100 text-sm">{review.userName}</h4>
-                            <div className="flex items-center gap-2 mt-0.5">
-                              <span className="text-xs text-slate-400">
-                                {new Date(review.createdAt).toLocaleDateString('vi-VN')}
-                              </span>
-                              {review.serviceName && (
-                                <>
-                                  <span className="text-slate-300 dark:text-slate-700">•</span>
-                                  <span className="text-[10px] font-bold text-indigo-500 bg-indigo-50 dark:bg-indigo-900/30 px-2 py-0.5 rounded-full uppercase tracking-wider">
-                                    {review.serviceName}
-                                  </span>
-                                </>
-                              )}
+                      <div
+                        key={review.id}
+                        className="flex gap-3 sm:gap-4 pb-4 sm:pb-6 border-b border-slate-100 dark:border-slate-800 last:border-0"
+                      >
+                        <img
+                          src={review.userAvatar || 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?q=80&w=100&auto=format&fit=crop'}
+                          alt={review.userName}
+                          className="size-8 sm:size-10 rounded-full object-cover shrink-0"
+                        />
+                        <div className="flex flex-col gap-2 flex-1">
+                          <div className="flex justify-between items-start">
+                            <div>
+                              <h4 className="font-bold text-slate-900 dark:text-slate-100 text-sm">{review.userName}</h4>
+                              <div className="flex items-center gap-2 mt-0.5">
+                                <span className="text-xs text-slate-400">
+                                  {new Date(review.createdAt).toLocaleDateString('vi-VN')}
+                                </span>
+                                {review.serviceName && (
+                                  <>
+                                    <span className="text-slate-300 dark:text-slate-700">•</span>
+                                    <span className="text-[10px] font-bold text-indigo-500 bg-indigo-50 dark:bg-indigo-900/30 px-2 py-0.5 rounded-full uppercase tracking-wider">
+                                      {review.serviceName}
+                                    </span>
+                                  </>
+                                )}
+                              </div>
+                            </div>
+                            <div className="flex text-amber-400">
+                              {[1, 2, 3, 4, 5].map((s) => (
+                                <span
+                                  key={s}
+                                  className="material-symbols-outlined text-sm"
+                                  style={{ fontVariationSettings: s <= review.rating ? "'FILL' 1" : "'FILL' 0" }}
+                                >
+                                  star
+                                </span>
+                              ))}
                             </div>
                           </div>
-                          <div className="flex text-amber-400">
-                            {[1, 2, 3, 4, 5].map((s) => (
-                              <span
-                                key={s}
-                                className="material-symbols-outlined text-sm"
-                                style={{ fontVariationSettings: s <= review.rating ? "'FILL' 1" : "'FILL' 0" }}
-                              >
-                                star
-                              </span>
-                            ))}
-                          </div>
-                        </div>
-                        <p className="text-slate-600 dark:text-slate-300 text-sm leading-relaxed">{review.comment}</p>
+                          <p className="text-slate-600 dark:text-slate-300 text-sm leading-relaxed">{review.comment}</p>
 
-                        {review.reply && (
-                          <div className="mt-4 bg-slate-50 dark:bg-slate-800/50 rounded-2xl p-4 border-l-4 border-[#1a2b4c] relative overflow-hidden">
-                            <div className="flex items-center justify-between mb-2">
-                              <span className="text-[10px] font-black text-[#1a2b4c] uppercase tracking-widest flex items-center gap-1.5">
-                                <span className="material-symbols-outlined text-xs">reply</span>
-                                Phản hồi từ chủ shop
-                              </span>
-                              <span className="text-[10px] text-slate-400">
-                                {new Date(review.repliedAt).toLocaleDateString('vi-VN')}
-                              </span>
+                          {review.reply && (
+                            <div className="mt-4 bg-slate-50 dark:bg-slate-800/50 rounded-2xl p-4 border-l-4 border-[#1a2b4c] relative overflow-hidden">
+                              <div className="flex items-center justify-between mb-2">
+                                <span className="text-[10px] font-black text-[#1a2b4c] uppercase tracking-widest flex items-center gap-1.5">
+                                  <span className="material-symbols-outlined text-xs">reply</span>
+                                  Phản hồi từ chủ shop
+                                </span>
+                                <span className="text-[10px] text-slate-400">
+                                  {new Date(review.repliedAt).toLocaleDateString('vi-VN')}
+                                </span>
+                              </div>
+                              <p className="text-slate-700 dark:text-slate-200 text-sm italic leading-relaxed">
+                                "{review.reply}"
+                              </p>
                             </div>
-                            <p className="text-slate-700 dark:text-slate-200 text-sm italic leading-relaxed">
-                              "{review.reply}"
-                            </p>
-                          </div>
-                        )}
+                          )}
+                        </div>
                       </div>
-                    </div>
-                  ))
-                ) : (
-                  <p className="text-slate-400 text-sm italic">Chưa có đánh giá nào cho cơ sở này.</p>
-                );
+                    ))
+                  ) : (
+                    <p className="text-slate-400 text-sm italic">Chưa có đánh giá nào cho cơ sở này.</p>
+                  );
                 })()}
               </div>
 
@@ -2343,35 +2341,35 @@ export default function ClinicDetail() {
                       <div className="relative">
                         <div className="flex flex-col gap-2 max-h-[340px] overflow-y-auto pr-1 scroll-smooth [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:bg-slate-200 dark:[&::-webkit-scrollbar-thumb]:bg-slate-700 [&::-webkit-scrollbar-thumb]:rounded-full">
                           {nonBoardingServices.map((svc: ServiceResponse) => {
-                          const isSelected = selectedServiceIds.includes(svc.id);
-                          return (
-                            <div
-                              key={svc.id}
-                              onClick={() => toggleService(svc.id)}
-                              className={`flex items-center justify-between p-3 rounded-xl border cursor-pointer transition-all ${isSelected
-                                ? 'bg-[#1a2b4c]/5 border-[#1a2b4c]/30 dark:bg-teal-900/20 dark:border-teal-500/50'
-                                : 'bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700 hover:border-[#1a2b4c]/30'
-                                }`}
-                            >
-                              <div className="flex flex-col">
-                                <span className={`text-sm font-bold ${isSelected ? 'text-[#1a2b4c] dark:text-teal-400' : 'text-slate-700 dark:text-slate-300'}`}>
-                                  {svc.serviceName}
-                                </span>
-                                <span className="text-xs text-slate-500">
-                                  {getServicePriceInfo(svc).displayPrice.toLocaleString('vi-VN')}đ • {formatServiceDuration(svc.durationMinutes, svc.category)} {getServicePriceInfo(svc).matchedTierLabel}
-                                </span>
+                            const isSelected = selectedServiceIds.includes(svc.id);
+                            return (
+                              <div
+                                key={svc.id}
+                                onClick={() => toggleService(svc.id)}
+                                className={`flex items-center justify-between p-3 rounded-xl border cursor-pointer transition-all ${isSelected
+                                  ? 'bg-[#1a2b4c]/5 border-[#1a2b4c]/30 dark:bg-teal-900/20 dark:border-teal-500/50'
+                                  : 'bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700 hover:border-[#1a2b4c]/30'
+                                  }`}
+                              >
+                                <div className="flex flex-col">
+                                  <span className={`text-sm font-bold ${isSelected ? 'text-[#1a2b4c] dark:text-teal-400' : 'text-slate-700 dark:text-slate-300'}`}>
+                                    {svc.serviceName}
+                                  </span>
+                                  <span className="text-xs text-slate-500">
+                                    {getServicePriceInfo(svc).displayPrice.toLocaleString('vi-VN')}đ • {formatServiceDuration(svc.durationMinutes, svc.category)} {getServicePriceInfo(svc).matchedTierLabel}
+                                  </span>
+                                </div>
+                                <div className={`w-5 h-5 rounded border-2 flex items-center justify-center transition-all ${isSelected
+                                  ? 'bg-[#1a2b4c] border-[#1a2b4c] dark:bg-teal-500 dark:border-teal-500'
+                                  : 'border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700'
+                                  }`}>
+                                  {isSelected && (
+                                    <span className="material-symbols-outlined text-white text-[13px]" style={{ fontVariationSettings: "'wght' 700" }}>check</span>
+                                  )}
+                                </div>
                               </div>
-                              <div className={`w-5 h-5 rounded border-2 flex items-center justify-center transition-all ${isSelected
-                                ? 'bg-[#1a2b4c] border-[#1a2b4c] dark:bg-teal-500 dark:border-teal-500'
-                                : 'border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700'
-                                }`}>
-                                {isSelected && (
-                                  <span className="material-symbols-outlined text-white text-[13px]" style={{ fontVariationSettings: "'wght' 700" }}>check</span>
-                                )}
-                              </div>
-                            </div>
-                          );
-                        })}
+                            );
+                          })}
                         </div>
                         {nonBoardingServices.length > 4 && (
                           <div className="pointer-events-none absolute bottom-0 left-0 right-1 h-10 bg-gradient-to-t from-white dark:from-slate-900 to-transparent rounded-b-xl" />
@@ -2442,10 +2440,10 @@ export default function ClinicDetail() {
                                       Thời gian: {formatServiceDuration(svc.durationMinutes, svc.category)}
                                     </span>
                                   </div>
-                                    <div className="flex items-center gap-1.5 flex-shrink-0">
-                                      <span className="font-bold text-teal-600 dark:text-teal-400 text-xs">
-                                        {getServicePriceInfo(svc).displayPrice.toLocaleString('vi-VN')}đ {getServicePriceInfo(svc).matchedTierLabel}
-                                      </span>
+                                  <div className="flex items-center gap-1.5 flex-shrink-0">
+                                    <span className="font-bold text-teal-600 dark:text-teal-400 text-xs">
+                                      {getServicePriceInfo(svc).displayPrice.toLocaleString('vi-VN')}đ {getServicePriceInfo(svc).matchedTierLabel}
+                                    </span>
                                     <button
                                       type="button"
                                       onClick={(e) => {
@@ -3000,8 +2998,8 @@ export default function ClinicDetail() {
                       let links: any[] = [];
                       try {
                         links = JSON.parse(shop?.socialLinks || '[]');
-                      } catch {}
-                      
+                      } catch { }
+
                       return links.map((link) => {
                         let label = link.label || link.type;
                         if (link.type === 'FACEBOOK') label = 'Facebook';
@@ -3010,7 +3008,7 @@ export default function ClinicDetail() {
                         else if (link.type === 'WEBSITE') label = 'Website';
                         else if (link.type === 'YOUTUBE') label = 'YouTube';
                         else if (link.type === 'ZALO') label = 'Zalo';
-                        
+
                         return (
                           <div key={link.id} className="flex items-center gap-3 px-1.5">
                             <SocialIcon type={link.type} />
@@ -3036,8 +3034,8 @@ export default function ClinicDetail() {
               {totalPrice > 0 ? 'Tổng cộng' : 'Giá chỉ từ'}
             </span>
             <span className="font-black text-xl text-[#1a2b4c] dark:text-teal-400">
-              {totalPrice > 0 
-                ? `${totalPrice.toLocaleString('vi-VN')}đ` 
+              {totalPrice > 0
+                ? `${totalPrice.toLocaleString('vi-VN')}đ`
                 : (apiServices.length > 0 ? `${Math.min(...apiServices.map(s => s.price)).toLocaleString('vi-VN')}đ` : '---')}
             </span>
           </div>
@@ -3139,11 +3137,10 @@ export default function ClinicDetail() {
                                 key={s}
                                 type="button"
                                 onClick={() => setQuickPetForm(prev => ({ ...prev, species: s }))}
-                                className={`flex-1 py-2.5 rounded-xl text-sm font-bold border-2 transition-all ${
-                                  quickPetForm.species === s
-                                    ? 'border-[#1a2b4c] bg-[#1a2b4c]/5 text-[#1a2b4c] dark:border-teal-400 dark:bg-teal-900/10 dark:text-teal-400'
-                                    : 'border-slate-200 dark:border-slate-600 text-slate-500 hover:border-slate-300'
-                                }`}
+                                className={`flex-1 py-2.5 rounded-xl text-sm font-bold border-2 transition-all ${quickPetForm.species === s
+                                  ? 'border-[#1a2b4c] bg-[#1a2b4c]/5 text-[#1a2b4c] dark:border-teal-400 dark:bg-teal-900/10 dark:text-teal-400'
+                                  : 'border-slate-200 dark:border-slate-600 text-slate-500 hover:border-slate-300'
+                                  }`}
                               >
                                 {s === 'Chó' ? '🐶' : '🐱'} {s}
                               </button>
@@ -3397,7 +3394,7 @@ export default function ClinicDetail() {
                 <div className="relative flex flex-col md:flex-row gap-6 -mt-12 mb-8">
                   <div className="relative">
                     <img
-                      src={(selectedStaff as any).avatar || 'https://images.unsplash.com/photo-1612349317150-e413f6a5b16d?q=80&w=200&auto=format&fit=crop'}
+                      src={getStaffAvatar(selectedStaff)}
                       alt={selectedStaff.fullName}
                       className="size-32 rounded-3xl object-cover border-4 border-white dark:border-slate-900 shadow-xl"
                     />
@@ -3857,7 +3854,7 @@ export default function ClinicDetail() {
               >
                 <span className="material-symbols-outlined">chevron_left</span>
               </button>
-              
+
               <motion.img
                 key={activeImageIndex}
                 initial={{ opacity: 0, x: 20 }}
