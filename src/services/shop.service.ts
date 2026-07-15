@@ -18,6 +18,7 @@ export interface ShopPublicResponse {
   city: string;
   description: string;
   licenseImageUrl: string;
+  licenseNumber?: string;
   logoUrl?: string;
   bannerUrl?: string;
   galleryUrls?: string;

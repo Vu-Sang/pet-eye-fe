@@ -28,9 +28,9 @@ function calculateDistance(lat1: number, lon1: number, lat2: number, lon2: numbe
 
 const SHOP_TYPE_TABS = [
   { value: 'Tất cả', label: 'Tất cả', icon: <Grid size={16} /> },
-  { value: 'CLINIC', label: 'Khám thú y', icon: <Stethoscope size={16} /> },
-  { value: 'SPA', label: 'Spa & Grooming', icon: <Scissors size={16} /> },
   { value: 'HOTEL', label: 'Lưu trú', icon: <Home size={16} /> },
+  { value: 'SPA', label: 'Spa & Grooming', icon: <Scissors size={16} /> },
+  { value: 'CLINIC', label: 'Khám thú y', icon: <Stethoscope size={16} /> },
   { value: 'MIXED', label: 'Tổng hợp', icon: <Store size={16} /> },
 ];
 
@@ -119,15 +119,15 @@ export default function VetSearch() {
 
 
 
-  // Lock body scroll when mobile filter is open
+  // Lock body scroll when mobile filter or map modal is open
   useEffect(() => {
-    if (isMobileFilterOpen) {
+    if (isMobileFilterOpen || isMapModalOpen) {
       document.body.style.overflow = 'hidden';
     } else {
       document.body.style.overflow = '';
     }
     return () => { document.body.style.overflow = ''; };
-  }, [isMobileFilterOpen]);
+  }, [isMobileFilterOpen, isMapModalOpen]);
 
   const shopsWithDistance = useMemo(() => {
     return clinics.map((shop: ShopPublicResponse) => {
@@ -218,7 +218,7 @@ export default function VetSearch() {
       city: shop.city,
       latitude: shop.latitude || 0,
       longitude: shop.longitude || 0,
-      logoUrl: shop.licenseImageUrl || '',
+      logoUrl: shop.logoUrl || '',
       ratingAvg: shop.ratingAvg,
       distanceKm: shop.distanceKm ?? 0,
       durationMinutes: null
@@ -354,8 +354,8 @@ export default function VetSearch() {
               Cơ sở đã được xác thực
             </span>
             <h1 className="text-3xl md:text-6xl font-black tracking-tight leading-tight text-blue-950 dark:text-white drop-shadow-sm">
-              Tìm cơ sở <span className="text-gradient">thú y</span> <br className="hidden sm:block" />
-              &amp; Dịch vụ quanh bạn
+              Tìm cơ sở &amp; Dịch vụ <br className="hidden sm:block" />
+              <span className="text-gradient">thú cưng</span> quanh bạn
             </h1>
           </motion.div>
 
@@ -534,7 +534,7 @@ export default function VetSearch() {
                       {/* Image */}
                       <div className={`relative overflow-hidden shrink-0 bg-slate-100 dark:bg-slate-800 ${viewMode === 'list' ? 'w-[125px] sm:w-72' : 'h-28 sm:h-44 md:h-52 w-full'}`}>
                         <img
-                          src={shop.logoUrl || shop.licenseImageUrl || 'https://images.unsplash.com/photo-1516734212186-a967f81ad0d7?q=80&w=800&auto=format&fit=crop'}
+                          src={shop.logoUrl || 'https://images.unsplash.com/photo-1516734212186-a967f81ad0d7?q=80&w=800&auto=format&fit=crop'}
                           alt={shop.shopName}
                           className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-1000"
                         />
@@ -803,7 +803,7 @@ export default function VetSearch() {
                   </div>
                 )}
               </div>
-              <div className="w-full md:w-1/3 flex-1 md:h-full bg-slate-50 dark:bg-slate-950 border-t md:border-t-0 md:border-l border-slate-200 dark:border-slate-800 flex flex-col">
+              <div className="w-full md:w-1/3 flex-1 min-h-0 md:h-full bg-slate-50 dark:bg-slate-950 border-t md:border-t-0 md:border-l border-slate-200 dark:border-slate-800 flex flex-col">
                 <div className="p-4 md:p-6 border-b border-slate-200 dark:border-slate-800 shrink-0">
                   <h3 className="font-black text-lg md:text-xl text-slate-900 dark:text-white flex items-center gap-2">
                     <MapIcon size={20} className="text-primary" />
