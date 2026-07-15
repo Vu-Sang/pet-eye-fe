@@ -63,7 +63,7 @@ export const clinicService = {
         distance: '---',
         price: '---',
         tags: shop.shopType ? shop.shopType.split(',').map((t: string) => t.trim()) : [],
-        image: shop.licenseImageUrl || 'https://images.unsplash.com/photo-1516734212186-a967f81ad0d7?q=80&w=800&auto=format&fit=crop',
+        image: shop.logoUrl || 'https://images.unsplash.com/photo-1516734212186-a967f81ad0d7?q=80&w=800&auto=format&fit=crop',
         verified: shop.isVerified,
         badge: shop.isVerified ? 'Verified' : null,
       }));
@@ -87,7 +87,7 @@ export const clinicService = {
       distance: '---',
       price: '---',
       tags: shop.shopType ? shop.shopType.split(',').map((t: string) => t.trim()) : [],
-      image: shop.licenseImageUrl || 'https://images.unsplash.com/photo-1516734212186-a967f81ad0d7?q=80&w=800&auto=format&fit=crop',
+      image: shop.logoUrl || 'https://images.unsplash.com/photo-1516734212186-a967f81ad0d7?q=80&w=800&auto=format&fit=crop',
       verified: shop.isVerified,
       badge: shop.isVerified ? 'Verified' : null,
     };

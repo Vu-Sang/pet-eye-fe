@@ -9,7 +9,7 @@ import {
 import { motion, AnimatePresence } from 'motion/react';
 import { useAuth } from '../../contexts/AuthContext';
 import { useTheme } from '../../contexts/ThemeContext';
-import { trackHeroSearch, trackClickFeaturedShop, trackUseGpsNearby, trackClickCta } from '../../lib/analytics';
+import { trackHeroSearch, trackClickFeaturedShop, trackUseGpsNearby, trackClickCta, trackClickFaq } from '../../lib/analytics';
 import { translateShopType, getShopTypeLabel } from '../../utils/shopHelper';
 
 // Import assets
@@ -623,7 +623,13 @@ export default function Home() {
                   </motion.div>
                 ))}
               </div>
-              <button onClick={() => handleAction('/search?type=HOTEL')} className="w-full sm:w-fit justify-center bg-primary hover:bg-primary/95 dark:bg-blue-600 dark:hover:bg-blue-500 text-white px-6 py-4 md:py-3 2xl:px-10 2xl:py-5 rounded-2xl 2xl:rounded-[24px] font-black flex items-center gap-2 2xl:gap-3 transition-all shadow-lg shadow-primary/20 dark:shadow-blue-500/20 hover:scale-[1.02] text-sm 2xl:text-base">
+              <button 
+                onClick={() => {
+                  trackClickCta('khám phá cơ sở có camera', 'landing_page_camera_section');
+                  handleAction('/search?type=HOTEL');
+                }} 
+                className="w-full sm:w-fit justify-center bg-primary hover:bg-primary/95 dark:bg-blue-600 dark:hover:bg-blue-500 text-white px-6 py-4 md:py-3 2xl:px-10 2xl:py-5 rounded-2xl 2xl:rounded-[24px] font-black flex items-center gap-2 2xl:gap-3 transition-all shadow-lg shadow-primary/20 dark:shadow-blue-500/20 hover:scale-[1.02] text-sm 2xl:text-base"
+              >
                 KHÁM PHÁ CƠ SỞ CÓ CAMERA <ArrowRight size={20} className="w-4 h-4 2xl:w-5 2xl:h-5" />
               </button>
             </motion.div>
@@ -1053,7 +1059,13 @@ export default function Home() {
             ].map((faq, i) => (
               <div key={i} className="bg-white dark:bg-slate-900/60 border border-slate-200/80 dark:border-slate-800/80 shadow-sm hover:shadow-md transition-all duration-300 rounded-2xl overflow-hidden">
                 <button
-                  onClick={() => setActiveFaq(activeFaq === i ? null : i)}
+                  onClick={() => {
+                    const willOpen = activeFaq !== i;
+                    if (willOpen) {
+                      trackClickFaq(faq.q);
+                    }
+                    setActiveFaq(willOpen ? i : null);
+                  }}
                   className="w-full px-4 py-4 md:px-6 md:py-5 flex items-center justify-between text-left focus:outline-none"
                 >
                   <span className="font-black text-sm md:text-base text-slate-900 dark:text-white pr-4 leading-snug">{faq.q}</span>

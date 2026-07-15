@@ -1013,7 +1013,7 @@ export default function ClinicDetail() {
         shopId,
         shopName: shop?.shopName,
         shopAddress: shop ? `${shop.address}${shop.city ? `, ${shop.city}` : ''}` : '',
-        shopImage: shop?.logoUrl || shop?.licenseImageUrl,
+        shopImage: shop?.logoUrl,
         serviceId: primaryServiceId,
         // Danh sách đầy đủ để hiển thị trên Payment
         services: selectedServices,
