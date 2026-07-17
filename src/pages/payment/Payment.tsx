@@ -593,7 +593,7 @@ export default function Payment() {
                 )}
               </button>
 
-              {import.meta.env.DEV && (
+              {(import.meta.env.DEV || window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') && (
                 <button
                   onClick={async () => {
                     if (!agreed || loading) return;

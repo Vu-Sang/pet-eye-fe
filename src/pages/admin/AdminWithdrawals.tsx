@@ -358,11 +358,13 @@ export default function AdminWithdrawals() {
     refetchInterval: 15_000,
   });
 
-  const { data: adminBalance = 0 } = useQuery({
+  const { data: balances } = useQuery({
     queryKey: ['admin-balance'],
     queryFn: walletService.getAdminBalance,
     staleTime: 60_000,
   });
+  const adminBalance = balances?.adminBalance || 0;
+  const totalFrozenBalance = balances?.totalFrozenBalance || 0;
 
   const approveMutation = useMutation({
     mutationFn: async ({ id, note, type }: { id: number; note: string; type: string }): Promise<any> => {
@@ -567,12 +569,15 @@ export default function AdminWithdrawals() {
           <p className="text-xs font-bold uppercase tracking-wider opacity-80 mb-1">Ví Admin (Phí hoa hồng)</p>
           <p className="text-xl font-bold">{formatVND(adminBalance)}</p>
         </div>
+        <div className="bg-gradient-to-br from-blue-600 to-indigo-600 rounded-2xl p-5 text-white shadow-lg col-span-2 sm:col-span-1 glow-blue">
+          <p className="text-xs font-bold uppercase tracking-wider opacity-80 mb-1">Số dư đóng băng</p>
+          <p className="text-xl font-bold">{formatVND(totalFrozenBalance)}</p>
+        </div>
         {[
           { label: 'Chờ duyệt', value: pendingCount, accent: isDark ? 'text-amber-400' : 'text-amber-600' },
-          { label: 'Đang chuyển', value: payingCount, accent: isDark ? 'text-blue-400' : 'text-blue-600' },
           { label: 'Tổng yêu cầu', value: withdrawals.length, accent: isDark ? 'text-white' : 'text-slate-900' },
         ].map(s => (
-          <div key={s.label} className={`rounded-2xl p-5 ${isDark ? 'admin-glass-card' : 'bg-white border border-slate-100 shadow-sm'}`}>
+          <div key={s.label} className={`rounded-2xl p-5 ${isDark ? 'admin-glass-card' : 'bg-white border border-slate-100 shadow-sm'} col-span-1`}>
             <p className={`text-xs font-bold uppercase tracking-wider mb-1 ${isDark ? 'text-slate-500' : 'text-slate-400'}`}>{s.label}</p>
             <p className={`text-2xl font-bold ${s.accent}`}>{s.value}</p>
           </div>

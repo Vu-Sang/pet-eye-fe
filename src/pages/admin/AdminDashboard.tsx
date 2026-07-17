@@ -147,11 +147,12 @@ export default function AdminDashboard() {
     refetchInterval: 60_000,
   });
 
-  const { data: adminBalance = 0, isLoading: isLoadingBalance } = useQuery({
+  const { data: balances, isLoading: isLoadingBalance } = useQuery({
     queryKey: ['admin-balance'],
     queryFn: walletService.getAdminBalance,
-    refetchInterval: 60_000,
   });
+  const adminBalance = balances?.adminBalance || 0;
+  const totalFrozenBalance = balances?.totalFrozenBalance || 0;
 
   const { data: pendingWithdrawals = [], isLoading: isLoadingWithdrawals } = useQuery({
     queryKey: ['admin-withdrawals-pending'],
@@ -211,16 +212,16 @@ export default function AdminDashboard() {
     },
     {
       apiKey: 'systemBalance',
-      label: 'Số dư hệ thống',
-      value: fmtShort(adminBalance),
-      rawValue: adminBalance,
+      label: 'Số dư hệ thống (Đóng băng)',
+      value: fmtShort(totalFrozenBalance),
+      rawValue: totalFrozenBalance,
       icon: Wallet,
       accent: 'indigo',
       trend: 'Real-time',
       trendUp: null,
       sparkData: [45, 45, 50, 52, 60, 65, 75, 80],
       color: isDark ? '#a78bfa' : '#6366f1',
-      subText: 'số dư khả dụng'
+      subText: 'số dư đóng băng của shop'
     },
     {
       apiKey: userFilter === 'active' ? 'activeUsers' : userFilter === 'inactive' ? 'inactiveUsers' : 'totalUsers',

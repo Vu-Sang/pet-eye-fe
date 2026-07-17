@@ -63,9 +63,9 @@ export const walletService = {
 
   // ── Admin ───────────────────────────────────────────────────────────────────
 
-  getAdminBalance: async (): Promise<number> => {
-    const res = await apiClient.get<ApiResponse<{ adminBalance: number }>>('/wallet/admin/balance');
-    return res.data.result?.adminBalance ?? 0;
+  getAdminBalance: async (): Promise<{ adminBalance: number, totalFrozenBalance: number }> => {
+    const res = await apiClient.get<ApiResponse<{ adminBalance: number, totalFrozenBalance: number }>>('/wallet/admin/balance');
+    return res.data.result ?? { adminBalance: 0, totalFrozenBalance: 0 };
   },
 
   getShopWallet: async (shopId: number): Promise<ShopWalletResponse> => {
