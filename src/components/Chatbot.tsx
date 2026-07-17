@@ -47,7 +47,7 @@ type PayMethod = 'CASH' | 'PAYOS';
 
 interface ShopInfo {
   id: number; shopName: string; address: string; city: string;
-  ratingAvg: number; isVerified: boolean; licenseImageUrl?: string;
+  ratingAvg: number; isVerified: boolean; logoUrl?: string; licenseImageUrl?: string;
 }
 interface ServiceInfo { id: number; serviceName: string; price: number; }
 interface ShopWithServices { shop: ShopInfo; services: ServiceInfo[]; }
@@ -244,7 +244,7 @@ function ShopListCard({ shops }: { shops: ShopWithServices[] }) {
           <div className="flex items-center gap-3 p-3">
             <div className={"w-6 h-6 rounded-full flex items-center justify-center text-xs font-black shrink-0 " + (index === 0 ? 'bg-amber-400 text-white' : index === 1 ? 'bg-slate-400 text-white' : index === 2 ? 'bg-orange-400 text-white' : 'bg-slate-100 text-slate-500')}>{index + 1}</div>
             <div className="w-11 h-11 rounded-xl bg-slate-100 shrink-0 overflow-hidden">
-              {shop.licenseImageUrl ? <img src={shop.licenseImageUrl} className="w-full h-full object-cover" alt="" /> : <div className="w-full h-full flex items-center justify-center"><span className="material-symbols-outlined text-slate-300 text-xl">storefront</span></div>}
+              {shop.logoUrl || shop.licenseImageUrl ? <img src={shop.logoUrl || shop.licenseImageUrl} className="w-full h-full object-cover" alt="" /> : <div className="w-full h-full flex items-center justify-center"><span className="material-symbols-outlined text-slate-300 text-xl">storefront</span></div>}
             </div>
             <div className="flex-1 min-w-0">
               <p className="font-bold text-slate-900 text-sm truncate">{shop.shopName}</p>
@@ -279,7 +279,7 @@ function ShopDetailCard({ shop, services }: { shop: ShopInfo; services: ServiceI
     <div className="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden mt-2">
       <div className="flex items-center gap-3 p-3 border-b border-slate-100">
         <div className="w-14 h-14 rounded-xl bg-slate-100 shrink-0 overflow-hidden">
-          {shop.licenseImageUrl ? <img src={shop.licenseImageUrl} className="w-full h-full object-cover" alt={shop.shopName} /> : <div className="w-full h-full flex items-center justify-center"><span className="material-symbols-outlined text-slate-300 text-2xl">storefront</span></div>}
+          {shop.logoUrl || shop.licenseImageUrl ? <img src={shop.logoUrl || shop.licenseImageUrl} className="w-full h-full object-cover" alt={shop.shopName} /> : <div className="w-full h-full flex items-center justify-center"><span className="material-symbols-outlined text-slate-300 text-2xl">storefront</span></div>}
         </div>
         <div className="flex-1 min-w-0">
           <p className="font-bold text-slate-900 text-sm">{shop.shopName}</p>

@@ -108,6 +108,10 @@ export const trackChatbotOpen = () =>
 export const trackChatbotMessage = (messageType: 'user' | 'quick_suggestion', content?: string) =>
   trackEvent('chatbot_message', { message_type: messageType, content_preview: content?.substring(0, 50) });
 
+// === FAQ ===
+export const trackClickFaq = (question: string) =>
+  trackEvent('click_faq', { question });
+
 // === USER IDENTITY ===
 export const setUserId = (userId: string) => {
   if (isEnabled && typeof window !== 'undefined' && typeof window.gtag === 'function') {

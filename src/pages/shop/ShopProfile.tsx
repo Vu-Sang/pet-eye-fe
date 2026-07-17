@@ -120,6 +120,8 @@ export default function ShopProfile() {
     isVerified: false,
     socialLinks: '[]',
     lateGracePeriod: 15,
+    licenseNumber: '',
+    licenseImageUrl: '',
   });
 
   const VIETNAM_CITIES = [
@@ -158,6 +160,8 @@ export default function ShopProfile() {
         socialLinks: data.socialLinks || '[]',
         isVerified: data.isVerified,
         lateGracePeriod: data.lateGracePeriod ?? prev.lateGracePeriod,
+        licenseNumber: data.licenseNumber || '',
+        licenseImageUrl: data.licenseImageUrl || '',
       }));
     } catch (err) {
       console.error('Failed to fetch shop profile:', err);
@@ -573,6 +577,94 @@ export default function ShopProfile() {
                       {shopInfo.type.length > 0 ? shopInfo.type.map(t => SHOP_TYPES.find(st => st.value === t)?.label || t).join(' + ') : 'Chưa cập nhật loại hình'} • {shopInfo.city || 'Chưa cập nhật địa chỉ'}
                     </p>
                   </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Business License & Verification */}
+            <div className={`rounded-2xl p-8 shadow-sm border transition-all ${isDark ? 'admin-glass-card bg-slate-900/40 border-white/10' : 'bg-white border-slate-100'}`}>
+              <h3 className={`font-bold text-lg mb-6 flex items-center gap-2 ${isDark ? 'text-white' : 'text-slate-900'}`}>
+                <ShieldCheck size={20} className={isDark ? 'text-indigo-400' : 'text-primary'} />
+                Giấy phép kinh doanh & Xác thực
+              </h3>
+              
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                {/* Left Side: License Details */}
+                <div className="space-y-4">
+                  <div>
+                    <label className={`text-xs font-bold uppercase tracking-wider block mb-2 ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>
+                      Trạng thái xác minh
+                    </label>
+                    <div className="flex items-center">
+                      {shopInfo.isVerified ? (
+                        <div className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold border ${isDark ? 'bg-green-500/10 text-green-400 border-green-500/20' : 'bg-green-50 text-green-600 border-green-100'}`}>
+                          <ShieldCheck size={14} className="text-emerald-500" />
+                          Đã xác minh hoạt động
+                        </div>
+                      ) : (
+                        <div className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold border ${isDark ? 'bg-amber-500/10 text-amber-400 border-amber-500/20' : 'bg-amber-50 text-amber-600 border-amber-100'}`}>
+                          <span className="material-symbols-outlined text-sm text-amber-500">pending</span>
+                          Chờ xét duyệt / Chưa xác minh
+                        </div>
+                      )}
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className={`text-xs font-bold uppercase tracking-wider block mb-2 ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>
+                      Mã số doanh nghiệp / Số giấy phép
+                    </label>
+                    <div className="relative max-w-sm">
+                      <input 
+                        type="text" 
+                        readOnly 
+                        value={shopInfo.licenseNumber || 'Chưa cập nhật'} 
+                        className={`w-full px-4 py-3 rounded-xl border font-mono text-sm focus:outline-none transition-all ${isDark ? 'bg-slate-800/50 border-white/5 text-slate-300' : 'bg-slate-50 border-slate-200 text-slate-700'}`}
+                      />
+                      {shopInfo.licenseNumber && (
+                        <button
+                          type="button"
+                          onClick={() => {
+                            navigator.clipboard.writeText(shopInfo.licenseNumber);
+                            toast.success('Đã sao chép mã số giấy phép!');
+                          }}
+                          className={`absolute right-3 top-1/2 -translate-y-1/2 p-1.5 rounded-lg transition-colors ${isDark ? 'hover:bg-slate-700 text-slate-400' : 'hover:bg-slate-200 text-slate-500'}`}
+                          title="Sao chép"
+                        >
+                          <span className="material-symbols-outlined text-sm">content_copy</span>
+                        </button>
+                      )}
+                    </div>
+                  </div>
+                </div>
+
+                {/* Right Side: License Certificate Image */}
+                <div>
+                  <label className={`text-xs font-bold uppercase tracking-wider block mb-2 ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>
+                    Ảnh chụp giấy phép kinh doanh
+                  </label>
+                  {shopInfo.licenseImageUrl ? (
+                    <div className="relative group max-w-sm rounded-2xl overflow-hidden border border-slate-200 dark:border-slate-700 aspect-[4/3] bg-slate-100 dark:bg-slate-800">
+                      <img 
+                        src={shopInfo.licenseImageUrl} 
+                        alt="Giấy phép kinh doanh" 
+                        className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                      />
+                      <a 
+                        href={shopInfo.licenseImageUrl} 
+                        target="_blank" 
+                        rel="noopener noreferrer"
+                        className="absolute inset-0 bg-black/40 opacity-0 group-hover/img:opacity-100 flex items-center justify-center text-white backdrop-blur-[2px]"
+                      >
+                        <span className="material-symbols-outlined text-2xl">zoom_in</span>
+                      </a>
+                    </div>
+                  ) : (
+                    <div className={`max-w-sm border-2 border-dashed rounded-2xl flex flex-col items-center justify-center p-8 text-center ${isDark ? 'border-slate-700 text-slate-500 bg-slate-800/20' : 'border-slate-200 text-slate-400 bg-slate-50'}`}>
+                      <span className="material-symbols-outlined text-4xl mb-2">article</span>
+                      <p className="text-xs font-bold">Không có hình ảnh giấy phép</p>
+                    </div>
+                  )}
                 </div>
               </div>
             </div>
