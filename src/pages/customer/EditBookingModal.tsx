@@ -21,9 +21,9 @@ function matchPetWeight(numericWeight: number, weightTiers?: string[], prices?: 
   });
   
   let idx = 0;
-  if (numericWeight >= thresholds[0]) {
+  if (numericWeight > thresholds[0]) {
     for (let i = 0; i < thresholds.length - 1; i++) {
-      if (numericWeight >= thresholds[i]) {
+      if (numericWeight > thresholds[i]) {
         idx = i + 1;
       }
     }
@@ -36,7 +36,7 @@ function matchPetWeight(numericWeight: number, weightTiers?: string[], prices?: 
   if (thresholds.length >= 2) {
     if (idx === 0) {
       friendlyLabel = `Dưới ${thresholds[0]}kg`;
-    } else if (idx === thresholds.length - 1 && numericWeight >= thresholds[idx]) {
+    } else if (idx === thresholds.length - 1 && numericWeight > thresholds[idx]) {
       friendlyLabel = `Trên ${thresholds[idx]}kg`;
     } else {
       friendlyLabel = `${thresholds[idx - 1]} - ${thresholds[idx]}kg`;
