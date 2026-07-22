@@ -312,6 +312,11 @@ export const adminService = {
     await apiClient.delete(`/admin/vouchers/${id}`);
   },
 
+  toggleVoucher: async (id: number): Promise<any> => {
+    const res = await apiClient.patch<ApiResponse<any>>(`/admin/vouchers/${id}/toggle`);
+    return res.data.result;
+  },
+
   // Config
   getVoucherServiceConfig: async (): Promise<boolean> => {
     const res = await apiClient.get<ApiResponse<{ enabled: boolean }>>('/public/config/voucher-service');

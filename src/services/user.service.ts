@@ -40,6 +40,10 @@ export const userService = {
     await apiClient.patch('/users/me/acknowledge-upgrade');
   },
 
+  acknowledgeRegistration: async (): Promise<void> => {
+    await apiClient.patch('/users/me/acknowledge-registration');
+  },
+
   getPublicVouchers: async (): Promise<any[]> => {
     const response = await apiClient.get<ApiResponse<any[]>>('/admin/vouchers/public');
     return response.data.result || [];

@@ -42,6 +42,7 @@ export default function GiftBoxCelebration() {
   const { user } = useAuth();
   const [showPopup, setShowPopup] = useState(false);
   const [step, setStep] = useState<'gift' | 'opening' | 'rewards'>('gift');
+  const [giftType, setGiftType] = useState<'upgrade' | 'newcomer'>('upgrade');
   const [perksData, setPerksData] = useState<{ title: string, colorClass: string, perks: { title: string, desc: string, icon: string }[] } | null>(null);
 
   useEffect(() => {
@@ -58,26 +59,57 @@ export default function GiftBoxCelebration() {
 
         if (cancelled) return;
 
-        if (userData.justUpgraded) {
-          const tierName = userData.currentTier?.name || 'Đồng';
-          const base = TIER_PERKS_BASE[tierName] || TIER_PERKS_BASE['Đồng'];
-          const tierVouchers = publicVouchers.filter((v: any) => v.targetTier?.name === tierName);
-          const voucherPerks = tierVouchers.map((v: any) => ({
-            title: `Voucher Giảm ${v.discountValue}${v.discountType === 'PERCENTAGE' ? '%' : 'đ'} (x${v.issueQuantity})`,
-            desc: `Mã ${v.code} - HSD: ${v.validDays} ngày`,
-            icon: 'local_activity'
-          }));
+        if (userData.justRegistered) {
+          const newcomerVouchers = publicVouchers.filter((v: any) => v.voucherType === 'NEWCOMER');
+          if (newcomerVouchers.length > 0) {
+            const voucherPerks = newcomerVouchers.map((v: any) => ({
+              title: `Voucher Tân Thủ Giảm ${v.discountValue}${v.discountType === 'PERCENTAGE' ? '%' : 'đ'}`,
+              desc: `Mã ${v.code} - HSD: ${v.validDays} ngày. Dành riêng cho bạn!`,
+              icon: 'card_giftcard'
+            }));
 
-          setPerksData({
-            ...base,
-            perks: [...voucherPerks, ...base.perks]
-          });
-          setShowPopup(true);
-          userService.acknowledgeTierUpgrade().catch(console.error);
+            setPerksData({
+              title: 'Thành viên mới',
+              colorClass: 'text-violet-400',
+              perks: voucherPerks
+            });
+            setGiftType('newcomer');
+            setShowPopup(true);
+            userService.acknowledgeRegistration().catch(console.error);
+          } else {
+            // No newcomer vouchers to give, just acknowledge
+            userService.acknowledgeRegistration().catch(console.error);
+            
+            // Fallback to upgrade check in case they somehow got both at the same time
+            if (userData.justUpgraded) {
+               checkJustUpgraded(userData, publicVouchers);
+            }
+          }
+        } else if (userData.justUpgraded) {
+           checkJustUpgraded(userData, publicVouchers);
         }
       } catch (err) {
-        console.error('GiftBox check upgrade error:', err);
+        console.error('GiftBox check error:', err);
       }
+    };
+
+    const checkJustUpgraded = (userData: any, publicVouchers: any[]) => {
+      const tierName = userData.currentTier?.name || 'Đồng';
+      const base = TIER_PERKS_BASE[tierName] || TIER_PERKS_BASE['Đồng'];
+      const tierVouchers = publicVouchers.filter((v: any) => v.targetTier?.name === tierName && v.voucherType !== 'NEWCOMER');
+      const voucherPerks = tierVouchers.map((v: any) => ({
+        title: `Voucher Giảm ${v.discountValue}${v.discountType === 'PERCENTAGE' ? '%' : 'đ'} (x${v.issueQuantity})`,
+        desc: `Mã ${v.code} - HSD: ${v.validDays} ngày`,
+        icon: 'local_activity'
+      }));
+
+      setPerksData({
+        ...base,
+        perks: [...voucherPerks, ...base.perks]
+      });
+      setGiftType('upgrade');
+      setShowPopup(true);
+      userService.acknowledgeTierUpgrade().catch(console.error);
     };
 
     checkUpgrade();
@@ -156,11 +188,14 @@ export default function GiftBoxCelebration() {
             
             {/* Title */}
             <h2 className="text-3xl font-black text-white mb-2 mt-4 tracking-tight">
-              Chúc mừng thăng hạng! 🎉
+              {giftType === 'newcomer' ? 'Chào mừng bạn mới! 🎉' : 'Chúc mừng thăng hạng! 🎉'}
             </h2>
             <p className="text-slate-400 text-sm mb-10 leading-relaxed px-4 max-w-xs">
-              Bạn đã đạt <strong className={perksData.colorClass}>{perksData.title}</strong>!
-              <br />Ấn vào hộp quà để nhận phần thưởng
+              {giftType === 'newcomer' ? (
+                <>Bạn đã nhận được Hộp Quà <strong className={perksData.colorClass}>{perksData.title}</strong>!<br />Ấn vào hộp quà để nhận phần thưởng</>
+              ) : (
+                <>Bạn đã đạt <strong className={perksData.colorClass}>{perksData.title}</strong>!<br />Ấn vào hộp quà để nhận phần thưởng</>
+              )}
             </p>
 
             {/* Gift Box */}
@@ -173,12 +208,12 @@ export default function GiftBoxCelebration() {
               aria-label="Mở hộp quà"
             >
               {/* Glow */}
-              <div className="absolute inset-0 bg-yellow-500/25 blur-3xl rounded-full scale-150 animate-glow-pulse" />
+              <div className={`absolute inset-0 blur-3xl rounded-full scale-150 animate-glow-pulse ${giftType === 'newcomer' ? 'bg-violet-500/25' : 'bg-yellow-500/25'}`} />
               
               <div className="relative animate-gift-wiggle">
                 {/* Lid */}
                 <div className="relative z-10 w-36 h-12 mx-auto mb-0" style={{ perspective: '400px' }}>
-                  <div className="w-40 h-12 bg-gradient-to-b from-red-500 to-red-600 rounded-t-xl -ml-2 shadow-lg border-2 border-red-700 relative">
+                  <div className={`w-40 h-12 rounded-t-xl -ml-2 shadow-lg border-2 relative ${giftType === 'newcomer' ? 'bg-gradient-to-b from-violet-500 to-violet-600 border-violet-700' : 'bg-gradient-to-b from-red-500 to-red-600 border-red-700'}`}>
                     <div className="absolute inset-x-0 top-0 h-full flex items-center justify-center">
                       <div className="w-6 h-full bg-yellow-400 shadow-inner" />
                     </div>
@@ -192,7 +227,7 @@ export default function GiftBoxCelebration() {
                 
                 {/* Body */}
                 <div className="relative z-0 w-36 h-28 mx-auto -mt-1">
-                  <div className="w-full h-full bg-gradient-to-b from-red-600 to-red-700 rounded-b-xl shadow-2xl border-2 border-t-0 border-red-800 relative overflow-hidden">
+                  <div className={`w-full h-full rounded-b-xl shadow-2xl border-2 border-t-0 relative overflow-hidden ${giftType === 'newcomer' ? 'bg-gradient-to-b from-violet-600 to-violet-700 border-violet-800' : 'bg-gradient-to-b from-red-600 to-red-700 border-red-800'}`}>
                     <div className="absolute inset-y-0 left-1/2 -translate-x-1/2 w-6 bg-yellow-400 shadow-inner" />
                     <div className="absolute inset-x-0 top-1/2 -translate-y-1/2 h-6 bg-yellow-400 shadow-inner" />
                     <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-8 h-8 bg-yellow-500 rounded-full border-2 border-yellow-600 z-10" />
@@ -217,7 +252,7 @@ export default function GiftBoxCelebration() {
             <div className="relative">
               {/* Lid flies away */}
               <div className="relative z-10 w-36 h-12 mx-auto mb-0 animate-lid-open" style={{ perspective: '400px', transformOrigin: 'center bottom' }}>
-                <div className="w-40 h-12 bg-gradient-to-b from-red-500 to-red-600 rounded-t-xl -ml-2 shadow-lg border-2 border-red-700 relative">
+                <div className={`w-40 h-12 rounded-t-xl -ml-2 shadow-lg border-2 relative ${giftType === 'newcomer' ? 'bg-gradient-to-b from-violet-500 to-violet-600 border-violet-700' : 'bg-gradient-to-b from-red-500 to-red-600 border-red-700'}`}>
                   <div className="absolute inset-x-0 top-0 h-full flex items-center justify-center">
                     <div className="w-6 h-full bg-yellow-400 shadow-inner" />
                   </div>
@@ -231,7 +266,7 @@ export default function GiftBoxCelebration() {
               
               {/* Body shrinks */}
               <div className="relative z-0 w-36 h-28 mx-auto -mt-1 animate-body-burst">
-                <div className="w-full h-full bg-gradient-to-b from-red-600 to-red-700 rounded-b-xl shadow-2xl border-2 border-t-0 border-red-800 relative overflow-hidden">
+                <div className={`w-full h-full rounded-b-xl shadow-2xl border-2 border-t-0 relative overflow-hidden ${giftType === 'newcomer' ? 'bg-gradient-to-b from-violet-600 to-violet-700 border-violet-800' : 'bg-gradient-to-b from-red-600 to-red-700 border-red-800'}`}>
                   <div className="absolute inset-y-0 left-1/2 -translate-x-1/2 w-6 bg-yellow-400 shadow-inner" />
                   <div className="absolute inset-x-0 top-1/2 -translate-y-1/2 h-6 bg-yellow-400 shadow-inner" />
                   <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-8 h-8 bg-yellow-500 rounded-full border-2 border-yellow-600 z-10" />
@@ -250,7 +285,7 @@ export default function GiftBoxCelebration() {
         {step === 'rewards' && (
           <div className="bg-[#0f172a] w-full rounded-[2rem] shadow-2xl overflow-hidden border border-slate-800 animate-in fade-in zoom-in-95 duration-500">
             {/* Header */}
-            <div className="relative h-36 bg-gradient-to-br from-emerald-600 via-teal-600 to-cyan-600 animate-celebrate-bg flex flex-col items-center justify-center text-white overflow-hidden">
+            <div className={`relative h-36 animate-celebrate-bg flex flex-col items-center justify-center text-white overflow-hidden ${giftType === 'newcomer' ? 'bg-gradient-to-br from-violet-600 via-purple-600 to-indigo-600' : 'bg-gradient-to-br from-emerald-600 via-teal-600 to-cyan-600'}`}>
               <div className="absolute top-0 right-0 w-48 h-48 bg-white/10 rounded-full blur-3xl -mr-20 -mt-20" />
               <div className="absolute bottom-0 left-0 w-32 h-32 bg-yellow-500/10 rounded-full blur-2xl -ml-16 -mb-16" />
               
@@ -260,7 +295,7 @@ export default function GiftBoxCelebration() {
                 </div>
                 <h2 className="text-2xl font-black tracking-tight">Quà tặng đã mở! 🎁</h2>
                 <p className="text-white/70 text-xs font-medium mt-1">
-                  Đặc quyền <span className={perksData.colorClass}>{perksData.title}</span> đã được kích hoạt
+                  {giftType === 'newcomer' ? 'Bạn nhận được đặc quyền dành riêng cho' : 'Đặc quyền'} <span className={perksData.colorClass}>{perksData.title}</span>
                 </p>
               </div>
             </div>
@@ -273,15 +308,15 @@ export default function GiftBoxCelebration() {
                   className="animate-reward-reveal bg-slate-800/50 border border-slate-700/50 p-4 rounded-2xl flex items-center gap-4 hover:bg-slate-800/80 transition-colors"
                   style={{ animationDelay: `${idx * 150 + 200}ms` }}
                 >
-                  <div className="w-12 h-12 bg-gradient-to-br from-teal-500/20 to-emerald-500/20 rounded-xl flex items-center justify-center text-teal-400 shrink-0 border border-teal-500/30">
+                  <div className={`w-12 h-12 rounded-xl flex items-center justify-center shrink-0 border ${giftType === 'newcomer' ? 'bg-gradient-to-br from-violet-500/20 to-purple-500/20 text-violet-400 border-violet-500/30' : 'bg-gradient-to-br from-teal-500/20 to-emerald-500/20 text-teal-400 border-teal-500/30'}`}>
                     <span className="material-symbols-outlined text-2xl">{p.icon}</span>
                   </div>
                   <div className="text-left flex-1 min-w-0">
                     <h4 className="text-sm font-bold text-white mb-0.5">{p.title}</h4>
                     <p className="text-[10px] text-slate-400 truncate">{p.desc}</p>
                   </div>
-                  <div className="w-8 h-8 rounded-full bg-emerald-500/10 flex items-center justify-center shrink-0">
-                    <span className="material-symbols-outlined text-emerald-400 text-lg" style={{ fontVariationSettings: "'FILL' 1" }}>check_circle</span>
+                  <div className={`w-8 h-8 rounded-full flex items-center justify-center shrink-0 ${giftType === 'newcomer' ? 'bg-violet-500/10' : 'bg-emerald-500/10'}`}>
+                    <span className={`material-symbols-outlined text-lg ${giftType === 'newcomer' ? 'text-violet-400' : 'text-emerald-400'}`} style={{ fontVariationSettings: "'FILL' 1" }}>check_circle</span>
                   </div>
                 </div>
               ))}
@@ -294,7 +329,7 @@ export default function GiftBoxCelebration() {
                   setShowPopup(false);
                   setStep('gift');
                 }}
-                className="w-full py-4 bg-gradient-to-r from-teal-500 to-emerald-500 text-white rounded-2xl font-bold shadow-lg shadow-teal-500/25 hover:scale-[1.02] active:scale-95 transition-all text-sm flex items-center justify-center gap-2"
+                className={`w-full py-4 text-white rounded-2xl font-bold shadow-lg hover:scale-[1.02] active:scale-95 transition-all text-sm flex items-center justify-center gap-2 ${giftType === 'newcomer' ? 'bg-gradient-to-r from-violet-500 to-purple-500 shadow-violet-500/25' : 'bg-gradient-to-r from-teal-500 to-emerald-500 shadow-teal-500/25'}`}
               >
                 <span className="material-symbols-outlined text-lg">celebration</span>
                 Tuyệt vời, bắt đầu sử dụng!

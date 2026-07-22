@@ -35,6 +35,7 @@ export interface UserResponse {
   roles: RoleResponse[];
   totalSpending?: number;
   justUpgraded?: boolean;
+  justRegistered?: boolean;
   currentTier?: MembershipTierResponse;
   vouchers?: VoucherResponse[];
 }
