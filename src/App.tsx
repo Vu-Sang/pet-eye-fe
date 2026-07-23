@@ -43,6 +43,7 @@ import Payment from './pages/payment/Payment';
 import ProfilePets from './pages/customer/ProfilePets';
 import ProfileSecurity from './pages/customer/ProfileSecurity';
 import ProfileNotifications from './pages/customer/ProfileNotifications';
+import ProfileVouchers from './pages/customer/ProfileVouchers';
 import CameraView from './pages/public/CameraView';
 import ZaloCallback from './pages/auth/ZaloCallback';
 import BookingSuccess from './pages/customer/BookingSuccess';
@@ -174,6 +175,7 @@ function AppLayout() {
             <Route path="pets" element={<ProfilePets />} />
             <Route path="bookings" element={<BookingHistory />} />
             <Route path="transactions" element={<TransactionHistory />} />
+            <Route path="vouchers" element={<ProfileVouchers />} />
             <Route path="orders" element={<OrderHistory />} />
             <Route path="security" element={<ProfileSecurity />} />
             <Route path="notifications" element={<ProfileNotifications />} />
