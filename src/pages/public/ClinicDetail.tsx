@@ -13,7 +13,7 @@ import type { Pet } from '../../types';
 import type { DirectionsResponse } from '../../services/clinic.service';
 import ShopMap from '../../components/ShopMap';
 import { trackBookingStep1_ServiceSelection, trackBookingStep2_TimeSelection, trackBookingStep3_PetSelection, trackUseGpsNearby } from '../../lib/analytics';
-import { formatPetWeightLabel, formatWorkingDays, formatServiceDuration } from '../../utils/shopHelper';
+import { formatPetWeightLabel, formatWorkingDays, formatServiceDuration, checkIsShopOpen } from '../../utils/shopHelper';
 
 // Camera tier metadata — default fallbacks (shop can override via cameraTierLabels/cameraTierPrices)
 const CAMERA_TIER_META: Record<string, { label: string; desc: string; icon: string; defaultPrice: number }> = {
@@ -2975,15 +2975,22 @@ export default function ClinicDetail() {
                     <div className="flex items-start gap-3 px-1">
                       <span className="material-symbols-outlined text-slate-400 mt-0.5 text-lg">schedule</span>
                       <div className="flex flex-col text-xs">
-                        {shop?.openTime && shop?.closeTime ? (
-                          <>
-                            <span className="text-green-600 dark:text-green-400 font-semibold">Đang mở cửa</span>
-                            <span className="text-slate-500 dark:text-slate-400">
-                              {shop.openTime} - {shop.closeTime}
-                              {shop.workingDays ? ` (${formatWorkingDays(shop.workingDays)})` : ''}
-                            </span>
-                          </>
-                        ) : (
+                        {shop?.openTime && shop?.closeTime ? (() => {
+                          const isOpen = checkIsShopOpen(shop.openTime, shop.closeTime, shop.workingDays);
+                          return (
+                            <>
+                              {isOpen ? (
+                                <span className="text-green-600 dark:text-green-400 font-semibold">Đang mở cửa</span>
+                              ) : (
+                                <span className="text-rose-500 dark:text-rose-400 font-semibold">Đã đóng cửa</span>
+                              )}
+                              <span className="text-slate-500 dark:text-slate-400">
+                                {shop.openTime} - {shop.closeTime}
+                                {shop.workingDays ? ` (${formatWorkingDays(shop.workingDays)})` : ''}
+                              </span>
+                            </>
+                          );
+                        })() : (
                           <span className="text-slate-400 dark:text-slate-500">Chưa cập nhật giờ mở cửa</span>
                         )}
                       </div>
