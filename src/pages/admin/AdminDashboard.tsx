@@ -97,6 +97,7 @@ export default function AdminDashboard() {
   const [compareMonthLeft, setCompareMonthLeft] = useState<number>(new Date().getMonth() === 0 ? 11 : new Date().getMonth() - 1);
   const [compareMonthRight, setCompareMonthRight] = useState<number>(new Date().getMonth());
   const [userFilter, setUserFilter] = useState<'all' | 'active' | 'inactive'>('all');
+  const [showMoreStats, setShowMoreStats] = useState(false);
 
   const handleOpenModal = (metric: any) => {
     setSelectedMetric(metric);
@@ -444,6 +445,15 @@ export default function AdminDashboard() {
             }`}>
             Cập nhật: {new Date().toLocaleDateString('vi-VN', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
           </div>
+          <button
+            onClick={() => setShowMoreStats(!showMoreStats)}
+            className={`px-4 py-2 rounded-2xl text-xs font-bold transition-all ${isDark
+              ? 'bg-indigo-500/10 text-indigo-400 border border-indigo-500/20 hover:bg-indigo-500/20'
+              : 'bg-indigo-50 text-indigo-600 border border-indigo-100 hover:bg-indigo-100'
+              }`}
+          >
+            {showMoreStats ? 'Thu gọn' : 'Mở rộng'}
+          </button>
         </div>
       </div>
 
@@ -512,13 +522,13 @@ export default function AdminDashboard() {
       {/* Stats Cards */}
       {isLoadingStats || isLoadingBalance || isLoadingWithdrawals || isLoadingRefunds ? (
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6 relative z-10">
-          {Array.from({ length: 8 }).map((_, i) => (
+          {Array.from({ length: showMoreStats ? 8 : 4 }).map((_, i) => (
             <div key={i} className={`rounded-3xl p-6 animate-pulse h-[148px] ${isDark ? 'admin-glass-card' : 'bg-white border border-slate-100'}`} />
           ))}
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6 relative z-10">
-          {cards.map(s => {
+          {(showMoreStats ? cards : cards.slice(0, 4)).map(s => {
             const a = isDark ? accentMap[s.accent] : accentMapLight[s.accent];
             return (
               <div
