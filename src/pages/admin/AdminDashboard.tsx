@@ -712,7 +712,7 @@ export default function AdminDashboard() {
             <div>
               <div className="flex items-center gap-2">
                 <h3 className={`text-lg font-extrabold tracking-tight ${isDark ? 'text-white' : 'text-slate-900'}`}>
-                  Lượt đặt lịch
+                  Lượt đặt lịch trong tuần
                 </h3>
                 <span className={`px-2.5 py-0.5 rounded-full text-xs font-bold ${isDark ? 'bg-purple-500/20 text-purple-300 border border-purple-500/30' : 'bg-purple-50 text-purple-700 border border-purple-200'}`}>
                   {totalRangeBookings} đơn
