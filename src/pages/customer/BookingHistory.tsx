@@ -971,7 +971,7 @@ export default function BookingHistory() {
 
                                 {/* Month Bookings */}
                                 <div className="space-y-6">
-                                    {monthBookings.map(b => (
+                                    {(monthBookings as BookingResponse[]).map(b => (
                                         <BookingItem
                                             key={b.id}
                                             booking={b}
@@ -1302,7 +1302,7 @@ export default function BookingHistory() {
 
             {/* Update Bank Modal */}
             <AnimatePresence>
-                {showUpdateBankModal && selectedBooking && (
+                {showUpdateBankModal && selectedBookingForBank && (
                     <div className="fixed inset-0 z-[999] flex items-center justify-center p-4">
                         <motion.div
                             initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
