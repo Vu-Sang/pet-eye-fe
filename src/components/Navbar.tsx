@@ -4,7 +4,7 @@ import { useAuth } from '../contexts/AuthContext';
 import Logo from './Logo';
 import {
   Bell, ChevronDown, LogOut, User, Settings,
-  PawPrint, Menu, X, Video, Calendar, MessageCircle, ReceiptText, Sun, Moon, LayoutDashboard
+  PawPrint, Menu, X, Video, Calendar, MessageCircle, ReceiptText, Sun, Moon, LayoutDashboard, Ticket
 } from 'lucide-react';
 import { useTheme } from '../contexts/ThemeContext';
 import { useNotifications } from '../hooks/useNotifications';
@@ -374,6 +374,7 @@ function AuthNavbar() {
                   {[
                     { to: '/user/dashboard', icon: <LayoutDashboard size={16} />, label: 'Tổng quan' },
                     { to: '/profile', icon: <User size={16} />, label: 'Quản lý tài khoản' },
+                    { to: '/profile/vouchers', icon: <Ticket size={16} />, label: 'Quản lý voucher' },
                     { to: '/profile/bookings', icon: <Calendar size={16} />, label: 'Lịch đặt hẹn' },
                     { to: '/profile/transactions', icon: <ReceiptText size={16} />, label: 'Lịch sử giao dịch' },
                   ].map(item => (

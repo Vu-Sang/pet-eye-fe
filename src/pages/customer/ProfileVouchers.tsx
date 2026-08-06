@@ -5,19 +5,40 @@ export default function ProfileVouchers() {
   const [vouchers, setVouchers] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
+  const [voucherCodeInput, setVoucherCodeInput] = useState('');
+  const [claiming, setClaiming] = useState(false);
+  const [claimMessage, setClaimMessage] = useState('');
+
+  const fetchVouchers = async () => {
+    try {
+      const data = await userService.getMyVouchers();
+      setVouchers(data || []);
+    } catch (error) {
+      console.error('Failed to fetch vouchers', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   useEffect(() => {
-    const fetchVouchers = async () => {
-      try {
-        const data = await userService.getMyVouchers();
-        setVouchers(data || []);
-      } catch (error) {
-        console.error('Failed to fetch vouchers', error);
-      } finally {
-        setLoading(false);
-      }
-    };
     fetchVouchers();
   }, []);
+
+  const handleClaimVoucher = async () => {
+    if (!voucherCodeInput.trim()) return;
+    setClaiming(true);
+    setClaimMessage('');
+    try {
+      await userService.claimVoucher(voucherCodeInput.trim().toUpperCase());
+      setClaimMessage('Lưu mã giảm giá thành công!');
+      setVoucherCodeInput('');
+      fetchVouchers();
+    } catch (e: any) {
+      setClaimMessage(e?.response?.data?.message || 'Mã giảm giá không hợp lệ hoặc đã hết lượt.');
+    } finally {
+      setClaiming(false);
+    }
+  };
 
   const formatCurrency = (amount: number) => {
     return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(amount);
@@ -45,9 +66,35 @@ export default function ProfileVouchers() {
 
   return (
     <div className="flex flex-col gap-6">
-      <div>
-        <h1 className="text-3xl text-slate-900 dark:text-slate-100 tracking-tight font-bold">Voucher của tôi</h1>
-        <p className="text-slate-500 dark:text-slate-400 mt-1">Quản lý và xem hạn sử dụng các ưu đãi bạn đã nhận được.</p>
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-4">
+        <div>
+          <h1 className="text-3xl text-slate-900 dark:text-slate-100 tracking-tight font-bold">Voucher của tôi</h1>
+          <p className="text-slate-500 dark:text-slate-400 mt-1">Quản lý và xem hạn sử dụng các ưu đãi bạn đã nhận được.</p>
+        </div>
+        
+        <div className="w-full md:w-auto">
+          <div className="flex gap-2">
+            <input
+              type="text"
+              placeholder="Nhập mã giảm giá..."
+              value={voucherCodeInput}
+              onChange={(e) => setVoucherCodeInput(e.target.value)}
+              className="flex-1 md:w-64 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#1a2b4c] text-slate-700 dark:text-slate-200 uppercase shadow-sm"
+            />
+            <button
+              onClick={handleClaimVoucher}
+              disabled={!voucherCodeInput.trim() || claiming}
+              className="px-5 py-2.5 bg-[#1a2b4c] text-white font-bold rounded-xl hover:bg-[#243d6b] disabled:opacity-50 text-sm whitespace-nowrap shadow-sm transition-colors"
+            >
+              {claiming ? 'Đang lưu...' : 'Lưu mã'}
+            </button>
+          </div>
+          {claimMessage && (
+            <p className={`text-xs mt-2 font-medium ${claimMessage.includes('thành công') ? 'text-green-600' : 'text-red-500'}`}>
+              {claimMessage}
+            </p>
+          )}
+        </div>
       </div>
 
       <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-800 p-6 md:p-8 min-h-[400px]">

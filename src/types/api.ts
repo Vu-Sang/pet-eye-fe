@@ -207,6 +207,9 @@ export interface BookingResponse {
   paymentStatus?: string;
   paymentMethod?: string;
   paidAmount?: number;
+  discountAmount?: number;
+  totalAmount?: number;
+  remainingAmount?: number;
   cameraRtspUrl?: string;
   cameraStreamUrl?: string;
   cameraEnabled?: boolean;

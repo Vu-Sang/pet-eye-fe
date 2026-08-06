@@ -579,7 +579,7 @@ export default function ShopCustomers() {
                                   </div>
                                 </div>
                                 <div className="text-right">
-                                  <p className={`text-xs font-black ${isDark ? 'text-white' : 'text-slate-900'}`}>{String(h.servicePrice).replace(/\B(?=(\d{3})+(?!\d))/g, ".")}đ</p>
+                                  <p className={`text-xs font-black ${isDark ? 'text-white' : 'text-slate-900'}`}>{String(h.totalAmount ?? h.servicePrice ?? 0).replace(/\B(?=(\d{3})+(?!\d))/g, ".")}đ</p>
                                   <span className={`text-[9px] font-bold uppercase ${h.status === 'COMPLETED' ? 'text-green-500' : (h.status === 'CANCELLED' || h.status === 'WAITING_REFUND') ? 'text-red-500' : 'text-blue-500'}`}>
                                     {h.status === 'COMPLETED' ? 'Thành công' : (h.status === 'CANCELLED' || h.status === 'WAITING_REFUND') ? 'Đã hủy' : 'Đã xác nhận'}
                                   </span>

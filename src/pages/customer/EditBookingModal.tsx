@@ -1,8 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { X, Calendar, Clock, Stethoscope, User, Plus, Loader2 } from 'lucide-react';
-import { formatVND } from '../../utils/currency';
-import { generateTimeSlots, isTimeInPastOrBuffer } from '../../utils/dateUtils';
 import { formatPetWeightLabel } from '../../utils/shopHelper';
 import { petService } from '../../services/pet.service';
 import { shopService } from '../../services/shop.service';
@@ -11,6 +9,10 @@ import { useAuth } from '../../contexts/AuthContext';
 import toast from 'react-hot-toast';
 import type { BookingResponse, ServiceResponse } from '../../types/api';
 import { motion, AnimatePresence } from 'motion/react';
+
+const formatVND = (n: number) => {
+  return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(n);
+};
 
 function matchPetWeight(numericWeight: number, weightTiers?: string[], prices?: number[]): { tier: string; price: number } | null {
   if (!weightTiers || !prices || weightTiers.length === 0 || prices.length === 0) return null;

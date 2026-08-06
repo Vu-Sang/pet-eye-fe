@@ -143,9 +143,8 @@ export default function AdminVouchers() {
     setIsModalOpen(true);
   };
 
-  const inp = `w-full rounded-xl px-4 py-3 font-semibold transition outline-none ${
-    isDark ? "admin-glass-input" : "bg-white border border-slate-200 text-slate-700 focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500"
-  }`;
+  const inp = `w-full rounded-xl px-4 py-3 font-semibold transition outline-none ${isDark ? "admin-glass-input" : "bg-white border border-slate-200 text-slate-700 focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500"
+    }`;
   const lbl = `block text-[11px] font-bold uppercase tracking-widest mb-2 ${isDark ? "text-slate-500" : "text-slate-500"}`;
 
   const tierBadge = (name: string) => {
@@ -165,13 +164,11 @@ export default function AdminVouchers() {
         onClick={() => handleToggleVoucher(voucher)}
         disabled={isLoading}
         title={isActive ? "Đang bật - Nhấn để tắt" : "Đang tắt - Nhấn để bật"}
-        className={`relative inline-flex h-6 w-11 flex-shrink-0 items-center rounded-full transition-colors duration-200 focus:outline-none ${
-          isLoading ? "opacity-50 cursor-wait" : "cursor-pointer"
-        } ${isActive ? "bg-green-500" : isDark ? "bg-slate-600" : "bg-slate-300"}`}
+        className={`relative inline-flex h-6 w-11 flex-shrink-0 items-center rounded-full transition-colors duration-200 focus:outline-none ${isLoading ? "opacity-50 cursor-wait" : "cursor-pointer"
+          } ${isActive ? "bg-green-500" : isDark ? "bg-slate-600" : "bg-slate-300"}`}
       >
-        <span className={`inline-block h-4 w-4 transform rounded-full bg-white shadow transition-transform duration-200 ${
-          isActive ? "translate-x-6" : "translate-x-1"
-        }`} />
+        <span className={`inline-block h-4 w-4 transform rounded-full bg-white shadow transition-transform duration-200 ${isActive ? "translate-x-6" : "translate-x-1"
+          }`} />
       </button>
     );
   };
@@ -227,11 +224,10 @@ export default function AdminVouchers() {
 
       <div className={`flex gap-1 p-1 rounded-2xl w-fit ${isDark ? "bg-slate-800/60" : "bg-slate-100"}`}>
         <button onClick={() => setActiveTab("TIER")}
-          className={`flex items-center gap-2 px-5 py-2.5 rounded-xl font-semibold text-sm transition-all ${
-            activeTab === "TIER"
+          className={`flex items-center gap-2 px-5 py-2.5 rounded-xl font-semibold text-sm transition-all ${activeTab === "TIER"
               ? isDark ? "bg-white/10 text-white shadow" : "bg-white text-slate-900 shadow"
               : isDark ? "text-slate-500 hover:text-slate-300" : "text-slate-500 hover:text-slate-700"
-          }`}>
+            }`}>
           <Star className="w-4 h-4" />
           Voucher Theo Hạng
           <span className={`px-2 py-0.5 rounded-full text-[11px] font-bold ${activeTab === "TIER" ? "bg-blue-500/20 text-blue-500" : isDark ? "bg-white/5 text-slate-500" : "bg-slate-200 text-slate-500"}`}>
@@ -239,11 +235,10 @@ export default function AdminVouchers() {
           </span>
         </button>
         <button onClick={() => setActiveTab("NEWCOMER")}
-          className={`flex items-center gap-2 px-5 py-2.5 rounded-xl font-semibold text-sm transition-all ${
-            activeTab === "NEWCOMER"
+          className={`flex items-center gap-2 px-5 py-2.5 rounded-xl font-semibold text-sm transition-all ${activeTab === "NEWCOMER"
               ? isDark ? "bg-white/10 text-white shadow" : "bg-white text-slate-900 shadow"
               : isDark ? "text-slate-500 hover:text-slate-300" : "text-slate-500 hover:text-slate-700"
-          }`}>
+            }`}>
           <UserPlus className="w-4 h-4" />
           Voucher Tân Thủ
           <span className={`px-2 py-0.5 rounded-full text-[11px] font-bold ${activeTab === "NEWCOMER" ? "bg-violet-500/20 text-violet-500" : isDark ? "bg-white/5 text-slate-500" : "bg-slate-200 text-slate-500"}`}>
@@ -339,7 +334,7 @@ export default function AdminVouchers() {
             <div>
               <p className={`font-bold text-sm ${isDark ? "text-violet-300" : "text-violet-800"}`}>Voucher Tân Thủ hoạt động như thế nào?</p>
               <p className={`text-sm mt-1 ${isDark ? "text-slate-400" : "text-slate-600"}`}>
-                Voucher này tự động phát cho <strong>N khách đầu tiên</strong> ngay khi họ <strong>đăng ký tài khoản thành công</strong>. Chỉ voucher đang BẬT mới được phát.
+                Voucher này tự động phát cho <strong>N khách đầu tiên</strong> ngay khi họ <strong>nhập mã giới thiệu</strong>. Chỉ voucher đang BẬT mới được phát.
               </p>
             </div>
           </div>
@@ -433,14 +428,14 @@ export default function AdminVouchers() {
                   <div className="grid grid-cols-2 gap-4">
                     <div>
                       <label className={lbl}>Hạng Áp Dụng</label>
-                      <select value={formData.targetTierName} onChange={e => setFormData({...formData, targetTierName: e.target.value})} className={inp}>
+                      <select value={formData.targetTierName} onChange={e => setFormData({ ...formData, targetTierName: e.target.value })} className={inp}>
                         <option>Bạc</option><option>Vàng</option><option>Kim Cương</option>
                       </select>
                     </div>
                     <div>
                       <label className={lbl}>Mức Chi Tiêu Cần Đạt (VND) *</label>
                       <input required type="number" min="0" value={formData.requiredSpending}
-                        onChange={e => setFormData({...formData, requiredSpending: Number(e.target.value)})}
+                        onChange={e => setFormData({ ...formData, requiredSpending: Number(e.target.value) })}
                         className={inp} placeholder="VD: 1000000" />
                     </div>
                   </div>
@@ -450,7 +445,7 @@ export default function AdminVouchers() {
               {formData.voucherType === "NEWCOMER" && (
                 <div className={`p-4 rounded-2xl ${isDark ? "bg-violet-500/5 border border-violet-500/10" : "bg-violet-50/50 border border-violet-100"}`}>
                   <h3 className={`text-sm font-bold mb-1 ${isDark ? "text-violet-400" : "text-violet-800"}`}>Giới hạn Dịch vụ Áp Dụng</h3>
-                  <select value={formData.targetServiceCategory} onChange={e => setFormData({...formData, targetServiceCategory: e.target.value})} className={inp}>
+                  <select value={formData.targetServiceCategory} onChange={e => setFormData({ ...formData, targetServiceCategory: e.target.value })} className={inp}>
                     <option value="">Tất cả dịch vụ</option>
                     <option value="SPA">Chỉ Dịch vụ Spa</option>
                     <option value="GROOMING">Chỉ Dịch vụ Grooming</option>
@@ -467,12 +462,12 @@ export default function AdminVouchers() {
                   <div className="col-span-2">
                     <label className={lbl}>Mã Voucher *</label>
                     <input required type="text" value={formData.code}
-                      onChange={e => setFormData({...formData, code: e.target.value.toUpperCase()})}
+                      onChange={e => setFormData({ ...formData, code: e.target.value.toUpperCase() })}
                       className={`${inp} uppercase`} placeholder="VD: WELCOME15" />
                   </div>
                   <div>
                     <label className={lbl}>Loại Giảm Giá</label>
-                    <select value={formData.discountType} onChange={e => setFormData({...formData, discountType: e.target.value})} className={inp}>
+                    <select value={formData.discountType} onChange={e => setFormData({ ...formData, discountType: e.target.value })} className={inp}>
                       <option value="PERCENTAGE">Phần trăm (%)</option>
                       <option value="FIXED">Số tiền (VND)</option>
                     </select>
@@ -483,23 +478,23 @@ export default function AdminVouchers() {
                       min={formData.voucherType === "NEWCOMER" ? 10 : 1}
                       max={formData.voucherType === "NEWCOMER" && formData.discountType === "PERCENTAGE" ? 20 : undefined}
                       value={formData.discountValue}
-                      onChange={e => setFormData({...formData, discountValue: Number(e.target.value)})}
+                      onChange={e => setFormData({ ...formData, discountValue: Number(e.target.value) })}
                       className={inp} />
                   </div>
                   <div>
                     <label className={lbl}>Đơn Tối Thiểu (VND)</label>
                     <input type="number" min="0" value={formData.minOrderValue}
-                      onChange={e => setFormData({...formData, minOrderValue: Number(e.target.value)})} className={inp} />
+                      onChange={e => setFormData({ ...formData, minOrderValue: Number(e.target.value) })} className={inp} />
                   </div>
                   <div>
                     <label className={lbl}>Thời Hạn Sử Dụng (Ngày)</label>
                     <input required type="number" min="1" value={formData.validDays}
-                      onChange={e => setFormData({...formData, validDays: Number(e.target.value)})} className={inp} />
+                      onChange={e => setFormData({ ...formData, validDays: Number(e.target.value) })} className={inp} />
                   </div>
                   <div className="col-span-2">
                     <label className={lbl}>{formData.voucherType === "NEWCOMER" ? "Số Khách Đầu Tiên Được Nhận" : "Số Lượng Cấp Phát"}</label>
                     <input required type="number" min="1" value={formData.issueQuantity}
-                      onChange={e => setFormData({...formData, issueQuantity: Number(e.target.value)})} className={inp} />
+                      onChange={e => setFormData({ ...formData, issueQuantity: Number(e.target.value) })} className={inp} />
                   </div>
                 </div>
               </div>

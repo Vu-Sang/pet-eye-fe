@@ -53,15 +53,44 @@ export default function Payment() {
   
   const [myVouchers, setMyVouchers] = useState<any[]>([]);
   const [selectedVoucherId, setSelectedVoucherId] = useState<number | null>(null);
+  
+  const [voucherCodeInput, setVoucherCodeInput] = useState('');
+  const [claimingVoucher, setClaimingVoucher] = useState(false);
+  const [claimVoucherMessage, setClaimVoucherMessage] = useState('');
 
   React.useEffect(() => {
-    // Fetch user vouchers on mount
+    fetchVouchers();
+  }, []);
+
+  const fetchVouchers = () => {
     import('../../services/user.service').then(({ userService }) => {
       userService.getMyVouchers()
         .then(data => setMyVouchers(data))
         .catch(err => console.error("Failed to fetch vouchers", err));
     });
-  }, []);
+  };
+
+  const handleClaimVoucher = async () => {
+    if (!voucherCodeInput.trim()) return;
+    setClaimingVoucher(true);
+    setClaimVoucherMessage('');
+    try {
+      const { userService } = await import('../../services/user.service');
+      const res = await userService.claimVoucher(voucherCodeInput.trim().toUpperCase());
+      setClaimVoucherMessage('Lưu mã giảm giá thành công!');
+      setVoucherCodeInput('');
+      fetchVouchers(); // Refresh list
+      
+      // Auto select if not selected
+      if (res?.result?.id && !selectedVoucherId) {
+        setSelectedVoucherId(res.result.id);
+      }
+    } catch (e: any) {
+      setClaimVoucherMessage(e?.response?.data?.message || 'Mã giảm giá không hợp lệ hoặc đã hết lượt.');
+    } finally {
+      setClaimingVoucher(false);
+    }
+  };
 
   // Dùng services[] nếu có, fallback về serviceName/servicePrice cũ
   const serviceList: BookingService[] = booking?.services && booking.services.length > 0
@@ -424,39 +453,65 @@ export default function Payment() {
                 </div>
               )}
 
-              {payMethod === 'payos' && myVouchers.length > 0 && (
+              {payMethod === 'payos' && (
                 <div className="mt-5 pt-5 border-t border-slate-200 dark:border-slate-700">
                   <h3 className="font-bold text-slate-800 dark:text-slate-100 mb-3 flex items-center gap-2">
                     <span className="material-symbols-outlined text-rose-500">local_activity</span>
                     Mã giảm giá (Voucher)
                   </h3>
-                  <select
-                    className="w-full bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-3 text-sm font-semibold focus:outline-none focus:ring-2 focus:ring-[#1a2b4c] text-slate-700 dark:text-slate-200"
-                    value={selectedVoucherId || ''}
-                    onChange={(e) => {
-                      const vId = e.target.value ? Number(e.target.value) : null;
-                      setSelectedVoucherId(vId);
-                      if (vId) {
-                        const voucher = myVouchers.find(v => v.id === vId)?.voucher;
-                        if (voucher) {
-                          trackSelectVoucher(voucher.code, voucher.discountValue, voucher.discountType);
+                  
+                  {/* Khung nhập mã giảm giá */}
+                  <div className="flex gap-2 mb-3">
+                    <input
+                      type="text"
+                      placeholder="Nhập mã giảm giá..."
+                      value={voucherCodeInput}
+                      onChange={(e) => setVoucherCodeInput(e.target.value)}
+                      className="flex-1 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-[#1a2b4c] text-slate-700 dark:text-slate-200 uppercase"
+                    />
+                    <button
+                      onClick={handleClaimVoucher}
+                      disabled={!voucherCodeInput.trim() || claimingVoucher}
+                      className="px-4 py-3 bg-[#1a2b4c] text-white font-bold rounded-xl hover:bg-[#243d6b] disabled:opacity-50 text-sm whitespace-nowrap"
+                    >
+                      {claimingVoucher ? 'Đang lưu...' : 'Lưu mã'}
+                    </button>
+                  </div>
+                  {claimVoucherMessage && (
+                    <p className={`text-xs mb-3 font-medium ${claimVoucherMessage.includes('thành công') ? 'text-green-600' : 'text-red-500'}`}>
+                      {claimVoucherMessage}
+                    </p>
+                  )}
+
+                  {myVouchers.length > 0 && (
+                    <select
+                      className="w-full bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-3 text-sm font-semibold focus:outline-none focus:ring-2 focus:ring-[#1a2b4c] text-slate-700 dark:text-slate-200"
+                      value={selectedVoucherId || ''}
+                      onChange={(e) => {
+                        const vId = e.target.value ? Number(e.target.value) : null;
+                        setSelectedVoucherId(vId);
+                        if (vId) {
+                          const voucher = myVouchers.find(v => v.id === vId)?.voucher;
+                          if (voucher) {
+                            trackSelectVoucher(voucher.code, voucher.discountValue, voucher.discountType);
+                          }
                         }
-                      }
-                    }}
-                  >
-                    <option value="">Không sử dụng voucher</option>
-                    {myVouchers.map(uv => {
-                      const v = uv.voucher;
-                      const disabled = v.minOrderValue && rawTotalPrice < v.minOrderValue;
-                      return (
-                        <option key={uv.id} value={uv.id} disabled={disabled}>
-                          {v.code} - Giảm {v.discountType === 'PERCENTAGE' ? `${v.discountValue}%` : formatVND(v.discountValue)} 
-                          {v.minOrderValue ? ` (Đơn tối thiểu ${formatVND(v.minOrderValue)})` : ''}
-                          {disabled ? ' - Chưa đủ điều kiện' : ''}
-                        </option>
-                      );
-                    })}
-                  </select>
+                      }}
+                    >
+                      <option value="">Không sử dụng voucher</option>
+                      {myVouchers.map(uv => {
+                        const v = uv.voucher;
+                        const disabled = v.minOrderValue && rawTotalPrice < v.minOrderValue;
+                        return (
+                          <option key={uv.id} value={uv.id} disabled={disabled}>
+                            {v.code} - Giảm {v.discountType === 'PERCENTAGE' ? `${v.discountValue}%` : formatVND(v.discountValue)} 
+                            {v.minOrderValue ? ` (Đơn tối thiểu ${formatVND(v.minOrderValue)})` : ''}
+                            {disabled ? ' - Chưa đủ điều kiện' : ''}
+                          </option>
+                        );
+                      })}
+                    </select>
+                  )}
                 </div>
               )}
 

@@ -93,10 +93,15 @@ export default function AdminDashboard() {
   const [customDateInput, setCustomDateInput] = useState({ start: '', end: '' });
   const [appliedCustomDate, setAppliedCustomDate] = useState({ start: '', end: '' });
   const [showDatePicker, setShowDatePicker] = useState(false);
+  const [bookingDateRange, setBookingDateRange] = useState<'7days' | '14days' | '30days' | 'thisMonth' | 'custom'>('7days');
+  const [bookingCustomInput, setBookingCustomInput] = useState({ start: '', end: '' });
+  const [bookingAppliedCustom, setBookingAppliedCustom] = useState({ start: '', end: '' });
+  const [showBookingDatePicker, setShowBookingDatePicker] = useState(false);
   const [selectedMetric, setSelectedMetric] = useState<any>(null);
   const [compareMonthLeft, setCompareMonthLeft] = useState<number>(new Date().getMonth() === 0 ? 11 : new Date().getMonth() - 1);
   const [compareMonthRight, setCompareMonthRight] = useState<number>(new Date().getMonth());
   const [userFilter, setUserFilter] = useState<'all' | 'active' | 'inactive'>('all');
+  const [showMoreStats, setShowMoreStats] = useState(false);
 
   const handleOpenModal = (metric: any) => {
     setSelectedMetric(metric);
@@ -172,22 +177,56 @@ export default function AdminDashboard() {
     retry: false,
   });
 
+  const getBookingDateParams = () => {
+    if (bookingDateRange === 'custom') {
+      return {
+        startDate: bookingAppliedCustom.start || undefined,
+        endDate: bookingAppliedCustom.end || undefined
+      };
+    }
+    const end = new Date();
+    let start = new Date();
+    if (bookingDateRange === '7days') {
+      start.setDate(end.getDate() - 6);
+    } else if (bookingDateRange === '14days') {
+      start.setDate(end.getDate() - 13);
+    } else if (bookingDateRange === '30days') {
+      start.setDate(end.getDate() - 29);
+    } else if (bookingDateRange === 'thisMonth') {
+      start = new Date(end.getFullYear(), end.getMonth(), 1);
+    }
+    return {
+      startDate: start.toISOString().split('T')[0],
+      endDate: end.toISOString().split('T')[0]
+    };
+  };
+
+  const { startDate: bStartDate, endDate: bEndDate } = getBookingDateParams();
+
   const { data: bookingsRaw = [] } = useQuery({
-    queryKey: ['admin-bookings-weekly'],
-    queryFn: () => adminService.getBookingsWeekly(),
+    queryKey: ['admin-bookings-weekly', bStartDate, bEndDate],
+    queryFn: () => adminService.getBookingsWeekly(bStartDate, bEndDate),
     retry: false,
   });
 
+  const totalRangeBookings = bookingsRaw.reduce((sum, b) => sum + (b.count || 0), 0);
+
   const revenueData = MONTH_LABELS.map((name, i) => {
     const found = revenueRaw.find(r => r.month === i + 1);
-    return { name, value: found ? Number((found.revenue / 1_000_000).toFixed(2)) : 0 };
+    return { name, value: found ? found.revenue / 1_000_000 : 0 };
   });
 
   const bookingData = bookingsRaw.length > 0
     ? bookingsRaw.map(b => {
-      const d = new Date(b.date);
+      const parts = b.date.split('-');
+      const d = parts.length === 3 ? new Date(Number(parts[0]), Number(parts[1]) - 1, Number(parts[2])) : new Date(b.date);
+      const dayOfWeek = d.getDay().toString();
+      const isShortRange = bookingsRaw.length <= 7;
+      const formattedLabel = isShortRange
+        ? `${DAY_LABELS[dayOfWeek] ?? b.date} (${parts[2]}/${parts[1]})`
+        : `${parts[2]}/${parts[1]}`;
       return {
-        name: DAY_LABELS[d.getDay().toString()] ?? b.date,
+        name: formattedLabel,
         value: b.count,
       };
     })
@@ -219,7 +258,7 @@ export default function AdminDashboard() {
       accent: 'indigo',
       trend: 'Real-time',
       trendUp: null,
-      sparkData: [45, 45, 50, 52, 60, 65, 75, 80],
+      sparkData: stats.systemBalanceSparkData || [0, 0, 0, 0, 0, 0, 0, totalFrozenBalance],
       color: isDark ? '#a78bfa' : '#6366f1',
       subText: 'số dư đóng băng của shop'
     },
@@ -444,6 +483,15 @@ export default function AdminDashboard() {
             }`}>
             Cập nhật: {new Date().toLocaleDateString('vi-VN', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
           </div>
+          <button
+            onClick={() => setShowMoreStats(!showMoreStats)}
+            className={`px-4 py-2 rounded-2xl text-xs font-bold transition-all ${isDark
+              ? 'bg-indigo-500/10 text-indigo-400 border border-indigo-500/20 hover:bg-indigo-500/20'
+              : 'bg-indigo-50 text-indigo-600 border border-indigo-100 hover:bg-indigo-100'
+              }`}
+          >
+            {showMoreStats ? 'Thu gọn' : 'Mở rộng'}
+          </button>
         </div>
       </div>
 
@@ -512,13 +560,13 @@ export default function AdminDashboard() {
       {/* Stats Cards */}
       {isLoadingStats || isLoadingBalance || isLoadingWithdrawals || isLoadingRefunds ? (
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6 relative z-10">
-          {Array.from({ length: 8 }).map((_, i) => (
+          {Array.from({ length: showMoreStats ? 8 : 4 }).map((_, i) => (
             <div key={i} className={`rounded-3xl p-6 animate-pulse h-[148px] ${isDark ? 'admin-glass-card' : 'bg-white border border-slate-100'}`} />
           ))}
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6 relative z-10">
-          {cards.map(s => {
+          {(showMoreStats ? cards : cards.slice(0, 4)).map(s => {
             const a = isDark ? accentMap[s.accent] : accentMapLight[s.accent];
             return (
               <div
@@ -656,22 +704,90 @@ export default function AdminDashboard() {
         </div>
 
         {/* Booking chart */}
-        <div className={`rounded-3xl p-6 transition-all duration-300 relative overflow-hidden ${isDark
+        <div className={`rounded-3xl p-6 transition-all duration-300 relative overflow-visible ${isDark
           ? 'admin-glass-card hover:border-white/15'
           : 'bg-white border border-slate-100 shadow-[0_4px_20px_rgba(0,0,0,0.01)] hover:shadow-[0_12px_36px_rgba(148,163,184,0.1)] hover:border-slate-200'
           }`}>
-          <div className="flex items-center justify-between mb-8">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
             <div>
-              <h3 className={`text-lg font-extrabold tracking-tight ${isDark ? 'text-white' : 'text-slate-900'}`}>
-                Booking trong tuần
-              </h3>
-              <p className={`text-xs mt-1 font-medium ${isDark ? 'text-slate-500' : 'text-slate-400'}`}>
-                Số lượng đặt lịch 7 ngày gần nhất
+              <div className="flex items-center gap-2">
+                <h3 className={`text-lg font-extrabold tracking-tight ${isDark ? 'text-white' : 'text-slate-900'}`}>
+                  Lượt đặt lịch trong tuần
+                </h3>
+                <span className={`px-2.5 py-0.5 rounded-full text-xs font-bold ${isDark ? 'bg-purple-500/20 text-purple-300 border border-purple-500/30' : 'bg-purple-50 text-purple-700 border border-purple-200'}`}>
+                  {totalRangeBookings} đơn
+                </span>
+              </div>
+              <p className={`text-xs mt-1 font-medium ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>
+                {bStartDate && bEndDate ? `Từ ${bStartDate.split('-').reverse().join('/')} đến ${bEndDate.split('-').reverse().join('/')}` : 'Số lượng đặt lịch theo khoảng thời gian'}
               </p>
             </div>
-            <div className={`w-10 h-10 rounded-2xl flex items-center justify-center ${isDark ? 'bg-purple-500/10' : 'bg-purple-50'
-              }`}>
-              <Calendar size={20} className={isDark ? 'text-purple-400' : 'text-purple-600'} />
+
+            {/* Date filter buttons & Custom Picker */}
+            <div className={`relative flex items-center flex-wrap gap-1 p-1 rounded-2xl border ${isDark ? 'bg-slate-900/60 border-white/10' : 'bg-slate-50 border-slate-200'}`}>
+              {[
+                { id: '7days', label: '7 ngày' },
+                { id: '14days', label: '14 ngày' },
+                { id: '30days', label: '30 ngày' },
+                { id: 'thisMonth', label: 'Tháng này' },
+              ].map(f => (
+                <button
+                  key={f.id}
+                  onClick={() => {
+                    setBookingDateRange(f.id as any);
+                    setShowBookingDatePicker(false);
+                  }}
+                  className={`px-2.5 py-1 text-[11px] font-bold rounded-xl transition-all ${bookingDateRange === f.id ? (isDark ? 'bg-purple-600 text-white shadow-md shadow-purple-500/20' : 'bg-purple-600 text-white shadow-sm') : (isDark ? 'text-slate-400 hover:text-white hover:bg-slate-800' : 'text-slate-600 hover:bg-white')}`}
+                >
+                  {f.label}
+                </button>
+              ))}
+              <button
+                onClick={() => {
+                  setShowBookingDatePicker(!showBookingDatePicker);
+                  if (bookingDateRange !== 'custom') setBookingDateRange('custom');
+                }}
+                className={`px-2.5 py-1 text-[11px] font-bold rounded-xl transition-all flex items-center gap-1 ${bookingDateRange === 'custom' ? (isDark ? 'bg-purple-600 text-white shadow-md shadow-purple-500/20' : 'bg-purple-600 text-white shadow-sm') : (isDark ? 'text-slate-400 hover:text-white hover:bg-slate-800' : 'text-slate-600 hover:bg-white')}`}
+              >
+                <Calendar size={12} /> Tuỳ chọn
+              </button>
+
+              {showBookingDatePicker && bookingDateRange === 'custom' && (
+                <div className={`absolute top-full right-0 mt-2 p-4 rounded-2xl border shadow-2xl z-50 animate-in fade-in slide-in-from-top-2 duration-200 ${isDark ? 'bg-slate-900 border-white/10 shadow-black/60' : 'bg-white border-slate-200 shadow-purple-900/10'}`}>
+                  <div className="flex items-center gap-2">
+                    <div className="flex flex-col gap-1">
+                      <label className={`text-[9px] font-bold uppercase tracking-wider ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>Từ ngày</label>
+                      <input
+                        type="date"
+                        value={bookingCustomInput.start}
+                        onChange={(e) => setBookingCustomInput(prev => ({ ...prev, start: e.target.value }))}
+                        className={`text-xs font-bold px-2.5 py-1.5 rounded-xl border outline-none ${isDark ? 'bg-slate-800 border-white/10 text-white [color-scheme:dark]' : 'bg-slate-50 border-slate-200 text-slate-700'}`}
+                      />
+                    </div>
+                    <span className={`font-bold mt-4 ${isDark ? 'text-slate-600' : 'text-slate-300'}`}>-</span>
+                    <div className="flex flex-col gap-1">
+                      <label className={`text-[9px] font-bold uppercase tracking-wider ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>Đến ngày</label>
+                      <input
+                        type="date"
+                        value={bookingCustomInput.end}
+                        onChange={(e) => setBookingCustomInput(prev => ({ ...prev, end: e.target.value }))}
+                        className={`text-xs font-bold px-2.5 py-1.5 rounded-xl border outline-none ${isDark ? 'bg-slate-800 border-white/10 text-white [color-scheme:dark]' : 'bg-slate-50 border-slate-200 text-slate-700'}`}
+                      />
+                    </div>
+                  </div>
+                  <div className="mt-3 flex justify-end">
+                    <button
+                      onClick={() => {
+                        setBookingAppliedCustom(bookingCustomInput);
+                        setShowBookingDatePicker(false);
+                      }}
+                      className={`px-3 py-1.5 rounded-xl text-xs font-bold text-white transition-transform active:scale-95 ${isDark ? 'bg-purple-600 hover:bg-purple-500 shadow-lg shadow-purple-500/20' : 'bg-purple-600 hover:bg-purple-700 shadow-sm'}`}
+                    >
+                      Áp dụng
+                    </button>
+                  </div>
+                </div>
+              )}
             </div>
           </div>
           <div className="h-[260px] w-full">

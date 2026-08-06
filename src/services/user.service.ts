@@ -65,5 +65,12 @@ export const userService = {
   getMyVouchers: async (): Promise<any[]> => {
     const response = await apiClient.get<ApiResponse<any[]>>('/users/me/vouchers');
     return response.data.result || [];
+  },
+
+  claimVoucher: async (code: string): Promise<any> => {
+    const response = await apiClient.post<ApiResponse<any>>('/users/me/vouchers/claim', null, {
+      params: { code }
+    });
+    return response.data;
   }
 };

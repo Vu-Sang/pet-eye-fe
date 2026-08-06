@@ -38,6 +38,10 @@ export interface TaskResponse {
   updatedAt?: string;
   paymentMethod?: string;
   paymentStatus?: string;
+  paidAmount?: number;
+  discountAmount?: number;
+  totalAmount?: number;
+  remainingAmount?: number;
   completedServiceIds?: number[];
   services?: {
     serviceId: number;

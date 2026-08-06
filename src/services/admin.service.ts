@@ -154,8 +154,10 @@ export const adminService = {
     return res.data.result ?? [];
   },
 
-  getBookingsWeekly: async (): Promise<BookingDaily[]> => {
-    const res = await apiClient.get<ApiResponse<BookingDaily[]>>('/admin/dashboard/bookings-weekly');
+  getBookingsWeekly: async (startDate?: string, endDate?: string): Promise<BookingDaily[]> => {
+    const res = await apiClient.get<ApiResponse<BookingDaily[]>>('/admin/dashboard/bookings-weekly', {
+      params: { startDate, endDate }
+    });
     return res.data.result ?? [];
   },
 

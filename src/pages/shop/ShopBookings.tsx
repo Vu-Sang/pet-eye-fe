@@ -17,11 +17,16 @@ import {
     LayoutGrid, List as ListIcon, ChevronLeft, ChevronRight, Plus,
     Timer, MessageCircle, MoreVertical, CheckCircle2, Video,
     MapPin, Phone, Mail, Scissors, Info, X, Play,
-    Activity, Utensils, Syringe, Heart, Sparkles, FileText, Download, Send, PawPrint
+    Activity, Utensils, Syringe, Heart, Sparkles, FileText, Download, Send, PawPrint,
+    CreditCard, Wallet, Banknote
 } from 'lucide-react';
 import { taskService, type TaskResponse } from '../../services/task.service';
 import { staffService, type StaffResponse } from '../../services/staff.service';
 import { useTheme } from '../../contexts/ThemeContext';
+
+const formatVND = (amount: number | undefined | null) => {
+    return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(amount || 0);
+};
 
 // Constants
 const STATUS_CONFIG: Record<string, any> = {
@@ -35,6 +40,7 @@ const STATUS_CONFIG: Record<string, any> = {
 };
 
 interface BookingListItemProps {
+    key?: any;
     booking: any;
     staffList: StaffResponse[];
     updatingId: number | null;
@@ -122,7 +128,14 @@ function BookingListItem({
                                 <div className="w-8 h-8 rounded-lg bg-slate-50 dark:bg-slate-900 flex items-center justify-center text-slate-400">🐾</div>
                                 <div>
                                     <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Thú cưng</p>
-                                    <p className="text-xs font-bold text-slate-700 dark:text-slate-300">{booking.petName}</p>
+                                    <p className="text-xs font-bold text-slate-700 dark:text-slate-300">
+                                        {booking.petName}
+                                        {booking.petWeight && (
+                                            <span className="ml-2 inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400 border border-indigo-100 dark:border-indigo-800/40">
+                                                ⚖️ {booking.petWeight}
+                                            </span>
+                                        )}
+                                    </p>
                                 </div>
                             </div>
                             <div className="flex items-center gap-3">
@@ -131,6 +144,49 @@ function BookingListItem({
                                     <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1.5">Phụ trách</p>
                                     <StaffAssignmentSelect bookingId={booking.bookingId} status={booking.status} currentStaffId={booking.staffId} staffList={staffList} updatingId={updatingId} onAssign={onAssign} />
                                 </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Financial Summary Row */}
+                    <div className={`mt-4 pt-3 border-t flex flex-wrap items-center justify-between gap-3 ${isDark ? 'border-slate-800/80' : 'border-slate-100'}`}>
+                        <div className="flex flex-wrap items-center gap-2">
+                            {/* Payment Status Badge */}
+                            {(booking.remainingAmount != null ? booking.remainingAmount <= 0 : (booking.paidAmount && booking.paidAmount >= (booking.totalAmount || 0))) ? (
+                                <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[10px] font-black uppercase tracking-wider bg-emerald-50 text-emerald-700 border border-emerald-200 dark:bg-emerald-500/10 dark:text-emerald-400 dark:border-emerald-500/20">
+                                    <CheckCircle2 size={12} className="text-emerald-500" />
+                                    Đã thanh toán Online ({formatVND(booking.paidAmount || booking.totalAmount)})
+                                </span>
+                            ) : (booking.paidAmount ?? 0) > 0 ? (
+                                <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[10px] font-black uppercase tracking-wider bg-amber-50 text-amber-700 border border-amber-200 dark:bg-amber-500/10 dark:text-amber-400 dark:border-amber-500/20">
+                                    <CreditCard size={12} className="text-amber-500" />
+                                    Đã cọc Online: {formatVND(booking.paidAmount)}
+                                </span>
+                            ) : (
+                                <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[10px] font-black uppercase tracking-wider bg-blue-50 text-blue-700 border border-blue-200 dark:bg-blue-500/10 dark:text-blue-400 dark:border-blue-500/20">
+                                    <Wallet size={12} className="text-blue-500" />
+                                    Thanh toán tại quầy
+                                </span>
+                            )}
+                        </div>
+
+                        <div className="flex items-center gap-4 text-right">
+                            <div>
+                                <p className="text-[9px] font-black uppercase tracking-widest text-slate-400">Tổng đơn</p>
+                                <p className={`text-xs font-black ${isDark ? 'text-white' : 'text-slate-900'}`}>
+                                    {formatVND(booking.totalAmount ?? (booking.services && booking.services.length > 0 ? booking.services.reduce((sum: number, s: any) => sum + (s.servicePrice || 0), 0) : booking.servicePrice))}
+                                </p>
+                            </div>
+
+                            <div className="pl-3 border-l border-slate-200 dark:border-slate-700">
+                                <p className="text-[9px] font-black uppercase tracking-widest text-slate-400">
+                                    {(booking.remainingAmount != null ? booking.remainingAmount > 0 : (!booking.paidAmount || booking.paidAmount < (booking.totalAmount || 0))) ? 'Cần thu' : 'Còn lại'}
+                                </p>
+                                <p className={`text-xs font-black ${(booking.remainingAmount != null ? booking.remainingAmount > 0 : (!booking.paidAmount || booking.paidAmount < (booking.totalAmount || 0))) ? 'text-amber-600 dark:text-amber-400' : 'text-emerald-600 dark:text-emerald-400'}`}>
+                                    {(booking.remainingAmount != null ? booking.remainingAmount > 0 : (!booking.paidAmount || booking.paidAmount < (booking.totalAmount || 0)))
+                                        ? formatVND(booking.remainingAmount ?? ((booking.totalAmount ?? (booking.services ? booking.services.reduce((sum: number, s: any) => sum + (s.servicePrice || 0), 0) : booking.servicePrice || 0)) - (booking.paidAmount || 0)))
+                                        : '0đ (Đủ)'}
+                                </p>
                             </div>
                         </div>
                     </div>
@@ -401,6 +457,15 @@ export default function ShopBookings() {
                 const existingCompleted = new Set<number>((existing.completedServiceIds) || []);
                 (item.completedServiceIds || []).forEach((id: number) => existingCompleted.add(id));
                 existing.completedServiceIds = Array.from(existingCompleted);
+
+                // Preserve financial and pet details
+                if (item.petWeight && !existing.petWeight) existing.petWeight = item.petWeight;
+                if (item.totalAmount != null) existing.totalAmount = item.totalAmount;
+                if (item.paidAmount != null) existing.paidAmount = item.paidAmount;
+                if (item.discountAmount != null) existing.discountAmount = item.discountAmount;
+                if (item.remainingAmount != null) existing.remainingAmount = item.remainingAmount;
+                if (item.paymentMethod && !existing.paymentMethod) existing.paymentMethod = item.paymentMethod;
+                if (item.paymentStatus && !existing.paymentStatus) existing.paymentStatus = item.paymentStatus;
 
                 map.set(bid, existing);
             }
@@ -818,7 +883,7 @@ export default function ShopBookings() {
                                                             <span className="text-xs font-bold text-[#1a2b4c] dark:text-indigo-400">{svc.serviceName}</span>
                                                         </div>
                                                         <span className="text-xs font-black text-[#1a2b4c] dark:text-indigo-400">
-                                                            {new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(svc.servicePrice || 0)}
+                                                            {formatVND(svc.servicePrice || 0)}
                                                         </span>
                                                     </div>
                                                 ))
@@ -829,10 +894,84 @@ export default function ShopBookings() {
                                                         <span className="text-xs font-bold text-[#1a2b4c] dark:text-indigo-400">{selectedBooking.serviceName}</span>
                                                     </div>
                                                     <span className="text-xs font-black text-[#1a2b4c] dark:text-indigo-400">
-                                                        {new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(selectedBooking.servicePrice || 0)}
+                                                        {formatVND(selectedBooking.servicePrice || 0)}
                                                     </span>
                                                 </div>
                                             )}
+                                        </div>
+                                    </div>
+
+                                    {/* Financial & Payment Details Card */}
+                                    <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-900/80 border border-slate-100 dark:border-slate-700/80 space-y-3">
+                                        <div className="flex items-center justify-between">
+                                            <p className="text-[9px] font-black uppercase tracking-widest text-slate-400 flex items-center gap-1.5">
+                                                <CreditCard size={12} className="text-indigo-500" />
+                                                Chi tiết thanh toán & Thu ngân
+                                            </p>
+                                            {selectedBooking.petWeight && (
+                                                <span className="text-[9px] font-bold px-2 py-0.5 rounded-full bg-indigo-50 dark:bg-indigo-900/40 text-indigo-600 dark:text-indigo-300 border border-indigo-100 dark:border-indigo-800">
+                                                    Cân nặng: {selectedBooking.petWeight}
+                                                </span>
+                                            )}
+                                        </div>
+
+                                        <div className="space-y-2 text-xs">
+                                            <div className="flex justify-between text-slate-600 dark:text-slate-400">
+                                                <span>Tổng tiền dịch vụ:</span>
+                                                <span className="font-semibold text-slate-800 dark:text-slate-200">
+                                                    {formatVND(selectedBooking.services && selectedBooking.services.length > 0 ? selectedBooking.services.reduce((s: number, i: any) => s + (i.servicePrice || 0), 0) : (selectedBooking.servicePrice || 0))}
+                                                </span>
+                                            </div>
+
+                                            {(selectedBooking.discountAmount || 0) > 0 && (
+                                                <div className="flex justify-between text-emerald-600 dark:text-emerald-400">
+                                                    <span>Khuyến mãi / Voucher:</span>
+                                                    <span className="font-semibold">
+                                                        - {formatVND(selectedBooking.discountAmount)}
+                                                    </span>
+                                                </div>
+                                            )}
+
+                                            <div className="flex justify-between text-slate-600 dark:text-slate-400">
+                                                <span>Đã thanh toán Online:</span>
+                                                <span className="font-semibold text-emerald-600 dark:text-emerald-400">
+                                                    {formatVND(selectedBooking.paidAmount || 0)}
+                                                </span>
+                                            </div>
+
+                                            <div className="pt-2 border-t border-slate-200 dark:border-slate-700 flex justify-between items-center">
+                                                <span className="font-bold text-slate-900 dark:text-white">Tổng đơn hàng:</span>
+                                                <span className="font-black text-sm text-slate-900 dark:text-white">
+                                                    {formatVND(selectedBooking.totalAmount ?? (selectedBooking.services && selectedBooking.services.length > 0 ? selectedBooking.services.reduce((s: number, i: any) => s + (i.servicePrice || 0), 0) : (selectedBooking.servicePrice || 0)))}
+                                                </span>
+                                            </div>
+                                        </div>
+
+                                        {/* Prominent Collection Banner */}
+                                        <div className={`p-3 rounded-xl border flex items-center justify-between ${
+                                            (selectedBooking.remainingAmount != null ? selectedBooking.remainingAmount <= 0 : (selectedBooking.paidAmount && selectedBooking.paidAmount >= (selectedBooking.totalAmount || 0)))
+                                                ? 'bg-emerald-500/10 border-emerald-500/30 text-emerald-700 dark:text-emerald-300'
+                                                : 'bg-amber-500/10 border-amber-500/30 text-amber-800 dark:text-amber-300'
+                                        }`}>
+                                            <div>
+                                                <p className="text-[8px] font-black uppercase tracking-widest opacity-75">
+                                                    {(selectedBooking.remainingAmount != null ? selectedBooking.remainingAmount <= 0 : (selectedBooking.paidAmount && selectedBooking.paidAmount >= (selectedBooking.totalAmount || 0)))
+                                                        ? 'Trạng thái thu tiền'
+                                                        : 'Số tiền cần thu tại quầy'}
+                                                </p>
+                                                <p className="text-xs font-bold mt-0.5">
+                                                    {(selectedBooking.remainingAmount != null ? selectedBooking.remainingAmount <= 0 : (selectedBooking.paidAmount && selectedBooking.paidAmount >= (selectedBooking.totalAmount || 0)))
+                                                        ? 'Đã thanh toán đủ (Online)'
+                                                        : 'Thu từ khách hàng khi nhận/trả thú cưng'}
+                                                </p>
+                                            </div>
+                                            <div className="text-right">
+                                                <p className="text-sm font-black">
+                                                    {(selectedBooking.remainingAmount != null ? selectedBooking.remainingAmount <= 0 : (selectedBooking.paidAmount && selectedBooking.paidAmount >= (selectedBooking.totalAmount || 0)))
+                                                        ? '0đ (Đã đủ)'
+                                                        : formatVND(selectedBooking.remainingAmount ?? Math.max(0, (selectedBooking.totalAmount || 0) - (selectedBooking.paidAmount || 0)))}
+                                                </p>
+                                            </div>
                                         </div>
                                     </div>
 
@@ -998,7 +1137,7 @@ export default function ShopBookings() {
 
                                         <p className="text-xs text-slate-500 font-medium mb-1">Số tiền giao dịch</p>
                                         <h1 className="text-3xl font-black text-[#1a2b4c] dark:text-white mb-2 tracking-tight">
-                                            {new Intl.NumberFormat('vi-VN').format(viewInvoiceBooking.services ? viewInvoiceBooking.services.reduce((acc: number, cur: any) => acc + (cur.servicePrice || 0), 0) : (viewInvoiceBooking.servicePrice || 0))}đ
+                                            {formatVND(viewInvoiceBooking.totalAmount ?? (viewInvoiceBooking.services ? viewInvoiceBooking.services.reduce((acc: number, cur: any) => acc + (cur.servicePrice || 0), 0) : (viewInvoiceBooking.servicePrice || 0)))}
                                         </h1>
                                         <div className="px-3 py-1 bg-green-50/80 dark:bg-green-500/10 text-green-600 dark:text-green-400 text-[9px] font-black uppercase tracking-widest rounded-full">
                                             Thành công
