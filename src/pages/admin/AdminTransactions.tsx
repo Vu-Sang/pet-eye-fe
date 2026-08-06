@@ -3,7 +3,7 @@ import {
   Search, Filter, Eye, Download, RefreshCw, CreditCard,
   Building2, User, CheckCircle2, Clock, XCircle,
   FileText, DollarSign, ChevronLeft, ChevronRight, PawPrint, X,
-  ChevronDown, Check, Layers, Tag, RotateCcw
+  ChevronDown, Check, Layers, Tag, RotateCcw, FileSpreadsheet
 } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
 import { adminService, AdminTransactionResponse } from '../../services/admin.service';
@@ -11,6 +11,7 @@ import { useTheme } from '../../contexts/ThemeContext';
 import { format, parseISO } from 'date-fns';
 import html2canvas from 'html2canvas';
 import toast from 'react-hot-toast';
+import * as XLSX from 'xlsx';
 
 function getStatusBadge(status: string, isDark: boolean) {
   const s = status ? status.toUpperCase() : 'PENDING';
@@ -207,6 +208,98 @@ export default function AdminTransactions() {
     }
   };
 
+  const handleExportExcel = () => {
+    if (!transactions || transactions.length === 0) {
+      toast.error('Không có dữ liệu giao dịch để xuất file Excel.');
+      return;
+    }
+
+    try {
+      const exportTime = format(new Date(), 'dd/MM/yyyy HH:mm:ss');
+      
+      const titleRows = [
+        ['BÁO CÁO & BẢNG KÊ CHI TIẾT GIAO DỊCH - HỆ THỐNG PETEYE'],
+        [`Thời gian xuất: ${exportTime} | Người xuất: Admin PetEye System`],
+        [`Bộ lọc: Tìm kiếm="${search || 'Tất cả'}" | Trạng thái="${statusFilter || 'Tất cả'}" | Loại="${typeFilter || 'Tất cả'}" | Shop="${shopFilter || 'Tất cả'}"`],
+        [] // empty row spacing
+      ];
+
+      const tableHeaders = [
+        'STT',
+        'Mã Giao Dịch',
+        'Thời Gian',
+        'Cửa Hàng (Shop)',
+        'Tên Khách Hàng',
+        'Email Khách Hàng',
+        'Số Tiền (VNĐ)',
+        'Phương Thức',
+        'Loại Giao Dịch',
+        'Trạng Thái',
+        'Nội Dung Giao Dịch'
+      ];
+
+      const dataRows = transactions.map((tx, idx) => [
+        idx + 1,
+        tx.payosOrderCode ? `PAYOS-${tx.payosOrderCode}` : `TXN-${tx.id}`,
+        format(parseISO(tx.completedAt || tx.createdAt), 'dd/MM/yyyy HH:mm:ss'),
+        tx.shopName || 'Hệ thống PetEye',
+        tx.customerName || 'Khách hàng',
+        tx.customerEmail || '—',
+        tx.amount || 0,
+        (tx.paymentMethod || 'PAYOS').toUpperCase(),
+        getTypeLabel(tx.type),
+        tx.status === 'SUCCESS' ? 'Thành công' : tx.status === 'PENDING' ? 'Đang xử lý' : 'Thất bại / Hủy',
+        tx.description || `Thanh toán dịch vụ #${tx.id}`
+      ]);
+
+      const totalSum = transactions.reduce((acc, t) => acc + (t.amount || 0), 0);
+      const summaryRow = [
+        'TỔNG CỘNG',
+        '',
+        '',
+        '',
+        '',
+        '',
+        totalSum,
+        '',
+        '',
+        '',
+        `Tổng số ${transactions.length} giao dịch`
+      ];
+
+      const allRows = [...titleRows, tableHeaders, ...dataRows, [], summaryRow];
+
+      // Build Worksheet
+      const worksheet = XLSX.utils.aoa_to_sheet(allRows);
+
+      // Set explicit column widths to prevent squeezed text
+      worksheet['!cols'] = [
+        { wch: 8 },  // STT
+        { wch: 24 }, // Mã GD
+        { wch: 22 }, // Thời gian
+        { wch: 28 }, // Cửa hàng
+        { wch: 25 }, // Khách hàng
+        { wch: 32 }, // Email
+        { wch: 20 }, // Số tiền
+        { wch: 18 }, // Phương thức
+        { wch: 25 }, // Loại GD
+        { wch: 20 }, // Trạng thái
+        { wch: 45 }  // Nội dung
+      ];
+
+      // Build Workbook
+      const workbook = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(workbook, worksheet, 'Danh Sách Giao Dịch');
+
+      const fileName = `Bao_Cao_Giao_Dich_PetEye_${format(new Date(), 'yyyyMMdd_HHmmss')}.xlsx`;
+      XLSX.writeFile(workbook, fileName);
+      toast.success('Xuất file Excel thành công!');
+    } catch (err) {
+      console.error(err);
+      toast.error('Có lỗi xảy ra khi xuất file Excel.');
+    }
+  };
+
   // Status Filter Options
   const statusOptions: SelectOption[] = [
     { label: 'Trạng thái: Tất cả', value: '', icon: <Layers size={13} /> },
@@ -255,15 +348,27 @@ export default function AdminTransactions() {
             Truy vết, kiểm tra và xuất biên lai giao dịch của các Cửa hàng trên toàn hệ thống
           </p>
         </div>
-        <button
-          onClick={() => refetch()}
-          className={`flex items-center gap-2 px-4 py-2.5 rounded-xl font-semibold text-xs transition-all border ${
-            isDark ? 'bg-slate-800 text-slate-200 border-slate-700 hover:bg-slate-700' : 'bg-white text-slate-700 border-slate-200 hover:bg-slate-50 shadow-sm'
-          }`}
-        >
-          <RefreshCw size={14} className={isLoading ? 'animate-spin' : ''} />
-          Làm mới
-        </button>
+
+        <div className="flex items-center gap-3">
+          <button
+            onClick={handleExportExcel}
+            className="flex items-center gap-2 px-4 py-2.5 rounded-xl font-bold text-xs bg-emerald-600 hover:bg-emerald-700 text-white transition-all shadow-md hover:shadow-lg active:scale-95"
+            title="Xuất danh sách giao dịch ra file Excel chuẩn định dạng"
+          >
+            <FileSpreadsheet size={15} />
+            Xuất Excel
+          </button>
+
+          <button
+            onClick={() => refetch()}
+            className={`flex items-center gap-2 px-4 py-2.5 rounded-xl font-semibold text-xs transition-all border ${
+              isDark ? 'bg-slate-800 text-slate-200 border-slate-700 hover:bg-slate-700' : 'bg-white text-slate-700 border-slate-200 hover:bg-slate-50 shadow-sm'
+            }`}
+          >
+            <RefreshCw size={14} className={isLoading ? 'animate-spin' : ''} />
+            Làm mới
+          </button>
+        </div>
       </div>
 
       {/* Overview Cards */}
@@ -415,8 +520,8 @@ export default function AdminTransactions() {
                       <p className="font-bold text-slate-900 dark:text-white">
                         {tx.payosOrderCode ? `PAYOS-${tx.payosOrderCode}` : `TXN-${tx.id}`}
                       </p>
-                      <p className="text-[10px] text-slate-400 mt-0.5">
-                        {format(parseISO(tx.createdAt), 'dd/MM/yyyy HH:mm')}
+                      <p className="text-[10px] text-slate-400 mt-0.5" title="Thời gian thanh toán">
+                        {format(parseISO(tx.completedAt || tx.createdAt), 'dd/MM/yyyy HH:mm')}
                       </p>
                     </td>
 
@@ -546,9 +651,9 @@ export default function AdminTransactions() {
                     </span>
                   </div>
                   <div className="flex justify-between items-start gap-4">
-                    <span className="text-slate-500">Thời gian</span>
+                    <span className="text-slate-500">Thời gian thanh toán</span>
                     <span className="font-bold text-[#1a2b4c] text-right">
-                      {format(parseISO(selectedTx.createdAt), "dd/MM/yyyy HH:mm:ss")}
+                      {format(parseISO(selectedTx.completedAt || selectedTx.createdAt), "dd/MM/yyyy HH:mm:ss")}
                     </span>
                   </div>
                   <div className="flex justify-between items-start gap-4">
