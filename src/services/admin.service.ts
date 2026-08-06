@@ -11,6 +11,7 @@ export interface AdminTransactionResponse {
   gatewayTransactionId?: string;
   description?: string;
   createdAt: string;
+  completedAt?: string;
   bookingId?: number;
   shopId?: number;
   shopName?: string;
