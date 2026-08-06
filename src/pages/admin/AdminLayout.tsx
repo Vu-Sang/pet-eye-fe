@@ -17,6 +17,7 @@ const NAV_ITEMS = [
   { label: 'Dashboard', path: '/admin/dashboard', icon: LayoutDashboard },
   { label: 'Quản lý Shop', path: '/admin/shops', icon: Store },
   { label: 'Quản lý Member', path: '/admin/members', icon: Users },
+  { label: 'Lịch sử Giao dịch', path: '/admin/transactions', icon: CreditCard },
   { label: 'Quản lý Voucher', path: '/admin/vouchers', icon: Ticket },
   { label: 'Rút tiền', path: '/admin/withdrawals', icon: Wallet },
   { label: 'Thông báo', path: '/admin/notifications', icon: Bell },

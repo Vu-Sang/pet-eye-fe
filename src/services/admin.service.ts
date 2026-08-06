@@ -1,5 +1,23 @@
 import apiClient from './apiClient';
-import type { ApiResponse } from '../types/api';
+import type { ApiResponse, PageResponse } from '../types/api';
+
+export interface AdminTransactionResponse {
+  id: number;
+  type: string;
+  amount: number;
+  paymentMethod: string;
+  status: string;
+  payosOrderCode?: number;
+  gatewayTransactionId?: string;
+  description?: string;
+  createdAt: string;
+  bookingId?: number;
+  shopId?: number;
+  shopName?: string;
+  serviceName?: string;
+  customerName?: string;
+  customerEmail?: string;
+}
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -327,5 +345,26 @@ export const adminService = {
 
   setVoucherServiceConfig: async (enabled: boolean): Promise<void> => {
     await apiClient.put(`/admin/config/voucher-service?enabled=${enabled}`);
+  },
+
+  // Transactions
+  getAllTransactions: async (params?: {
+    shopId?: number;
+    status?: string;
+    type?: string;
+    search?: string;
+    page?: number;
+    size?: number;
+  }): Promise<PageResponse<AdminTransactionResponse>> => {
+    const query = new URLSearchParams();
+    if (params?.shopId) query.append('shopId', params.shopId.toString());
+    if (params?.status) query.append('status', params.status);
+    if (params?.type) query.append('type', params.type);
+    if (params?.search) query.append('search', params.search);
+    if (params?.page) query.append('page', params.page.toString());
+    if (params?.size) query.append('size', params.size.toString());
+
+    const res = await apiClient.get<ApiResponse<PageResponse<AdminTransactionResponse>>>(`/transactions/admin/all?${query.toString()}`);
+    return res.data.result ?? { content: [], page: 1, size: 10, totalElements: 0, totalPages: 0, last: true };
   },
 };
