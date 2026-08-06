@@ -60,6 +60,7 @@ import AdminNotifications from './pages/admin/AdminNotifications';
 import AdminMessages from './pages/admin/AdminMessages';
 import AdminAIAssistant from './pages/admin/AdminAIAssistant';
 import AdminWithdrawals from './pages/admin/AdminWithdrawals';
+import AdminTransactions from './pages/admin/AdminTransactions';
 import ShopWallet from './pages/shop/ShopWallet';
 import AdminVouchers from './pages/admin/AdminVouchers';
 import Chatbot from './components/Chatbot';
@@ -136,6 +137,7 @@ function AppLayout() {
             <Route path="dashboard" element={<AdminDashboard />} />
             <Route path="shops" element={<AdminShops />} />
             <Route path="members" element={<AdminMembers />} />
+            <Route path="transactions" element={<AdminTransactions />} />
             <Route path="vouchers" element={<AdminVouchers />} />
             <Route path="withdrawals" element={<AdminWithdrawals />} />
             <Route path="notifications" element={<AdminNotifications />} />
