@@ -11,7 +11,7 @@ import { useTheme } from '../../contexts/ThemeContext';
 import { format, parseISO } from 'date-fns';
 import html2canvas from 'html2canvas';
 import toast from 'react-hot-toast';
-import * as XLSX from 'xlsx';
+import XLSX from 'xlsx-js-style';
 
 function getStatusBadge(status: string, isDark: boolean) {
   const s = status ? status.toUpperCase() : 'PENDING';
@@ -49,6 +49,21 @@ function getTypeLabel(type: string) {
     case 'WITHDRAWAL': return 'Rút tiền';
     case 'REFUND': return 'Hoàn tiền';
     default: return type || 'Giao dịch';
+  }
+}
+
+function getPaymentMethodLabel(method?: string) {
+  if (!method) return 'PAYOS (Thanh toán 100% online)';
+  const m = method.toUpperCase();
+  switch (m) {
+    case 'PAYOS':
+    case 'MOCK':
+      return 'PAYOS (Thanh toán 100% online)';
+    case 'CASH_DEPOSIT':
+    case 'CASH':
+      return 'CASH_DEPOSIT (Đặt cọc online, thanh toán tại quầy)';
+    default:
+      return method;
   }
 }
 
@@ -216,18 +231,57 @@ export default function AdminTransactions() {
 
     try {
       const exportTime = format(new Date(), 'dd/MM/yyyy HH:mm:ss');
-      
-      const titleRows = [
-        ['BÁO CÁO & BẢNG KÊ CHI TIẾT GIAO DỊCH - HỆ THỐNG PETEYE'],
-        [`Thời gian xuất: ${exportTime} | Người xuất: Admin PetEye System`],
-        [`Bộ lọc: Tìm kiếm="${search || 'Tất cả'}" | Trạng thái="${statusFilter || 'Tất cả'}" | Loại="${typeFilter || 'Tất cả'}" | Shop="${shopFilter || 'Tất cả'}"`],
-        [] // empty row spacing
-      ];
+      const ws: any = {};
 
-      const tableHeaders = [
+      const setCell = (r: number, c: number, v: any, style: any = {}, numFmt?: string) => {
+        const cellRef = XLSX.utils.encode_cell({ r, c });
+        const isNum = typeof v === 'number';
+        const cell: any = { v, t: isNum ? 'n' : 's', s: style };
+        if (numFmt) cell.z = numFmt;
+        ws[cellRef] = cell;
+      };
+
+      const titleStyle = {
+        font: { name: 'Calibri', sz: 14, bold: true, color: { rgb: '1A2B4C' } },
+        alignment: { horizontal: 'left', vertical: 'center' }
+      };
+
+      const metaStyle = {
+        font: { name: 'Calibri', sz: 9, italic: true, color: { rgb: '64748B' } },
+        alignment: { horizontal: 'left', vertical: 'center' }
+      };
+
+      const headerStyle = {
+        fill: { fgColor: { rgb: '1A2B4C' } },
+        font: { name: 'Calibri', sz: 10, bold: true, color: { rgb: 'FFFFFF' } },
+        alignment: { horizontal: 'center', vertical: 'center', wrapText: true },
+        border: {
+          top: { style: 'thin', color: { rgb: '000000' } },
+          bottom: { style: 'medium', color: { rgb: '000000' } },
+          left: { style: 'thin', color: { rgb: '334155' } },
+          right: { style: 'thin', color: { rgb: '334155' } }
+        }
+      };
+
+      const thinBorder = {
+        top: { style: 'thin', color: { rgb: 'CBD5E1' } },
+        bottom: { style: 'thin', color: { rgb: 'CBD5E1' } },
+        left: { style: 'thin', color: { rgb: 'CBD5E1' } },
+        right: { style: 'thin', color: { rgb: 'CBD5E1' } }
+      };
+
+      const getRowBg = (idx: number) => (idx % 2 === 0 ? 'FFFFFF' : 'F8FAFC');
+
+      // 1. Header Information
+      setCell(0, 0, 'PETEYE SYSTEM — BÁO CÁO & BẢNG KÊ CHI TIẾT GIAO DỊCH', titleStyle);
+      setCell(1, 0, `Thời gian xuất: ${exportTime} | Người xuất: Admin PetEye System`, metaStyle);
+      setCell(2, 0, `Bộ lọc: Tìm kiếm="${search || 'Tất cả'}" | Trạng thái="${statusFilter || 'Tất cả'}" | Loại="${typeFilter || 'Tất cả'}" | Shop="${shopFilter || 'Tất cả'}"`, metaStyle);
+
+      // 2. Table Headers
+      const headers = [
         'STT',
         'Mã Giao Dịch',
-        'Thời Gian',
+        'Thời Gian Thanh Toán',
         'Cửa Hàng (Shop)',
         'Tên Khách Hàng',
         'Email Khách Hàng',
@@ -238,62 +292,149 @@ export default function AdminTransactions() {
         'Nội Dung Giao Dịch'
       ];
 
-      const dataRows = transactions.map((tx, idx) => [
-        idx + 1,
-        tx.payosOrderCode ? `PAYOS-${tx.payosOrderCode}` : `TXN-${tx.id}`,
-        format(parseISO(tx.completedAt || tx.createdAt), 'dd/MM/yyyy HH:mm:ss'),
-        tx.shopName || 'Hệ thống PetEye',
-        tx.customerName || 'Khách hàng',
-        tx.customerEmail || '—',
-        tx.amount || 0,
-        (tx.paymentMethod || 'PAYOS').toUpperCase(),
-        getTypeLabel(tx.type),
-        tx.status === 'SUCCESS' ? 'Thành công' : tx.status === 'PENDING' ? 'Đang xử lý' : 'Thất bại / Hủy',
-        tx.description || `Thanh toán dịch vụ #${tx.id}`
-      ]);
+      headers.forEach((h, colIdx) => {
+        setCell(4, colIdx, h, headerStyle);
+      });
 
+      // 3. Data Rows
+      let currentRow = 5;
+      transactions.forEach((tx, idx) => {
+        const bg = getRowBg(idx);
+
+        const cellCenter = {
+          fill: { fgColor: { rgb: bg } },
+          font: { name: 'Calibri', sz: 10, color: { rgb: '0F172A' } },
+          alignment: { horizontal: 'center', vertical: 'center' },
+          border: thinBorder
+        };
+
+        const cellCode = {
+          fill: { fgColor: { rgb: bg } },
+          font: { name: 'Calibri', sz: 10, bold: true, color: { rgb: '1E293B' } },
+          alignment: { horizontal: 'center', vertical: 'center' },
+          border: thinBorder
+        };
+
+        const cellLeft = {
+          fill: { fgColor: { rgb: bg } },
+          font: { name: 'Calibri', sz: 10, color: { rgb: '334155' } },
+          alignment: { horizontal: 'left', vertical: 'center' },
+          border: thinBorder
+        };
+
+        const cellAmount = {
+          fill: { fgColor: { rgb: bg } },
+          font: { name: 'Calibri', sz: 10, bold: true, color: { rgb: '059669' } },
+          alignment: { horizontal: 'right', vertical: 'center' },
+          border: thinBorder
+        };
+
+        const s = tx.status ? tx.status.toUpperCase() : 'PENDING';
+        let statusStyle = cellCenter;
+        if (s === 'SUCCESS' || s === 'COMPLETED' || s === 'PAID') {
+          statusStyle = {
+            fill: { fgColor: { rgb: 'DEF7EC' } },
+            font: { name: 'Calibri', sz: 9, bold: true, color: { rgb: '03543F' } },
+            alignment: { horizontal: 'center', vertical: 'center' },
+            border: thinBorder
+          };
+        } else if (s === 'PENDING' || s === 'PROCESSING' || s === 'WAITING') {
+          statusStyle = {
+            fill: { fgColor: { rgb: 'FEF3C7' } },
+            font: { name: 'Calibri', sz: 9, bold: true, color: { rgb: '92400E' } },
+            alignment: { horizontal: 'center', vertical: 'center' },
+            border: thinBorder
+          };
+        } else {
+          statusStyle = {
+            fill: { fgColor: { rgb: 'FDE8E8' } },
+            font: { name: 'Calibri', sz: 9, bold: true, color: { rgb: '9B1C1C' } },
+            alignment: { horizontal: 'center', vertical: 'center' },
+            border: thinBorder
+          };
+        }
+
+        const code = tx.payosOrderCode ? `PAYOS-${tx.payosOrderCode}` : `TXN-${tx.id}`;
+        const timeStr = format(parseISO(tx.completedAt || tx.createdAt), 'dd/MM/yyyy HH:mm:ss');
+        const shop = tx.shopName || 'Hệ thống PetEye';
+        const customer = tx.customerName || 'Khách hàng';
+        const email = tx.customerEmail || '—';
+        const amount = tx.amount || 0;
+        const method = getPaymentMethodLabel(tx.paymentMethod);
+        const type = getTypeLabel(tx.type);
+        const statusText = s === 'SUCCESS' || s === 'PAID' ? 'Thành công' : s === 'PENDING' ? 'Đang xử lý' : 'Thất bại / Hủy';
+        const desc = tx.description || `Thanh toán dịch vụ #${tx.id}`;
+
+        setCell(currentRow, 0, idx + 1, cellCenter);
+        setCell(currentRow, 1, code, cellCode);
+        setCell(currentRow, 2, timeStr, cellCenter);
+        setCell(currentRow, 3, shop, cellLeft);
+        setCell(currentRow, 4, customer, cellLeft);
+        setCell(currentRow, 5, email, cellLeft);
+        setCell(currentRow, 6, amount, cellAmount, '#,##0"đ"');
+        setCell(currentRow, 7, method, cellCenter);
+        setCell(currentRow, 8, type, cellLeft);
+        setCell(currentRow, 9, statusText, statusStyle);
+        setCell(currentRow, 10, desc, cellLeft);
+
+        currentRow++;
+      });
+
+      // 4. Summary Row
+      currentRow++;
       const totalSum = transactions.reduce((acc, t) => acc + (t.amount || 0), 0);
-      const summaryRow = [
-        'TỔNG CỘNG',
-        '',
-        '',
-        '',
-        '',
-        '',
-        totalSum,
-        '',
-        '',
-        '',
-        `Tổng số ${transactions.length} giao dịch`
-      ];
 
-      const allRows = [...titleRows, tableHeaders, ...dataRows, [], summaryRow];
+      const summaryLabelStyle = {
+        fill: { fgColor: { rgb: 'E2E8F0' } },
+        font: { name: 'Calibri', sz: 11, bold: true, color: { rgb: '0F172A' } },
+        alignment: { horizontal: 'left', vertical: 'center' },
+        border: {
+          top: { style: 'medium', color: { rgb: '0F172A' } },
+          bottom: { style: 'double', color: { rgb: '0F172A' } },
+          left: thinBorder.left,
+          right: thinBorder.right
+        }
+      };
 
-      // Build Worksheet
-      const worksheet = XLSX.utils.aoa_to_sheet(allRows);
+      const summaryAmountStyle = {
+        fill: { fgColor: { rgb: 'D1FAE5' } },
+        font: { name: 'Calibri', sz: 11, bold: true, color: { rgb: '065F46' } },
+        alignment: { horizontal: 'right', vertical: 'center' },
+        border: {
+          top: { style: 'medium', color: { rgb: '0F172A' } },
+          bottom: { style: 'double', color: { rgb: '0F172A' } },
+          left: thinBorder.left,
+          right: thinBorder.right
+        }
+      };
 
-      // Set explicit column widths to prevent squeezed text
-      worksheet['!cols'] = [
+      setCell(currentRow, 0, 'TỔNG CỘNG', summaryLabelStyle);
+      for (let c = 1; c <= 5; c++) setCell(currentRow, c, '', summaryLabelStyle);
+      setCell(currentRow, 6, totalSum, summaryAmountStyle, '#,##0"đ"');
+      for (let c = 7; c <= 9; c++) setCell(currentRow, c, '', summaryLabelStyle);
+      setCell(currentRow, 10, `Tổng số: ${transactions.length} giao dịch đối soát`, summaryLabelStyle);
+
+      ws['!ref'] = XLSX.utils.encode_range({ s: { r: 0, c: 0 }, e: { r: currentRow, c: 10 } });
+      ws['!cols'] = [
         { wch: 8 },  // STT
         { wch: 24 }, // Mã GD
         { wch: 22 }, // Thời gian
-        { wch: 28 }, // Cửa hàng
-        { wch: 25 }, // Khách hàng
+        { wch: 30 }, // Cửa hàng
+        { wch: 26 }, // Khách hàng
         { wch: 32 }, // Email
         { wch: 20 }, // Số tiền
         { wch: 18 }, // Phương thức
         { wch: 25 }, // Loại GD
         { wch: 20 }, // Trạng thái
-        { wch: 45 }  // Nội dung
+        { wch: 52 }  // Nội dung
       ];
 
-      // Build Workbook
       const workbook = XLSX.utils.book_new();
-      XLSX.utils.book_append_sheet(workbook, worksheet, 'Danh Sách Giao Dịch');
+      XLSX.utils.book_append_sheet(workbook, ws, 'Danh Sách Giao Dịch');
 
       const fileName = `Bao_Cao_Giao_Dich_PetEye_${format(new Date(), 'yyyyMMdd_HHmmss')}.xlsx`;
       XLSX.writeFile(workbook, fileName);
-      toast.success('Xuất file Excel thành công!');
+      toast.success('Xuất file Excel báo cáo đẹp mắt thành công!');
     } catch (err) {
       console.error(err);
       toast.error('Có lỗi xảy ra khi xuất file Excel.');
@@ -492,6 +633,7 @@ export default function AdminTransactions() {
                 <th className="py-3.5 px-4">Số tiền</th>
                 <th className="py-3.5 px-4">Phương thức</th>
                 <th className="py-3.5 px-4">Loại</th>
+                <th className="py-3.5 px-4">Nội dung chuyển khoản</th>
                 <th className="py-3.5 px-4">Trạng thái</th>
                 <th className="py-3.5 px-4 text-center">Thao tác</th>
               </tr>
@@ -499,14 +641,14 @@ export default function AdminTransactions() {
             <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
               {isLoading ? (
                 <tr>
-                  <td colSpan={8} className="text-center py-12 text-slate-400">
+                  <td colSpan={9} className="text-center py-12 text-slate-400">
                     <RefreshCw className="animate-spin mx-auto mb-2" size={20} />
                     Đang tải dữ liệu giao dịch...
                   </td>
                 </tr>
               ) : transactions.length === 0 ? (
                 <tr>
-                  <td colSpan={8} className="text-center py-12 text-slate-400">
+                  <td colSpan={9} className="text-center py-12 text-slate-400">
                     Không tìm thấy giao dịch nào phù hợp.
                   </td>
                 </tr>
@@ -551,13 +693,20 @@ export default function AdminTransactions() {
                     </td>
 
                     {/* Method */}
-                    <td className="py-3.5 px-4 uppercase font-bold text-[11px] text-slate-500 dark:text-slate-400">
-                      {tx.paymentMethod || 'PAYOS'}
+                    <td className="py-3.5 px-4 font-bold text-[11px] text-slate-700 dark:text-slate-300">
+                      {getPaymentMethodLabel(tx.paymentMethod)}
                     </td>
 
                     {/* Type */}
                     <td className="py-3.5 px-4 font-medium text-[11px]">
                       {getTypeLabel(tx.type)}
+                    </td>
+
+                    {/* Description / Nội dung chuyển khoản */}
+                    <td className="py-3.5 px-4 font-medium text-[11px]">
+                      <span className="truncate max-w-[220px] block font-mono text-[11px] text-slate-600 dark:text-slate-300" title={tx.description || `Thanh toán dịch vụ #${tx.bookingId || tx.id}`}>
+                        {tx.description || `Thanh toán dịch vụ #${tx.bookingId || tx.id}`}
+                      </span>
                     </td>
 
                     {/* Status */}
@@ -674,12 +823,12 @@ export default function AdminTransactions() {
                       {selectedTx.customerEmail || 'N/A'}
                     </span>
                   </div>
-                  <div className="flex justify-between items-start gap-4">
-                    <span className="text-slate-500">Phương thức</span>
-                    <span className="font-bold text-[#1a2b4c] text-right uppercase">
-                      {selectedTx.paymentMethod || 'PAYOS'}
-                    </span>
-                  </div>
+                    <div className="flex justify-between items-start gap-4">
+                      <span className="text-slate-500">Phương thức</span>
+                      <span className="font-bold text-[#1a2b4c] text-right">
+                        {getPaymentMethodLabel(selectedTx.paymentMethod)}
+                      </span>
+                    </div>
                   <div className="flex justify-between items-start gap-4">
                     <span className="text-slate-500">Loại giao dịch</span>
                     <span className="font-bold text-[#1a2b4c] text-right">
