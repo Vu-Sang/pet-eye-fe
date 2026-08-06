@@ -1147,7 +1147,9 @@ export default function ShopBookings() {
                                     <div className="border-t border-dashed border-slate-200 dark:border-slate-700 py-6 space-y-4">
                                         <div className="flex justify-between items-start gap-4">
                                             <span className="text-xs text-slate-500 min-w-[90px]">Mã giao dịch</span>
-                                            <span className="text-xs font-bold text-[#1a2b4c] dark:text-white text-right break-all">MOCK-{viewInvoiceBooking.bookingId || viewInvoiceBooking.id}</span>
+                                            <span className="text-xs font-bold text-[#1a2b4c] dark:text-white text-right break-all">
+                                                {viewInvoiceBooking.payosOrderCode ? `PAYOS-${viewInvoiceBooking.payosOrderCode}` : `PE-PAYMENT-${viewInvoiceBooking.bookingId || viewInvoiceBooking.id}`}
+                                            </span>
                                         </div>
                                         <div className="flex justify-between items-start gap-4">
                                             <span className="text-xs text-slate-500 min-w-[90px]">Thời gian</span>
@@ -1156,9 +1158,29 @@ export default function ShopBookings() {
                                             </span>
                                         </div>
                                         <div className="flex justify-between items-start gap-4">
+                                            <span className="text-xs text-slate-500 min-w-[90px]">Khách hàng</span>
+                                            <span className="text-xs font-bold text-[#1a2b4c] dark:text-white text-right">
+                                                {viewInvoiceBooking.customerName || viewInvoiceBooking.userName || 'Khách hàng'}
+                                            </span>
+                                        </div>
+                                        <div className="flex justify-between items-start gap-4">
+                                            <span className="text-xs text-slate-500 min-w-[90px]">Email</span>
+                                            <span className="text-xs font-bold text-[#1a2b4c] dark:text-white text-right">
+                                                {viewInvoiceBooking.customerEmail || 'support@peteye.vn'}
+                                            </span>
+                                        </div>
+                                        {viewInvoiceBooking.customerPhone && (
+                                            <div className="flex justify-between items-start gap-4">
+                                                <span className="text-xs text-slate-500 min-w-[90px]">Số điện thoại</span>
+                                                <span className="text-xs font-bold text-[#1a2b4c] dark:text-white text-right">
+                                                    {viewInvoiceBooking.customerPhone}
+                                                </span>
+                                            </div>
+                                        )}
+                                        <div className="flex justify-between items-start gap-4">
                                             <span className="text-xs text-slate-500 min-w-[90px]">Phương thức</span>
                                             <span className="text-xs font-bold text-[#1a2b4c] dark:text-white text-right uppercase">
-                                                {viewInvoiceBooking.paymentMethod || 'MOCK'}
+                                                {viewInvoiceBooking.paymentMethod || 'PAYOS'}
                                             </span>
                                         </div>
                                         <div className="flex justify-between items-start gap-4">
@@ -1178,7 +1200,7 @@ export default function ShopBookings() {
                                         <div className="flex justify-between items-start gap-4">
                                             <span className="text-xs text-slate-500 min-w-[90px]">Nội dung</span>
                                             <span className="text-xs font-bold text-[#1a2b4c] dark:text-white text-right">
-                                                Mock payment for booking #{viewInvoiceBooking.bookingId || viewInvoiceBooking.id}
+                                                Thanh toán dịch vụ đơn hàng #{viewInvoiceBooking.bookingId || viewInvoiceBooking.id}
                                             </span>
                                         </div>
                                     </div>

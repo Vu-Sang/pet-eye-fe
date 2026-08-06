@@ -120,3 +120,56 @@ export const formatServiceDuration = (minutes: number | undefined | null, catego
   }
   return `${minutes} phút`;
 };
+
+export const checkIsShopOpen = (
+  openTime?: string,
+  closeTime?: string,
+  workingDaysStr?: string
+): boolean => {
+  if (!openTime || !closeTime) return false;
+
+  const now = new Date();
+
+  if (workingDaysStr) {
+    const jsDayToDayName: Record<number, string> = {
+      0: 'Chủ nhật',
+      1: 'Thứ 2',
+      2: 'Thứ 3',
+      3: 'Thứ 4',
+      4: 'Thứ 5',
+      5: 'Thứ 6',
+      6: 'Thứ 7',
+    };
+    const currentDayName = jsDayToDayName[now.getDay()];
+    const selectedDays = workingDaysStr
+      .split(',')
+      .map(d => d.trim());
+
+    if (selectedDays.length > 0 && !selectedDays.includes(currentDayName)) {
+      return false;
+    }
+  }
+
+  const parseTimeToMinutes = (timeStr: string): number | null => {
+    const parts = timeStr.trim().split(':');
+    if (parts.length < 2) return null;
+    const h = parseInt(parts[0], 10);
+    const m = parseInt(parts[1], 10);
+    if (isNaN(h) || isNaN(m)) return null;
+    return h * 60 + m;
+  };
+
+  const openMinutes = parseTimeToMinutes(openTime);
+  const closeMinutes = parseTimeToMinutes(closeTime);
+
+  if (openMinutes === null || closeMinutes === null) return false;
+
+  const currentMinutes = now.getHours() * 60 + now.getMinutes();
+
+  if (closeMinutes > openMinutes) {
+    return currentMinutes >= openMinutes && currentMinutes < closeMinutes;
+  } else {
+    return currentMinutes >= openMinutes || currentMinutes < closeMinutes;
+  }
+};
+
