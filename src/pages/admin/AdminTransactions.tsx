@@ -52,6 +52,21 @@ function getTypeLabel(type: string) {
   }
 }
 
+function getPaymentMethodLabel(method?: string) {
+  if (!method) return 'PAYOS (Thanh toán 100% online)';
+  const m = method.toUpperCase();
+  switch (m) {
+    case 'PAYOS':
+    case 'MOCK':
+      return 'PAYOS (Thanh toán 100% online)';
+    case 'CASH_DEPOSIT':
+    case 'CASH':
+      return 'CASH_DEPOSIT (Đặt cọc online, thanh toán tại quầy)';
+    default:
+      return method;
+  }
+}
+
 // ─── Custom Sleek Dropdown Component ──────────────────────────────────────────
 interface SelectOption {
   label: string;
@@ -345,7 +360,7 @@ export default function AdminTransactions() {
         const customer = tx.customerName || 'Khách hàng';
         const email = tx.customerEmail || '—';
         const amount = tx.amount || 0;
-        const method = (tx.paymentMethod || 'PAYOS').toUpperCase();
+        const method = getPaymentMethodLabel(tx.paymentMethod);
         const type = getTypeLabel(tx.type);
         const statusText = s === 'SUCCESS' || s === 'PAID' ? 'Thành công' : s === 'PENDING' ? 'Đang xử lý' : 'Thất bại / Hủy';
         const desc = tx.description || `Thanh toán dịch vụ #${tx.id}`;
@@ -618,6 +633,7 @@ export default function AdminTransactions() {
                 <th className="py-3.5 px-4">Số tiền</th>
                 <th className="py-3.5 px-4">Phương thức</th>
                 <th className="py-3.5 px-4">Loại</th>
+                <th className="py-3.5 px-4">Nội dung chuyển khoản</th>
                 <th className="py-3.5 px-4">Trạng thái</th>
                 <th className="py-3.5 px-4 text-center">Thao tác</th>
               </tr>
@@ -625,14 +641,14 @@ export default function AdminTransactions() {
             <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
               {isLoading ? (
                 <tr>
-                  <td colSpan={8} className="text-center py-12 text-slate-400">
+                  <td colSpan={9} className="text-center py-12 text-slate-400">
                     <RefreshCw className="animate-spin mx-auto mb-2" size={20} />
                     Đang tải dữ liệu giao dịch...
                   </td>
                 </tr>
               ) : transactions.length === 0 ? (
                 <tr>
-                  <td colSpan={8} className="text-center py-12 text-slate-400">
+                  <td colSpan={9} className="text-center py-12 text-slate-400">
                     Không tìm thấy giao dịch nào phù hợp.
                   </td>
                 </tr>
@@ -677,13 +693,20 @@ export default function AdminTransactions() {
                     </td>
 
                     {/* Method */}
-                    <td className="py-3.5 px-4 uppercase font-bold text-[11px] text-slate-500 dark:text-slate-400">
-                      {tx.paymentMethod || 'PAYOS'}
+                    <td className="py-3.5 px-4 font-bold text-[11px] text-slate-700 dark:text-slate-300">
+                      {getPaymentMethodLabel(tx.paymentMethod)}
                     </td>
 
                     {/* Type */}
                     <td className="py-3.5 px-4 font-medium text-[11px]">
                       {getTypeLabel(tx.type)}
+                    </td>
+
+                    {/* Description / Nội dung chuyển khoản */}
+                    <td className="py-3.5 px-4 font-medium text-[11px]">
+                      <span className="truncate max-w-[220px] block font-mono text-[11px] text-slate-600 dark:text-slate-300" title={tx.description || `Thanh toán dịch vụ #${tx.bookingId || tx.id}`}>
+                        {tx.description || `Thanh toán dịch vụ #${tx.bookingId || tx.id}`}
+                      </span>
                     </td>
 
                     {/* Status */}
@@ -800,12 +823,12 @@ export default function AdminTransactions() {
                       {selectedTx.customerEmail || 'N/A'}
                     </span>
                   </div>
-                  <div className="flex justify-between items-start gap-4">
-                    <span className="text-slate-500">Phương thức</span>
-                    <span className="font-bold text-[#1a2b4c] text-right uppercase">
-                      {selectedTx.paymentMethod || 'PAYOS'}
-                    </span>
-                  </div>
+                    <div className="flex justify-between items-start gap-4">
+                      <span className="text-slate-500">Phương thức</span>
+                      <span className="font-bold text-[#1a2b4c] text-right">
+                        {getPaymentMethodLabel(selectedTx.paymentMethod)}
+                      </span>
+                    </div>
                   <div className="flex justify-between items-start gap-4">
                     <span className="text-slate-500">Loại giao dịch</span>
                     <span className="font-bold text-[#1a2b4c] text-right">
