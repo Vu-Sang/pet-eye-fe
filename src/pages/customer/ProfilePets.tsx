@@ -44,6 +44,25 @@ export default function ProfilePets() {
   const [isSpeciesDropdownOpen, setIsSpeciesDropdownOpen] = useState(false);
   const [isGenderDropdownOpen, setIsGenderDropdownOpen] = useState(false);
   const [isCustomSpecies, setIsCustomSpecies] = useState(false);
+  const speciesRef = useRef<HTMLDivElement>(null);
+  const genderRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent | TouchEvent) => {
+      if (speciesRef.current && !speciesRef.current.contains(event.target as Node)) {
+        setIsSpeciesDropdownOpen(false);
+      }
+      if (genderRef.current && !genderRef.current.contains(event.target as Node)) {
+        setIsGenderDropdownOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    document.addEventListener('touchstart', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+      document.removeEventListener('touchstart', handleClickOutside);
+    };
+  }, []);
   const [step, setStep] = useState(1);
   const [submitting, setSubmitting] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
@@ -376,7 +395,7 @@ export default function ProfilePets() {
       {/* Add Pet Modal */}
       <AnimatePresence>
         {showAddModal && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4 overflow-hidden">
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
@@ -389,17 +408,17 @@ export default function ProfilePets() {
               initial={{ opacity: 0, scale: 0.9, y: 30 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.9, y: 30 }}
-              className="relative w-full max-w-4xl bg-white dark:bg-slate-900 rounded-[3rem] shadow-2xl overflow-hidden flex flex-col md:flex-row h-[90vh] md:h-[700px]"
+              className="relative w-full max-w-4xl bg-white dark:bg-slate-900 rounded-[2.5rem] md:rounded-[3rem] shadow-2xl overflow-hidden flex flex-col md:flex-row h-[88vh] max-h-[88vh] md:h-[700px] my-auto min-h-0"
             >
               <button 
                 onClick={() => setShowAddModal(false)}
-                className="absolute top-6 right-6 z-20 p-2.5 bg-white/80 dark:bg-slate-800/80 backdrop-blur-xl text-slate-500 hover:text-red-500 rounded-full transition-all shadow-sm border border-slate-100 dark:border-slate-700"
+                className="absolute top-4 right-4 md:top-6 md:right-6 z-20 p-2 md:p-2.5 bg-white/80 dark:bg-slate-800/80 backdrop-blur-xl text-slate-500 hover:text-red-500 rounded-full transition-all shadow-sm border border-slate-100 dark:border-slate-700"
               >
                 <X size={20} />
               </button>
 
               {/* Modal Sidebar */}
-              <div className="md:w-[280px] shrink-0 bg-slate-50 dark:bg-slate-800/40 p-6 md:p-10 flex flex-col border-b md:border-b-0 md:border-r border-slate-100 dark:border-slate-800 z-10">
+              <div className="md:w-[280px] shrink-0 bg-slate-50 dark:bg-slate-800/40 p-4 md:p-10 flex flex-col border-b md:border-b-0 md:border-r border-slate-100 dark:border-slate-800 z-10">
                 
                 {/* Mobile Header (Horizontal & Compact) */}
                 <div className="flex md:hidden items-center gap-4">
@@ -466,8 +485,8 @@ export default function ProfilePets() {
               </div>
 
               {/* Modal Content */}
-              <div className="flex-1 flex flex-col relative">
-                <div className="flex-1 p-6 pb-28 md:p-12 overflow-y-auto custom-scrollbar">
+              <div className="flex-1 flex flex-col min-h-0 overflow-hidden relative">
+                <div className="flex-1 p-4 md:p-12 overflow-y-auto custom-scrollbar touch-pan-y min-h-0 pb-6">
                   <AnimatePresence mode="wait">
                     <motion.div
                       key={step}
@@ -475,13 +494,13 @@ export default function ProfilePets() {
                       animate={{ opacity: 1, x: 0 }}
                       exit={{ opacity: 0, x: -20 }}
                       transition={{ duration: 0.3 }}
-                      className="space-y-8"
+                      className="space-y-6 md:space-y-8"
                     >
                       {step === 1 && (
                         <>
-                          <div className="flex flex-col items-center gap-4 py-2">
+                          <div className="flex flex-col items-center gap-3 py-1">
                             <div className="relative group cursor-pointer" onClick={() => fileInputRef.current?.click()}>
-                              <div className="size-36 rounded-[2.5rem] overflow-hidden ring-8 ring-slate-50 dark:ring-slate-800 transition-all shadow-2xl group-hover:ring-blue-100 dark:group-hover:ring-blue-900/20">
+                              <div className="size-28 md:size-36 rounded-[2rem] md:rounded-[2.5rem] overflow-hidden ring-6 md:ring-8 ring-slate-50 dark:ring-slate-800 transition-all shadow-xl group-hover:ring-blue-100 dark:group-hover:ring-blue-900/20">
                                 <img 
                                   src={formData.avatar || (formData.species === 'Mèo' ? 'https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?q=80&w=2043&auto=format&fit=crop' : 'https://images.unsplash.com/photo-1583511655857-d19b40a7a54e?q=80&w=2069&auto=format&fit=crop')} 
                                   className={`size-full object-cover ${isUploading ? 'opacity-50' : ''}`}
@@ -514,50 +533,56 @@ export default function ProfilePets() {
                               />
                             </div>
 
-                            <div className="relative">
+                            <div className="relative" ref={speciesRef}>
                               <label className="text-sm font-bold text-slate-400 mb-2 block">Loài</label>
-                              <div 
-                                className="w-full px-6 py-4 bg-slate-50 dark:bg-slate-800 border-2 border-transparent focus-within:border-blue-600/30 rounded-2xl text-slate-900 dark:text-white transition-all font-bold cursor-pointer flex items-center justify-between"
+                              <button
+                                type="button"
                                 onClick={() => setIsSpeciesDropdownOpen(!isSpeciesDropdownOpen)}
+                                className="w-full px-6 py-4 bg-slate-50 dark:bg-slate-800 border-2 border-transparent focus:border-blue-600/30 rounded-2xl text-slate-900 dark:text-white transition-all font-bold cursor-pointer flex items-center justify-between shadow-sm"
                               >
                                 <span>{formData.species === 'Chó' ? '🐶 ' : formData.species === 'Mèo' ? '🐱 ' : formData.species === 'Thỏ' ? '🐰 ' : '✨ '}{isCustomSpecies ? 'Khác' : formData.species}</span>
-                                <ChevronDown size={20} className="text-slate-400" />
-                              </div>
+                                <ChevronDown size={20} className={`text-slate-400 transition-transform duration-200 ${isSpeciesDropdownOpen ? 'rotate-180' : ''}`} />
+                              </button>
                               
                               <AnimatePresence>
                                 {isSpeciesDropdownOpen && (
-                                  <>
-                                    <div className="fixed inset-0 z-40" onClick={() => setIsSpeciesDropdownOpen(false)} />
-                                    <motion.div 
-                                      initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }}
-                                      className="absolute z-50 mt-2 w-full bg-white dark:bg-slate-800 border border-slate-100 dark:border-slate-700 rounded-2xl shadow-xl overflow-hidden p-2"
-                                    >
-                                      {[
-                                        { val: 'Chó', icon: '🐶' },
-                                        { val: 'Mèo', icon: '🐱' },
-                                        { val: 'Thỏ', icon: '🐰' },
-                                        { val: 'Khác', icon: '✨' },
-                                      ].map(opt => (
-                                        <button
-                                          key={opt.val}
-                                          type="button"
-                                          onClick={() => {
-                                            if (opt.val === 'Khác') {
-                                              setFormData({...formData, species: ''});
-                                              setIsCustomSpecies(true);
-                                            } else {
-                                              setFormData({...formData, species: opt.val});
-                                              setIsCustomSpecies(false);
-                                            }
-                                            setIsSpeciesDropdownOpen(false);
-                                          }}
-                                          className={`w-full text-left px-4 py-3 rounded-xl font-bold transition-colors flex items-center ${formData.species === opt.val ? 'bg-blue-50 dark:bg-blue-900/30 text-blue-600' : 'text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700/50'}`}
-                                        >
-                                          <span className="mr-2 text-lg">{opt.icon}</span> {opt.val}
-                                        </button>
-                                      ))}
-                                    </motion.div>
-                                  </>
+                                  <motion.div 
+                                    initial={{ opacity: 0, y: 5, scale: 0.98 }} 
+                                    animate={{ opacity: 1, y: 0, scale: 1 }} 
+                                    exit={{ opacity: 0, y: 5, scale: 0.98 }}
+                                    transition={{ duration: 0.15 }}
+                                    className="absolute left-0 right-0 top-full mt-2 z-[100] bg-white dark:bg-slate-800 border border-slate-100 dark:border-slate-700 rounded-2xl shadow-xl overflow-hidden p-2 space-y-1"
+                                  >
+                                    {[
+                                      { val: 'Chó', icon: '🐶' },
+                                      { val: 'Mèo', icon: '🐱' },
+                                      { val: 'Thỏ', icon: '🐰' },
+                                      { val: 'Khác', icon: '✨' },
+                                    ].map(opt => (
+                                      <button
+                                        key={opt.val}
+                                        type="button"
+                                        onPointerDown={(e) => {
+                                          e.preventDefault();
+                                          if (opt.val === 'Khác') {
+                                            setFormData(prev => ({ ...prev, species: '' }));
+                                            setIsCustomSpecies(true);
+                                          } else {
+                                            setFormData(prev => ({ ...prev, species: opt.val }));
+                                            setIsCustomSpecies(false);
+                                          }
+                                          setIsSpeciesDropdownOpen(false);
+                                        }}
+                                        className={`w-full text-left px-4 py-3 rounded-xl font-bold text-sm transition-colors flex items-center ${
+                                          (isCustomSpecies && opt.val === 'Khác') || (!isCustomSpecies && formData.species === opt.val)
+                                            ? 'bg-blue-50 dark:bg-blue-900/40 text-blue-600 dark:text-blue-400'
+                                            : 'text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700/50'
+                                        }`}
+                                      >
+                                        <span className="mr-2 text-lg">{opt.icon}</span> {opt.val}
+                                      </button>
+                                    ))}
+                                  </motion.div>
                                 )}
                               </AnimatePresence>
                             </div>
@@ -608,39 +633,45 @@ export default function ProfilePets() {
                               />
                             </div>
 
-                            <div className="relative">
+                            <div className="relative" ref={genderRef}>
                               <label className="text-sm font-bold text-slate-400 mb-2 block">Giới tính</label>
-                              <div 
-                                className="w-full px-6 py-4 bg-slate-50 dark:bg-slate-800 border-2 border-transparent focus-within:border-blue-600/30 rounded-2xl text-slate-900 dark:text-white transition-all font-bold cursor-pointer flex items-center justify-between"
+                              <button
+                                type="button"
                                 onClick={() => setIsGenderDropdownOpen(!isGenderDropdownOpen)}
+                                className="w-full px-6 py-4 bg-slate-50 dark:bg-slate-800 border-2 border-transparent focus:border-blue-600/30 rounded-2xl text-slate-900 dark:text-white transition-all font-bold cursor-pointer flex items-center justify-between shadow-sm"
                               >
                                 <span>{formData.gender}</span>
-                                <ChevronDown size={20} className="text-slate-400" />
-                              </div>
+                                <ChevronDown size={20} className={`text-slate-400 transition-transform duration-200 ${isGenderDropdownOpen ? 'rotate-180' : ''}`} />
+                              </button>
                               
                               <AnimatePresence>
                                 {isGenderDropdownOpen && (
-                                  <>
-                                    <div className="fixed inset-0 z-40" onClick={() => setIsGenderDropdownOpen(false)} />
-                                    <motion.div 
-                                      initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }}
-                                      className="absolute z-50 mt-2 w-full bg-white dark:bg-slate-800 border border-slate-100 dark:border-slate-700 rounded-2xl shadow-xl overflow-hidden p-2"
-                                    >
-                                      {['Đực', 'Cái', 'Chưa rõ'].map(opt => (
-                                        <button
-                                          key={opt}
-                                          type="button"
-                                          onClick={() => {
-                                            setFormData({...formData, gender: opt});
-                                            setIsGenderDropdownOpen(false);
-                                          }}
-                                          className={`w-full text-left px-4 py-3 rounded-xl font-bold transition-colors ${formData.gender === opt ? 'bg-blue-50 dark:bg-blue-900/30 text-blue-600' : 'text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700/50'}`}
-                                        >
-                                          {opt}
-                                        </button>
-                                      ))}
-                                    </motion.div>
-                                  </>
+                                  <motion.div 
+                                    initial={{ opacity: 0, y: -5, scale: 0.98 }} 
+                                    animate={{ opacity: 1, y: 0, scale: 1 }} 
+                                    exit={{ opacity: 0, y: -5, scale: 0.98 }}
+                                    transition={{ duration: 0.15 }}
+                                    className="absolute left-0 right-0 bottom-full mb-2 z-[100] bg-white dark:bg-slate-800 border border-slate-100 dark:border-slate-700 rounded-2xl shadow-xl overflow-hidden p-2 space-y-1"
+                                  >
+                                    {['Đực', 'Cái', 'Chưa rõ'].map(opt => (
+                                      <button
+                                        key={opt}
+                                        type="button"
+                                        onPointerDown={(e) => {
+                                          e.preventDefault();
+                                          setFormData(prev => ({ ...prev, gender: opt }));
+                                          setIsGenderDropdownOpen(false);
+                                        }}
+                                        className={`w-full text-left px-4 py-3 rounded-xl font-bold text-sm transition-colors ${
+                                          formData.gender === opt 
+                                            ? 'bg-blue-50 dark:bg-blue-900/40 text-blue-600 dark:text-blue-400' 
+                                            : 'text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700/50'
+                                        }`}
+                                      >
+                                        {opt}
+                                      </button>
+                                    ))}
+                                  </motion.div>
                                 )}
                               </AnimatePresence>
                             </div>
@@ -909,7 +940,7 @@ export default function ProfilePets() {
                 </div>
 
                 {/* Modal Footer */}
-                <div className="p-8 md:p-10 border-t border-slate-100 dark:border-slate-800 flex gap-4">
+                <div className="p-4 md:p-8 border-t border-slate-100 dark:border-slate-800 flex gap-3 md:gap-4 shrink-0 bg-white dark:bg-slate-900 z-10">
                   {step > 1 && (
                     <button
                       type="button"
