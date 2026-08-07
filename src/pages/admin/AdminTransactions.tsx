@@ -67,6 +67,36 @@ function getPaymentMethodLabel(method?: string) {
   }
 }
 
+function getPaymentMethodBadge(method?: string, isDark?: boolean) {
+  const m = (method || 'PAYOS').toUpperCase();
+  if (m === 'CASH_DEPOSIT' || m === 'CASH') {
+    return (
+      <span
+        className={`inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-bold border transition-colors ${
+          isDark
+            ? 'bg-amber-500/10 text-amber-400 border-amber-500/20'
+            : 'bg-amber-50 text-amber-700 border-amber-200'
+        }`}
+        title="CASH_DEPOSIT (Đặt cọc online, thanh toán tại quầy)"
+      >
+        CASH_DEPOSIT
+      </span>
+    );
+  }
+  return (
+    <span
+      className={`inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-bold border transition-colors ${
+        isDark
+          ? 'bg-blue-500/10 text-blue-400 border-blue-500/20'
+          : 'bg-blue-50 text-blue-700 border-blue-200'
+      }`}
+      title="PAYOS (Thanh toán 100% online)"
+    >
+      PAYOS
+    </span>
+  );
+}
+
 // ─── Custom Sleek Dropdown Component ──────────────────────────────────────────
 interface SelectOption {
   label: string;
@@ -627,15 +657,15 @@ export default function AdminTransactions() {
               <tr className={`border-b text-[11px] uppercase font-bold tracking-wider ${
                 isDark ? 'bg-slate-800/60 border-slate-800 text-slate-400' : 'bg-slate-50 border-slate-200 text-slate-500'
               }`}>
-                <th className="py-3.5 px-4">Mã Giao Dịch</th>
-                <th className="py-3.5 px-4">Cửa hàng (Shop)</th>
-                <th className="py-3.5 px-4">Khách hàng</th>
-                <th className="py-3.5 px-4">Số tiền</th>
-                <th className="py-3.5 px-4">Phương thức</th>
-                <th className="py-3.5 px-4">Loại</th>
-                <th className="py-3.5 px-4">Nội dung chuyển khoản</th>
-                <th className="py-3.5 px-4">Trạng thái</th>
-                <th className="py-3.5 px-4 text-center">Thao tác</th>
+                <th className="py-3 px-3">Mã GD</th>
+                <th className="py-3 px-3">Shop</th>
+                <th className="py-3 px-3">Khách hàng</th>
+                <th className="py-3 px-3">Số tiền</th>
+                <th className="py-3 px-3">Phương thức</th>
+                <th className="py-3 px-3">Loại</th>
+                <th className="py-3 px-3">Nội dung</th>
+                <th className="py-3 px-3">Trạng thái</th>
+                <th className="py-3 px-3 text-center">Thao tác</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
@@ -658,7 +688,7 @@ export default function AdminTransactions() {
                     isDark ? 'text-slate-300' : 'text-slate-700'
                   }`}>
                     {/* Mã GD */}
-                    <td className="py-3.5 px-4">
+                    <td className="py-3 px-3">
                       <p className="font-bold text-slate-900 dark:text-white">
                         {tx.payosOrderCode ? `PAYOS-${tx.payosOrderCode}` : `TXN-${tx.id}`}
                       </p>
@@ -668,54 +698,54 @@ export default function AdminTransactions() {
                     </td>
 
                     {/* Shop */}
-                    <td className="py-3.5 px-4 font-semibold">
-                      <div className="flex items-center gap-1.5 text-indigo-600 dark:text-indigo-400">
-                        <Building2 size={13} />
-                        <span>{tx.shopName || 'Hệ thống / PetEye'}</span>
+                    <td className="py-3 px-3 font-semibold">
+                      <div className="flex items-center gap-1 text-indigo-600 dark:text-indigo-400">
+                        <Building2 size={12} className="shrink-0" />
+                        <span className="truncate max-w-[120px] block" title={tx.shopName || 'Hệ thống / PetEye'}>{tx.shopName || 'Hệ thống / PetEye'}</span>
                       </div>
                     </td>
 
                     {/* Customer */}
-                    <td className="py-3.5 px-4">
-                      <p className="font-bold text-slate-900 dark:text-white">
+                    <td className="py-3 px-3">
+                      <p className="font-bold text-slate-900 dark:text-white truncate max-w-[130px]" title={tx.customerName || 'Khách hàng'}>
                         {tx.customerName || 'Khách hàng'}
                       </p>
-                      <p className="text-[10px] text-slate-400">
+                      <p className="text-[10px] text-slate-400 truncate max-w-[130px]" title={tx.customerEmail || '—'}>
                         {tx.customerEmail || '—'}
                       </p>
                     </td>
 
                     {/* Amount */}
-                    <td className="py-3.5 px-4">
-                      <span className="font-black text-emerald-600 dark:text-emerald-400 text-sm">
+                    <td className="py-3 px-3">
+                      <span className="font-black text-emerald-600 dark:text-emerald-400 text-xs">
                         +{(tx.amount || 0).toLocaleString()}đ
                       </span>
                     </td>
 
                     {/* Method */}
-                    <td className="py-3.5 px-4 font-bold text-[11px] text-slate-700 dark:text-slate-300">
-                      {getPaymentMethodLabel(tx.paymentMethod)}
+                    <td className="py-3 px-3">
+                      {getPaymentMethodBadge(tx.paymentMethod, isDark)}
                     </td>
 
                     {/* Type */}
-                    <td className="py-3.5 px-4 font-medium text-[11px]">
+                    <td className="py-3 px-3 font-medium text-[11px]">
                       {getTypeLabel(tx.type)}
                     </td>
 
                     {/* Description / Nội dung chuyển khoản */}
-                    <td className="py-3.5 px-4 font-medium text-[11px]">
-                      <span className="truncate max-w-[220px] block font-mono text-[11px] text-slate-600 dark:text-slate-300" title={tx.description || `Thanh toán dịch vụ #${tx.bookingId || tx.id}`}>
+                    <td className="py-3 px-3 font-medium text-[11px]">
+                      <span className="truncate max-w-[160px] block font-mono text-[11px] text-slate-600 dark:text-slate-300" title={tx.description || `Thanh toán dịch vụ #${tx.bookingId || tx.id}`}>
                         {tx.description || `Thanh toán dịch vụ #${tx.bookingId || tx.id}`}
                       </span>
                     </td>
 
                     {/* Status */}
-                    <td className="py-3.5 px-4">
+                    <td className="py-3 px-3">
                       {getStatusBadge(tx.status, isDark)}
                     </td>
 
                     {/* Action */}
-                    <td className="py-3.5 px-4 text-center">
+                    <td className="py-3 px-3 text-center">
                       <button
                         onClick={() => setSelectedTx(tx)}
                         className="p-1.5 rounded-lg bg-indigo-50 dark:bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 hover:bg-indigo-100 dark:hover:bg-indigo-500/20 transition-colors"
