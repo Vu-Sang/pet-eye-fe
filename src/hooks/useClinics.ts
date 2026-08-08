@@ -79,6 +79,7 @@ export function useClinics() {
       city:     debouncedCity   || undefined,
       shopType: shopTypeParam,
       page,
+      size: 4,
     }),
     staleTime: 30_000,
   });

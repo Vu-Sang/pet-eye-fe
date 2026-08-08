@@ -180,9 +180,9 @@ export const adminService = {
     return res.data.result ?? [];
   },
 
-  getMonthlyHistory: async (month: number, year: number): Promise<Record<string, { day: string; value: number }[]>> => {
+  getMonthlyHistory: async (month: number, year: number, status?: string): Promise<Record<string, { day: string; value: number }[]>> => {
     const res = await apiClient.get<ApiResponse<Record<string, { day: string; value: number }[]>>>('/admin/dashboard/monthly-history', {
-      params: { month, year }
+      params: { month, year, status: status && status !== 'ALL' ? status : undefined }
     });
     return res.data.result!;
   },

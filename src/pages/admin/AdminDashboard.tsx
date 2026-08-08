@@ -100,24 +100,26 @@ export default function AdminDashboard() {
   const [selectedMetric, setSelectedMetric] = useState<any>(null);
   const [compareMonthLeft, setCompareMonthLeft] = useState<number>(new Date().getMonth() === 0 ? 11 : new Date().getMonth() - 1);
   const [compareMonthRight, setCompareMonthRight] = useState<number>(new Date().getMonth());
+  const [bookingStatusFilter, setBookingStatusFilter] = useState<string>('ALL');
   const [userFilter, setUserFilter] = useState<'all' | 'active' | 'inactive'>('all');
   const [showMoreStats, setShowMoreStats] = useState(false);
 
   const handleOpenModal = (metric: any) => {
     setSelectedMetric(metric);
+    setBookingStatusFilter('ALL');
     setCompareMonthLeft(new Date().getMonth() === 0 ? 11 : new Date().getMonth() - 1);
     setCompareMonthRight(new Date().getMonth());
   };
 
   const { data: historyLeft = {} } = useQuery({
-    queryKey: ['admin-history', compareMonthLeft + 1, currentYear],
-    queryFn: () => adminService.getMonthlyHistory(compareMonthLeft + 1, currentYear),
+    queryKey: ['admin-history', compareMonthLeft + 1, currentYear, bookingStatusFilter],
+    queryFn: () => adminService.getMonthlyHistory(compareMonthLeft + 1, currentYear, bookingStatusFilter),
     enabled: selectedMetric !== null,
   });
 
   const { data: historyRight = {} } = useQuery({
-    queryKey: ['admin-history', compareMonthRight + 1, currentYear],
-    queryFn: () => adminService.getMonthlyHistory(compareMonthRight + 1, currentYear),
+    queryKey: ['admin-history', compareMonthRight + 1, currentYear, bookingStatusFilter],
+    queryFn: () => adminService.getMonthlyHistory(compareMonthRight + 1, currentYear, bookingStatusFilter),
     enabled: selectedMetric !== null,
   });
 
@@ -913,21 +915,45 @@ export default function AdminDashboard() {
               <X size={24} />
             </button>
 
-            <div className="flex items-center gap-4 mb-8">
-              <div className={`w-14 h-14 rounded-2xl flex items-center justify-center ${isDark ? accentMap[selectedMetric.accent].iconBg : accentMapLight[selectedMetric.accent].iconBg
-                }`}>
-                <selectedMetric.icon size={28} className={
-                  isDark ? accentMap[selectedMetric.accent].iconText : accentMapLight[selectedMetric.accent].iconText
-                } />
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8 pr-10">
+              <div className="flex items-center gap-4">
+                <div className={`w-14 h-14 rounded-2xl flex items-center justify-center ${isDark ? accentMap[selectedMetric.accent].iconBg : accentMapLight[selectedMetric.accent].iconBg
+                  }`}>
+                  <selectedMetric.icon size={28} className={
+                    isDark ? accentMap[selectedMetric.accent].iconText : accentMapLight[selectedMetric.accent].iconText
+                  } />
+                </div>
+                <div>
+                  <h2 className={`text-2xl font-extrabold tracking-tight ${isDark ? 'text-white' : 'text-slate-900'}`}>
+                    So sánh: {selectedMetric.label}
+                  </h2>
+                  <p className={`text-sm font-medium mt-1 ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>
+                    Biến động 30 ngày qua
+                  </p>
+                </div>
               </div>
-              <div>
-                <h2 className={`text-2xl font-extrabold tracking-tight ${isDark ? 'text-white' : 'text-slate-900'}`}>
-                  So sánh: {selectedMetric.label}
-                </h2>
-                <p className={`text-sm font-medium mt-1 ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>
-                  Biến động 30 ngày qua
-                </p>
-              </div>
+
+              {selectedMetric.apiKey === 'totalBookings' && (
+                <div className="flex items-center gap-2">
+                  <span className={`text-xs font-bold whitespace-nowrap ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>Trạng thái:</span>
+                  <select
+                    value={bookingStatusFilter}
+                    onChange={(e) => setBookingStatusFilter(e.target.value)}
+                    className={`px-3 py-2 rounded-xl border text-xs font-extrabold outline-none transition-all cursor-pointer ${
+                      isDark
+                        ? 'bg-slate-800 border-white/10 text-white hover:border-white/20'
+                        : 'bg-slate-100 border-slate-200 text-slate-800 hover:border-slate-300'
+                    }`}
+                  >
+                    <option value="ALL">Tất cả trạng thái</option>
+                    <option value="CONFIRMED">Đã xác nhận</option>
+                    <option value="WAITING_SHOP_APPROVAL">Chờ duyệt</option>
+                    <option value="IN_PROGRESS">Đang thực hiện</option>
+                    <option value="COMPLETED">Hoàn thành</option>
+                    <option value="CANCELLED">Đã hủy</option>
+                  </select>
+                </div>
+              )}
             </div>
 
             {(() => {

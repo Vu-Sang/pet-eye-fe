@@ -376,11 +376,18 @@ export default function Payment() {
                         {svc.durationMinutes ? ` (${formatServiceDuration(svc.durationMinutes, svc.category)})` : ''}
                       </span>
                     ))}
-                    <span className="px-2 py-1 bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-300 text-xs font-semibold rounded-lg flex items-center gap-1">
-                      <span className="material-symbols-outlined text-[14px]">schedule</span>
-                      Bắt đầu: {booking.date} • {booking.time}
-                      {estimatedEndTime ? ` - Dự kiến xong: ${estimatedEndTime}` : ''}
-                    </span>
+                    {booking.checkIn && booking.checkOut ? (
+                      <span className="px-2.5 py-1 bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-300 text-xs font-semibold rounded-lg flex items-center gap-1">
+                        <span className="material-symbols-outlined text-[14px]">schedule</span>
+                        Lưu trú: {new Date(booking.checkIn).toLocaleDateString('vi-VN')} ({new Date(booking.checkIn).toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' })}) → {new Date(booking.checkOut).toLocaleDateString('vi-VN')} ({new Date(booking.checkOut).toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' })}) • {Math.max(1, Math.round((new Date(booking.checkOut).getTime() - new Date(booking.checkIn).getTime()) / 86400000))} ngày
+                      </span>
+                    ) : (
+                      <span className="px-2 py-1 bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-300 text-xs font-semibold rounded-lg flex items-center gap-1">
+                        <span className="material-symbols-outlined text-[14px]">schedule</span>
+                        Bắt đầu: {booking.date} • {booking.time}
+                        {estimatedEndTime ? ` - Dự kiến xong: ${estimatedEndTime}` : ''}
+                      </span>
+                    )}
                   </div>
                   <p className="text-xs text-slate-500 mt-1">🐾 {booking.petName}</p>
                   {booking.staffId && (
