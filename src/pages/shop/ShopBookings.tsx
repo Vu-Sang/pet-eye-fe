@@ -865,10 +865,21 @@ export default function ShopBookings() {
                                             <p className="text-xs font-bold text-slate-700 dark:text-white">#{(selectedBooking.bookingId || selectedBooking.id)}</p>
                                         </div>
                                         <div>
-                                            <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1.5">Thời gian hẹn</p>
-                                            <p className="text-xs font-bold text-slate-700 dark:text-white">
-                                                {format(parseISO(selectedBooking.appointmentDatetime), "HH:mm - dd/MM/yyyy")}
-                                            </p>
+                                            <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1.5">Thời gian hẹn / Lưu trú</p>
+                                            {selectedBooking.checkIn && selectedBooking.checkOut ? (
+                                                <div>
+                                                    <p className="text-xs font-bold text-slate-700 dark:text-white">
+                                                        Lưu trú: {format(parseISO(selectedBooking.checkIn), "dd/MM/yyyy")} → {format(parseISO(selectedBooking.checkOut), "dd/MM/yyyy")}
+                                                    </p>
+                                                    <p className="text-[11px] font-semibold text-indigo-600 dark:text-indigo-400 mt-0.5">
+                                                        ({Math.max(1, Math.round((new Date(selectedBooking.checkOut).getTime() - new Date(selectedBooking.checkIn).getTime()) / (1000 * 60 * 60 * 24)))} ngày • Giờ hẹn: {format(parseISO(selectedBooking.appointmentDatetime), "HH:mm")})
+                                                    </p>
+                                                </div>
+                                            ) : (
+                                                <p className="text-xs font-bold text-slate-700 dark:text-white">
+                                                    {format(parseISO(selectedBooking.appointmentDatetime), "HH:mm - dd/MM/yyyy")}
+                                                </p>
+                                            )}
                                         </div>
                                     </div>
 

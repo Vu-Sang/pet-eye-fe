@@ -138,14 +138,15 @@ export const shopService = {
     return response.data.result ?? [];
   },
 
-  /** Search verified shops with pagination (10 per page). */
+  /** Search verified shops with pagination (4 per page). */
   searchPublicPaged: async (params?: {
     keyword?: string;
     city?: string;
     shopType?: string;
     page?: number;
+    size?: number;
   }): Promise<{ content: ShopPublicResponse[]; page: number; size: number; totalElements: number; totalPages: number; last: boolean }> => {
-    const response = await apiClient.get<ApiResponse<{ content: ShopPublicResponse[]; page: number; size: number; totalElements: number; totalPages: number; last: boolean }>>('/shops/public/paged', { params });
+    const response = await apiClient.get<ApiResponse<{ content: ShopPublicResponse[]; page: number; size: number; totalElements: number; totalPages: number; last: boolean }>>('/shops/public/paged', { params: { size: 4, ...params } });
     return response.data.result!;
   },
 
